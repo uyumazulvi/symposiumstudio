@@ -1,0 +1,2061 @@
+/* ==========================================================================
+   SYMPOSIUM STUDIO — BROADCAST CONTROL ROOM & SWISS EDITORIAL SYSTEM
+   Design Philosophy:
+     - Card-free editorial flow: Typography, whitespace & horizontal hairlines
+     - Centered live translation: The translation stream is the hero of the interface
+     - Muted warm anthracite palette: #171816 base, #20211E surfaces, #363731 dividers
+     - Controlled accents: #65C7B0 turquoise, #D6A66B muted amber
+   ========================================================================== */
+
+:root {
+  /* Renk Hiyerarşisi */
+  --bg-root: #171816;
+  --bg-surface: #20211E;
+  --bg-surface-elevated: #262722;
+  --bg-surface-active: #2D2E28;
+  --bg-surface-hover: #242520;
+
+  --border-hairline: #363731;
+  --border-subtle: #2A2B25;
+  --border-focus: #4F5047;
+
+  --text-primary: #F0EFE8;
+  --text-secondary: #A09F96;
+  --text-tertiary: #6E6D66;
+  --text-dim: #504F49;
+
+  /* Fonksiyonel ve Akustik Vurgular */
+  --accent-cyan: #65C7B0;
+  --accent-cyan-subtle: rgba(101, 199, 176, 0.10);
+  --accent-cyan-border: rgba(101, 199, 176, 0.35);
+
+  --accent-amber: #D6A66B;
+  --accent-amber-subtle: rgba(214, 166, 107, 0.10);
+  --accent-amber-border: rgba(214, 166, 107, 0.35);
+
+  --accent-crimson: #D95D5D;
+  --accent-crimson-subtle: rgba(217, 93, 93, 0.12);
+
+  /* Tipografi */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Grid & Ölçüler */
+  --header-height: 56px;
+  --switcher-height: 108px;
+  --radius-xs: 3px;
+  --radius-sm: 5px;
+  --radius-md: 7px;
+
+  /* Geçişler */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 140ms var(--ease-out);
+  --transition-med: 220ms var(--ease-out);
+}
+
+/* ==========================================================================
+   RESET & TEMEL TİPOGRAFİ
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-root);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  user-select: none;
+}
+
+/* Modal ve Gizlilik Kuralları */
+.hidden,
+.modal-backdrop.hidden {
+  display: none !important;
+}
+
+button {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 1px;
+}
+
+/* ==========================================================================
+   1. ÜST KONTROL & EDİTORYAL YAYIN ÇUBUĞU (HEADER)
+   ========================================================================== */
+.app-header {
+  height: var(--header-height);
+  background-color: var(--bg-root);
+  border-bottom: 1px solid var(--border-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  position: relative;
+  z-index: 50;
+  flex-shrink: 0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.wordmark-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  letter-spacing: -0.01em;
+}
+
+.brand-wordmark {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+}
+
+.brand-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: var(--accent-cyan);
+}
+
+.header-divider {
+  width: 1px;
+  height: 18px;
+  background-color: var(--border-hairline);
+}
+
+/* Oturum Durumu */
+.session-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xs);
+  transition: all var(--transition-fast);
+}
+
+.session-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--text-tertiary);
+  transition: background-color var(--transition-fast);
+}
+
+.session-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.session-label:empty {
+  display: none;
+}
+
+.session-pill.idle {
+  padding: 5px 6px;
+}
+
+.session-pill.recording,
+.session-pill.live {
+  padding: 3px 8px;
+  background-color: var(--accent-cyan-subtle);
+  border-color: var(--accent-cyan-border);
+}
+
+.session-pill.recording .session-dot,
+.session-pill.live .session-dot {
+  background-color: var(--accent-cyan);
+}
+
+.session-pill.recording .session-label,
+.session-pill.live .session-label {
+  color: var(--accent-cyan);
+}
+
+/* Swiss Ana Navigasyon Sekmeleri */
+.studio-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background-color: var(--bg-surface);
+  padding: 3px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-hairline);
+}
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: var(--radius-xs);
+  transition: all var(--transition-fast);
+}
+
+.nav-btn-icon svg {
+  width: 13px;
+  height: 13px;
+  display: block;
+}
+
+.nav-btn:hover {
+  color: var(--text-primary);
+}
+
+.nav-btn.active {
+  color: var(--text-primary);
+  background-color: var(--bg-surface-elevated);
+  font-weight: 600;
+}
+
+.lang-tag-indicator {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 6px;
+  background-color: var(--bg-root);
+  border: 1px solid var(--border-hairline);
+  color: var(--accent-amber);
+  border-radius: var(--radius-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* Sağ Kontroller */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* VU Metre */
+.meter-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xs);
+}
+
+.meter-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+}
+
+.vu-leds {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 12px;
+}
+
+.vu-led {
+  width: 3px;
+  height: 9px;
+  border-radius: 1px;
+  background-color: #2D2E28;
+  transition: background-color 60ms ease-out;
+}
+
+.vu-led.lit {
+  background-color: var(--accent-cyan);
+}
+
+.vu-led.lit:nth-child(n+6) {
+  background-color: var(--accent-amber);
+}
+
+.vu-led.peak.lit {
+  background-color: var(--accent-crimson);
+}
+
+/* Mikrofon Modu */
+.mic-mode-toggle {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  padding: 2px;
+  border-radius: var(--radius-xs);
+}
+
+.mode-pill {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: var(--radius-xs);
+  transition: all var(--transition-fast);
+}
+
+.mode-pill:hover {
+  color: var(--text-primary);
+}
+
+.mode-pill.active {
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Araç Butonları */
+.utility-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.util-btn {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.util-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+.util-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+  border-color: var(--border-hairline);
+}
+
+.util-btn.danger:hover {
+  color: var(--accent-crimson);
+  background-color: var(--accent-crimson-subtle);
+  border-color: rgba(217, 93, 93, 0.3);
+}
+
+/* ==========================================================================
+   2. ÇALIŞMA ALANI DÜZENİ
+   ========================================================================== */
+.workspace-view {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--bg-root);
+}
+
+/* ==========================================================================
+   3. CANLI ÇEVİRİ SAHNESİ — KARTSIZ, EDİTORYAL MERKEZ (HERO STAGE)
+   ========================================================================== */
+.teleprompter-stage {
+  padding: 28px 36px 32px 36px;
+  background-color: var(--bg-root);
+  border-bottom: 1px solid var(--border-hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Üst Dateline / Meta Satırı (Yatay Ayrım) */
+.stage-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.speaker-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-cyan);
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.speaker-name-hero {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.meta-slash {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.speaker-accent-hero {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+/* Dil Köprüsü */
+.stage-language-bridge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.language-bridge-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xs);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.language-bridge-btn:hover {
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-focus);
+}
+
+.bridge-arrow {
+  width: 12px;
+  height: 12px;
+  color: var(--accent-amber);
+}
+
+.engine-indicator {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-secondary);
+}
+
+/* Orijinal Konuşma Akışı (Subdued / Referans Metin) */
+.stage-source-area {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.source-stream-text {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  font-style: italic;
+  max-width: 1200px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* BÜYÜK VE NET CANLI ÇEVİRİ ALTYAZISI — KARTSIZ, YALIN EDİTORYAL ALAN */
+.stage-caption-canvas {
+  background: transparent;
+  border: none;
+  padding: 4px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.caption-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.caption-badge {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+}
+
+.caption-stream-text {
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  word-break: break-word;
+  white-space: pre-wrap;
+  min-height: 84px;
+  max-width: 1350px;
+}
+
+/* ==========================================================================
+   4. OTURUM TUTANAĞI — KARTSIZ EDİTORYAL KRONOLOJİ (LEDGER STREAM)
+   ========================================================================== */
+.transcript-journal {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--bg-root);
+  min-height: 160px;
+}
+
+.journal-header {
+  padding: 14px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-hairline);
+  background-color: var(--bg-root);
+  flex-shrink: 0;
+}
+
+.journal-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.journal-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text-secondary);
+}
+
+.journal-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 7px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xs);
+  color: var(--text-tertiary);
+}
+
+.journal-filter-switch {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  padding: 2px;
+  border-radius: var(--radius-xs);
+}
+
+.journal-filter-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: var(--radius-xs);
+  transition: all var(--transition-fast);
+}
+
+.journal-filter-btn:hover {
+  color: var(--text-primary);
+}
+
+.journal-filter-btn.active {
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Tutanak Akış Listesi */
+.journal-feed {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 36px;
+  display: flex;
+  flex-direction: column;
+  scroll-behavior: smooth;
+}
+
+.journal-feed::-webkit-scrollbar {
+  width: 5px;
+}
+
+.journal-feed::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.journal-feed::-webkit-scrollbar-thumb {
+  background: var(--border-hairline);
+  border-radius: 2px;
+}
+
+.journal-feed::-webkit-scrollbar-thumb:hover {
+  background: var(--border-focus);
+}
+
+/* Sade Özgün Empty State */
+.journal-empty-state {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 20px;
+  max-width: 460px;
+}
+
+.empty-wave-graphic {
+  width: 48px;
+  height: 24px;
+  margin-bottom: 16px;
+  color: var(--text-dim);
+}
+
+.empty-wave-graphic svg {
+  width: 100%;
+  height: 100%;
+}
+
+.empty-primary {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.empty-secondary {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+}
+
+/* Tutanak Girişi — KARTSIZ, YATAY AYIRICILARLA EDİTORYAL AKIŞ */
+.journal-entry {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-hairline);
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: background-color var(--transition-fast);
+}
+
+.journal-entry:last-child {
+  border-bottom: 1px solid transparent;
+}
+
+.entry-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.entry-speaker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.entry-speaker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.entry-speaker-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.entry-meta-divider {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.entry-speaker-accent {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.entry-timestamp {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.entry-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.entry-original {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  font-style: italic;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.entry-translation {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ==========================================================================
+   5. RAFİNE KONUŞMACI KONTROL ŞERİDİ (HARDWARE SWITCHER STRIP)
+   ========================================================================== */
+.switcher-console {
+  background-color: var(--bg-surface);
+  border-top: 1px solid var(--border-hairline);
+  padding: 12px 36px 14px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 30;
+}
+
+.console-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.console-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hint-accent-bar {
+  width: 3px;
+  height: 12px;
+  background-color: var(--accent-amber);
+  border-radius: 1px;
+}
+
+.hint-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.hint-label strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.console-add-speaker-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xs);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+}
+
+.console-add-speaker-btn svg {
+  width: 13px;
+  height: 13px;
+  color: var(--accent-cyan);
+}
+
+.console-add-speaker-btn:hover {
+  background-color: var(--bg-surface-active);
+  border-color: var(--border-focus);
+}
+
+/* Donanım Tipi Switcher Şeridi */
+.switcher-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.switcher-pad,
+.studio-pad {
+  background-color: var(--bg-root);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xs);
+  padding: 9px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 60px;
+  position: relative;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform 60ms ease-out;
+}
+
+.switcher-pad:hover,
+.studio-pad:hover {
+  background-color: var(--bg-surface-hover);
+  border-color: var(--border-focus);
+}
+
+.switcher-pad.pressed,
+.studio-pad.pressed {
+  background-color: var(--bg-surface-active) !important;
+  border-color: var(--accent-cyan) !important;
+  transform: scale(0.99);
+}
+
+.switcher-pad.active,
+.studio-pad.active {
+  background-color: var(--bg-surface-elevated);
+  border-color: var(--accent-cyan-border);
+}
+
+.pad-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pad-monogram {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-primary);
+}
+
+.pad-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pad-edit-btn {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  border-radius: var(--radius-xs);
+  transition: all var(--transition-fast);
+}
+
+.pad-edit-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+.pad-edit-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+}
+
+.pad-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--border-focus);
+  transition: background-color var(--transition-fast);
+}
+
+.switcher-pad.active .pad-status-dot,
+.studio-pad.active .pad-status-dot {
+  background-color: var(--accent-cyan);
+}
+
+.pad-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.pad-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pad-accent {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pad-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.pad-trigger-text {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+.switcher-pad.active .pad-trigger-text,
+.studio-pad.active .pad-trigger-text {
+  color: var(--accent-cyan);
+}
+
+.console-stop-btn {
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: var(--accent-crimson-subtle);
+  border: 1px solid rgba(217, 93, 93, 0.4);
+  border-radius: var(--radius-xs);
+  color: var(--accent-crimson);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+
+.console-stop-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.console-stop-btn:hover {
+  background-color: rgba(217, 93, 93, 0.22);
+}
+
+.console-stop-btn.start-mode {
+  background-color: rgba(101, 199, 176, 0.12);
+  border-color: rgba(101, 199, 176, 0.4);
+  color: var(--accent-teal);
+}
+
+.console-stop-btn.start-mode:hover {
+  background-color: rgba(101, 199, 176, 0.22);
+}
+
+/* ==========================================================================
+   6. TOPLANTI VE ÇEVİRİ DİLİ YAPILANDIRMASI — KARTSIZ EDİTORYAL DÜZEN
+   ========================================================================== */
+.language-workspace {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.lang-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.lang-page-title {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.lang-page-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.lang-matrix-board {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 24px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.matrix-card {
+  background: transparent;
+  border: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.matrix-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.matrix-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.matrix-dot.source {
+  background-color: var(--accent-amber);
+}
+
+.matrix-dot.target {
+  background-color: var(--accent-cyan);
+}
+
+.matrix-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+
+.matrix-select-wrap {
+  position: relative;
+}
+
+.matrix-select {
+  width: 100%;
+  padding: 11px 14px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xs);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23A09F96' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  transition: border-color var(--transition-fast);
+}
+
+.matrix-select:focus {
+  border-color: var(--accent-cyan);
+}
+
+.matrix-hint {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  line-height: 1.4;
+}
+
+.matrix-swap-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.matrix-swap-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-xs);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.matrix-swap-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.matrix-swap-btn:hover {
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-focus);
+}
+
+.presets-block {
+  background: transparent;
+  border: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.presets-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+
+.presets-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.preset-pill {
+  padding: 6px 14px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xs);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.preset-pill:hover {
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-focus);
+}
+
+.matrix-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.matrix-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 22px;
+  background-color: var(--accent-cyan);
+  color: #0E1A17;
+  border-radius: var(--radius-xs);
+  font-size: 13.5px;
+  font-weight: 600;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.matrix-submit-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+.matrix-submit-btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   7. MODALLAR VE DİYALOGLAR
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(14, 15, 13, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 480px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalIn 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-title-icon {
+  width: 17px;
+  height: 17px;
+  color: var(--accent-cyan);
+}
+
+.modal-heading {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.modal-close-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  border-radius: var(--radius-xs);
+  transition: all var(--transition-fast);
+}
+
+.modal-close-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+.modal-close-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-surface-elevated);
+}
+
+.modal-body {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.field-block label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.field-link {
+  font-size: 12px;
+  color: var(--accent-cyan);
+  text-decoration: none;
+}
+
+.field-link:hover {
+  text-decoration: underline;
+}
+
+.field-input {
+  width: 100%;
+  padding: 9px 12px;
+  background-color: var(--bg-root);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xs);
+  color: var(--text-primary);
+  font-size: 13.5px;
+  transition: border-color var(--transition-fast);
+}
+
+.field-input:focus {
+  border-color: var(--accent-cyan);
+}
+
+.field-description {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-tertiary);
+}
+
+.modal-footer {
+  padding: 14px 22px;
+  border-top: 1px solid var(--border-hairline);
+  background-color: var(--bg-root);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-footer.split {
+  justify-content: space-between;
+}
+
+.footer-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-ghost {
+  padding: 8px 16px;
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xs);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.btn-ghost:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-surface-elevated);
+}
+
+.btn-solid {
+  padding: 8px 18px;
+  background-color: var(--accent-cyan);
+  color: #0E1A17;
+  border-radius: var(--radius-xs);
+  font-size: 13px;
+  font-weight: 600;
+  transition: opacity var(--transition-fast);
+}
+
+.btn-solid:hover {
+  opacity: 0.92;
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background-color: var(--accent-crimson-subtle);
+  border: 1px solid rgba(217, 93, 93, 0.35);
+  border-radius: var(--radius-xs);
+  color: var(--accent-crimson);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+.btn-danger svg {
+  width: 14px;
+  height: 14px;
+}
+
+.btn-danger:hover {
+  background-color: rgba(217, 93, 93, 0.22);
+}
+
+/* ==========================================================================
+   8. SİSTEM TOAST BİLDİRİMİ
+   ========================================================================== */
+.system-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(40px);
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-primary);
+  padding: 8px 18px;
+  border-radius: var(--radius-xs);
+  font-size: 12.5px;
+  font-weight: 500;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  opacity: 0;
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
+  z-index: 120;
+}
+
+.system-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ==========================================================================
+   9. GELİŞMİŞ MOBİL VE TABLET UYARLAMALARI (MOBILE EXPERIENCE)
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .app-header {
+    padding: 0 16px;
+  }
+  .teleprompter-stage {
+    padding: 20px 20px 24px 20px;
+  }
+  .journal-header {
+    padding: 12px 20px;
+  }
+  .journal-feed {
+    padding: 0 20px;
+  }
+  .switcher-console {
+    padding: 10px 20px;
+  }
+  .lang-matrix-board {
+    grid-template-columns: 1fr;
+  }
+  .matrix-swap-col {
+    transform: rotate(90deg);
+  }
+}
+
+@media (max-width: 768px) {
+  /* Header: İki Katmanlı, Sıkışmayan Ergonomik Üst Çubuk */
+  /* Header: 2-Satır Grid — Marka ve Kontroller Üstte, Navigasyon Altta */
+  .app-header {
+    height: auto;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "brand controls"
+      "nav nav";
+    gap: 8px 10px;
+    padding: 8px 12px 10px 12px;
+    border-bottom: 1px solid var(--border-hairline);
+    background-color: var(--bg-root);
+  }
+
+  .header-left {
+    grid-area: brand;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .header-divider,
+  .brand-sub {
+    display: none;
+  }
+
+  .brand-wordmark {
+    font-size: 13.5px;
+    letter-spacing: 0.06em;
+  }
+
+  .session-pill {
+    padding: 3px 6px;
+  }
+
+  .header-right {
+    grid-area: controls;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .meter-block {
+    display: none; /* Mobilde VU metre gizlenerek yatay taşma önlenir */
+  }
+
+  .mic-mode-toggle {
+    padding: 1px;
+    flex-shrink: 0;
+  }
+
+  .mode-pill {
+    padding: 4px 7px;
+    font-size: 10.5px;
+  }
+
+  .utility-actions {
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .util-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .util-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  /* 2. Satır: Tam Genişlikte %50-%50 Eşit Dağılan Navigasyon */
+  .studio-nav {
+    grid-area: nav;
+    display: flex;
+    width: 100%;
+    gap: 4px;
+    padding: 2px;
+    background-color: var(--bg-surface);
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--border-hairline);
+  }
+
+  .nav-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 6px 10px;
+    font-size: 11.5px;
+    min-height: 32px;
+    white-space: nowrap;
+  }
+
+  .nav-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .lang-tag-indicator {
+    font-size: 9px;
+    padding: 1px 4px;
+  }
+
+  /* Mobilde VU Metre Sadeleştirilir */
+  .meter-block {
+    padding: 3px 6px;
+    gap: 4px;
+  }
+
+  .meter-label {
+    font-size: 8px;
+  }
+
+  .vu-leds {
+    gap: 2px;
+    height: 9px;
+  }
+
+  .vu-led {
+    width: 2.5px;
+    height: 8px;
+  }
+
+  /* Mod Butonları Mobilde Kompakt */
+  .mic-mode-toggle {
+    padding: 1px;
+  }
+
+  .mode-pill {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  /* Araç Butonları */
+  .utility-actions {
+    gap: 2px;
+  }
+
+  .util-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .util-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  /* Canlı Çeviri Sahnesi (Teleprompter) */
+  .teleprompter-stage {
+    padding: 14px 14px 12px 14px;
+    gap: 8px;
+  }
+
+  .stage-meta-row {
+    padding-bottom: 8px;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .speaker-identity {
+    gap: 6px;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+
+  .status-indicator-dot {
+    width: 7px;
+    height: 7px;
+  }
+
+  .speaker-name-hero {
+    font-size: 14.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+  }
+
+  .meta-slash {
+    font-size: 11px;
+  }
+
+  .speaker-accent-hero {
+    font-size: 11.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 110px;
+  }
+
+  .stage-language-bridge {
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .language-bridge-btn {
+    padding: 3px 8px;
+    font-size: 11px;
+    gap: 5px;
+  }
+
+  .bridge-arrow {
+    width: 10px;
+    height: 10px;
+  }
+
+  /* Kaynak ve Çeviri Metinleri */
+  .stage-source-area {
+    gap: 2px;
+  }
+
+  .source-stream-text {
+    font-size: 12.5px;
+    line-height: 1.45;
+    max-height: 38px;
+    overflow-y: auto;
+  }
+
+  .stage-caption-canvas {
+    padding: 0;
+    gap: 6px;
+  }
+
+  .caption-badge {
+    font-size: 9.5px;
+  }
+
+  .caption-stream-text {
+    font-size: 21px;
+    line-height: 1.4;
+    min-height: 52px;
+    max-height: 160px;
+    overflow-y: auto;
+    letter-spacing: -0.015em;
+  }
+
+  /* Oturum Tutanağı (Journal Feed) */
+  .transcript-journal {
+    min-height: 110px;
+  }
+
+  .journal-header {
+    padding: 8px 14px;
+  }
+
+  .journal-title {
+    font-size: 10px;
+  }
+
+  .journal-count {
+    font-size: 9px;
+    padding: 1px 5px;
+  }
+
+  .journal-filter-switch {
+    padding: 1px;
+  }
+
+  .journal-filter-btn {
+    padding: 3px 7px;
+    font-size: 11px;
+  }
+
+  .journal-feed {
+    padding: 0 14px;
+  }
+
+  .journal-entry {
+    padding: 10px 0;
+    gap: 6px;
+  }
+
+  .entry-speaker-name {
+    font-size: 12px;
+  }
+
+  .entry-speaker-accent {
+    font-size: 11px;
+  }
+
+  .entry-timestamp {
+    font-size: 10px;
+  }
+
+  .entry-original {
+    font-size: 12px;
+  }
+
+  .entry-translation {
+    font-size: 14.5px;
+    line-height: 1.45;
+  }
+
+  .switcher-console {
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px)) 12px;
+    gap: 6px;
+    background-color: var(--bg-surface);
+    border-top: 1px solid var(--border-hairline);
+    flex-shrink: 0;
+  }
+
+  .console-action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .console-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .hint-accent-bar {
+    height: 10px;
+    flex-shrink: 0;
+  }
+
+  .hint-label {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  .console-add-speaker-btn {
+    flex-shrink: 0;
+    padding: 3px 8px;
+    font-size: 11px;
+    gap: 4px;
+    white-space: nowrap;
+  }
+
+  .console-add-speaker-btn svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  /* Bütün Konuşmacılar Ekrana Tam Sığar */
+  .switcher-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+    gap: 6px;
+    width: 100%;
+    overflow: visible;
+  }
+
+  .switcher-pad,
+  .studio-pad {
+    width: 100%;
+    min-width: 0;
+    padding: 6px 8px;
+    min-height: 50px;
+    gap: 3px;
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .pad-head {
+    gap: 6px;
+  }
+
+  .pad-monogram {
+    font-size: 9.5px;
+    padding: 1px 5px;
+  }
+
+  .pad-edit-btn {
+    width: 20px;
+    height: 20px;
+  }
+
+  .pad-edit-btn svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  .pad-status-dot {
+    width: 5px;
+    height: 5px;
+  }
+
+  .pad-name {
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pad-accent {
+    font-size: 9.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pad-trigger-text {
+    font-size: 7.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .console-stop-btn {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+
+  /* Dil Yapılandırma Sayfası */
+  .language-workspace {
+    padding: 16px 14px calc(24px + env(safe-area-inset-bottom, 0px)) 14px;
+    gap: 18px;
+  }
+
+  .lang-page-header {
+    padding-bottom: 12px;
+  }
+
+  .lang-page-title {
+    font-size: 18px;
+  }
+
+  .lang-page-desc {
+    font-size: 12.5px;
+  }
+
+  .lang-matrix-board {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding-bottom: 18px;
+  }
+
+  .matrix-swap-col {
+    margin: 4px auto;
+  }
+
+  .matrix-swap-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* iOS Auto-Zoom Engelleyici: Mobilde input en az 16px olmalı */
+  .matrix-select,
+  .field-input {
+    font-size: 16px !important;
+    padding: 9px 12px;
+  }
+
+  .presets-block {
+    padding-bottom: 18px;
+    gap: 10px;
+  }
+
+  .presets-row {
+    gap: 6px;
+  }
+
+  .preset-pill {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .matrix-submit-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 11px;
+    font-size: 13.5px;
+  }
+
+  /* Modallar: Mobilde Bottom-Sheet Formuna Geçer */
+  .modal-backdrop {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .modal-card {
+    max-width: 100%;
+    width: 100%;
+    border-radius: 14px 14px 0 0;
+    max-height: 88vh;
+    border-bottom: none;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
+  }
+
+  .modal-header {
+    padding: 14px 18px;
+  }
+
+  .modal-body {
+    padding: 16px 18px;
+    gap: 14px;
+    overflow-y: auto;
+  }
+
+  .modal-footer {
+    padding: 12px 18px calc(14px + env(safe-area-inset-bottom, 0px)) 18px;
+  }
+
+  .btn-solid,
+  .btn-ghost,
+  .btn-danger {
+    padding: 9px 14px;
+    font-size: 12.5px;
+  }
+
+  /* Toast: Alt konsolun üzerine hizalanır */
+  .system-toast {
+    bottom: calc(75px + env(safe-area-inset-bottom, 0px));
+    max-width: 88%;
+    font-size: 12px;
+    padding: 7px 14px;
+    text-align: center;
+  }
+}
+
+/* Küçük Ekranlar (iPhone SE, 360px - 400px) */
+@media (max-width: 420px) {
+  .speaker-name-hero {
+    max-width: 110px;
+  }
+  .speaker-accent-hero {
+    max-width: 90px;
+  }
+  .switcher-pad,
+  .studio-pad {
+    flex: 0 0 135px;
+    min-width: 135px;
+  }
+  .caption-stream-text {
+    font-size: 19px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

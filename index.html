@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SYMPOSIUM STUDIO — Canlı Konferans & Simultane Çeviri</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- =========================================================================
+       1. ÜST KONTROL & EDİTORYAL NAVİGASYON (BROADCAST CONTROL BAR)
+       ========================================================================= -->
+  <header class="app-header">
+    <div class="header-left">
+      <!-- Tipografik Wordmark & Durum -->
+      <div class="brand-group">
+        <div class="wordmark-wrap">
+          <span class="brand-wordmark">SYMPOSIUM</span>
+          <span class="brand-sub">STUDIO</span>
+        </div>
+
+        <div class="header-divider"></div>
+
+        <!-- Sakin Oturum Durumu -->
+        <div id="recordingPill" class="session-pill idle" title="Oturum Durumu">
+          <span class="session-dot"></span>
+          <span id="statusLabel" class="session-label"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ana Navigasyon Sekmeleri (Swiss Tabs) -->
+    <nav class="studio-nav" aria-label="Ana Navigasyon">
+      <button id="tabLiveBtn" class="nav-btn active" role="tab" aria-selected="true">
+        <span class="nav-btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+        </span>
+        <span>Canlı Oturum</span>
+      </button>
+
+      <button id="tabLangBtn" class="nav-btn" role="tab" aria-selected="false">
+        <span class="nav-btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+        </span>
+        <span>Toplantı ve Çeviri</span>
+        <span id="activeLangBadgePill" class="lang-tag-indicator">EN → TR</span>
+      </button>
+    </nav>
+
+    <!-- Sağ: Kontroller, VU Metre ve Araçlar -->
+    <div class="header-right">
+      <!-- Mikrofon Giriş Seviyesi (VU Meter) -->
+      <div class="meter-block" title="Mikrofon Seviyesi (VU Metre)">
+        <span class="meter-label">MIC</span>
+        <div class="vu-leds" id="vuLeds">
+          <span class="vu-led"></span>
+          <span class="vu-led"></span>
+          <span class="vu-led"></span>
+          <span class="vu-led"></span>
+          <span class="vu-led"></span>
+          <span class="vu-led"></span>
+          <span class="vu-led"></span>
+          <span class="vu-led peak"></span>
+        </div>
+      </div>
+
+      <div class="header-divider"></div>
+
+      <!-- Mikrofon Modu (Segmented Controller) -->
+      <div class="mic-mode-toggle" role="tablist" aria-label="Mikrofon Çalışma Modu">
+        <button id="modePttBtn" class="mode-pill active" role="tab" aria-selected="true" title="Telsiz tipi basılı tutarak konuşma">
+          Bas-Konuş
+        </button>
+        <button id="modeTapBtn" class="mode-pill" role="tab" aria-selected="false" title="Tek tıkla konuşmacı geçişi">
+          Sürekli Akış
+        </button>
+      </div>
+
+      <div class="header-divider"></div>
+
+      <!-- Araç Butonları (Net ve İşlevsel) -->
+      <div class="utility-actions">
+        <button id="settingsBtn" class="util-btn" title="Yapılandırma & API">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+        <button id="copyScriptBtn" class="util-btn" title="Tüm Tutanağı Kopyala">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+          </svg>
+        </button>
+        <button id="downloadScriptBtn" class="util-btn" title="Dökümü TXT İndir">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" y2="3"/>
+          </svg>
+        </button>
+        <button id="clearBtn" class="util-btn danger" title="Tüm Oturum Kaydını Sıfırla">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 6h18"/>
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       GÖRÜNÜM 1: CANLI OTURUM & YAYIN SAHNESİ (PRIMARY WORKSPACE)
+       ========================================================================= -->
+  <main id="viewLiveSection" class="workspace-view active">
+    
+    <!-- 2. CANLI ÇEVİRİ VE ALTYAZI SAHNESİ (BROADCAST TELEPROMPTER) -->
+    <section class="teleprompter-stage" aria-label="Canlı Çeviri ve Altyazı">
+      <!-- Üst Meta Çubuğu (Gereksiz Rozetler Olmadan, Tipografik Netlik) -->
+      <div class="stage-meta-row">
+        <div class="speaker-identity">
+          <span id="speakerAvatarDot" class="status-indicator-dot"></span>
+          <span id="activeSpeakerNameDisplay" class="speaker-name-hero">Konuşmacı Seçilmedi</span>
+          <span class="meta-slash">/</span>
+          <span id="activeSpeakerAccentDisplay" class="speaker-accent-hero">Amerikan İngilizcesi</span>
+        </div>
+
+        <div class="stage-language-bridge">
+          <button id="quickLangBadgeBtn" class="language-bridge-btn" title="Dilleri Değiştir">
+            <span id="badgeSourceText">İngilizce</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="bridge-arrow">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+            <span id="badgeTargetText">Türkçe</span>
+          </button>
+          
+          <span id="liveEngineBadge" class="engine-indicator hidden"></span>
+        </div>
+      </div>
+
+      <!-- Orijinal Konuşma Akışı (Subdued / Referans Metin) -->
+      <div class="stage-source-area">
+        <p id="liveOriginalStream" class="source-stream-text">
+          Sistemi başlatmak için aşağıdaki konuşmacı tuşuna dokunun veya basılı tutun...
+        </p>
+      </div>
+
+      <!-- BÜYÜK VE NET CANLI ÇEVİRİ ALTYAZISI (ODAK NOKTASI) -->
+      <div class="stage-caption-canvas">
+        <div class="caption-header">
+          <span id="targetLangLabelBadge" class="caption-badge">TÜRKÇE ALTYAZI</span>
+        </div>
+        <p id="liveTranslationStream" class="caption-stream-text">
+          Konuşmacı başladığında simultane çeviri bu alanda büyük ve akıcı bir tipografiyle görüntülenecektir.
+        </p>
+      </div>
+    </section>
+
+    <!-- 3. OTURUM TUTANAĞI (EDİTORYAL KRONOLOJİ) -->
+    <section class="transcript-journal" aria-label="Oturum Tutanağı">
+      <div class="journal-header">
+        <div class="journal-title-wrap">
+          <span class="journal-title">OTURUM TUTANAĞI</span>
+          <span id="historyCounter" class="journal-count">0 Kayıt</span>
+        </div>
+
+        <div class="journal-filter-switch">
+          <button id="viewAllBtn" class="journal-filter-btn active">Çift Dilli</button>
+          <button id="viewTrBtn" class="journal-filter-btn">Yalnızca Çeviri</button>
+        </div>
+      </div>
+
+      <div id="transcriptFeed" class="journal-feed">
+        <!-- Sade, Özgün Empty State (AI Kartı Değil, Tasarlanmış Bir Ürün Parçası) -->
+        <div id="emptyNotice" class="journal-empty-state">
+          <div class="empty-wave-graphic">
+            <svg viewBox="0 0 48 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M2 12h8l3-8 6 16 6-12 4 8 3-4h16"/>
+            </svg>
+          </div>
+          <p class="empty-primary">Oturum henüz başlatılmadı</p>
+          <p class="empty-secondary">Konuşmacı seçip konuşmaya başladığınızda tüm diyaloglar zaman damgasıyla buraya kaydedilecektir.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. RAFİNE KONUŞMACI KONTROL ŞERİDİ (BROADCAST SWITCHER) -->
+    <footer class="switcher-console">
+      <div class="console-action-bar">
+        <div class="console-hint">
+          <span class="hint-accent-bar"></span>
+          <span id="dockInstructionText" class="hint-label">
+            <strong>Bas-Konuş Aktif:</strong> Konuşurken tuşa basılı tutun, bitince bırakın.
+          </span>
+        </div>
+
+        <button id="addNewSpeakerBtn" class="console-add-speaker-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          <span>Konuşmacı Ekle</span>
+        </button>
+      </div>
+
+      <!-- RAFİNE KONUŞMACI ŞERİDİ -->
+      <div id="soundboardGrid" class="switcher-strip">
+        <!-- JS Dinamik Olarak Rafine Butonlar Üretecek -->
+      </div>
+
+      <!-- Sürekli Akış Modunda Dinlemeyi Başlat / Durdur Butonu -->
+      <button id="stopSessionBtn" class="console-stop-btn start-mode hidden" title="Dinlemeyi Başlat">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="6 4 20 12 6 20 6 4"/>
+        </svg>
+        <span>Dinlemeyi Başlat</span>
+      </button>
+    </footer>
+
+  </main>
+
+  <!-- =========================================================================
+       GÖRÜNÜM 2: DİL VE ÇEVİRİ YAPILANDIRMASI (LANGUAGE SETUP)
+       ========================================================================= -->
+  <div id="viewLanguageSection" class="workspace-view hidden">
+    <div class="language-workspace">
+      
+      <div class="lang-page-header">
+        <h2 class="lang-page-title">Toplantı & Çeviri Dili Yapılandırması</h2>
+        <p class="lang-page-desc">Konferans salonunda konuşulan kaynak dili ve altyazıda görüntülenecek hedef dili yapılandırın.</p>
+      </div>
+
+      <!-- Dil Matris Alanı -->
+      <div class="lang-matrix-board">
+        
+        <!-- Sol Sütun: Kaynak Dil -->
+        <div class="matrix-card">
+          <div class="matrix-card-head">
+            <span class="matrix-dot source"></span>
+            <span class="matrix-title">KAYNAK DİL (SAHNEDE KONUŞULAN)</span>
+          </div>
+
+          <div class="matrix-select-wrap">
+            <select id="meetingSourceLangSelect" class="matrix-select">
+              <option value="en-US">İngilizce (ABD - Amerikan)</option>
+              <option value="en-GB">İngilizce (Birleşik Krallık - İngiliz)</option>
+              <option value="en-IN">İngilizce (Hindistan / Asya)</option>
+              <option value="en-AU">İngilizce (Avustralya)</option>
+              <option value="de-DE">Almanca (Almanya / Avusturya)</option>
+              <option value="fr-FR">Fransızca (Fransa)</option>
+              <option value="es-ES">İspanyolca (İspanya / Latin Amerika)</option>
+              <option value="it-IT">İtalyanca (İtalya)</option>
+              <option value="ru-RU">Rusça (Rusya)</option>
+              <option value="ar-SA">Arapça (Standart)</option>
+              <option value="zh-CN">Çince (Mandarin)</option>
+              <option value="ja-JP">Japonca (Japonya)</option>
+              <option value="tr-TR">Türkçe (Türkiye)</option>
+            </select>
+          </div>
+          <span class="matrix-hint">Mikrofon bu dilin fonetik yapısına adapte edilir.</span>
+        </div>
+
+        <!-- Merkez: Swap Butonu -->
+        <div class="matrix-swap-col">
+          <button id="swapLanguagesBtn" class="matrix-swap-btn" title="Dilleri Karşılıklı Değiştir">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Sağ Sütun: Hedef Dil -->
+        <div class="matrix-card">
+          <div class="matrix-card-head">
+            <span class="matrix-dot target"></span>
+            <span class="matrix-title">HEDEF DİL (ALTYAZI & TUTANAK)</span>
+          </div>
+
+          <div class="matrix-select-wrap">
+            <select id="meetingTargetLangSelect" class="matrix-select">
+              <option value="tr" selected>Türkçe (Hedef Altyazı)</option>
+              <option value="en">İngilizce (English)</option>
+              <option value="de">Almanca (Deutsch)</option>
+              <option value="fr">Fransızca (Français)</option>
+              <option value="es">İspanyolca (Español)</option>
+              <option value="it">İtalyanca (Italiano)</option>
+              <option value="ru">Rusça (Русский)</option>
+              <option value="ar">Arapça (العربية)</option>
+              <option value="zh">Çince (中文)</option>
+              <option value="ja">Japonca (日本語)</option>
+            </select>
+          </div>
+          <span class="matrix-hint">Canlı ekranda ve oturum tutanağında görüntülenecek dil.</span>
+        </div>
+
+      </div>
+
+      <!-- Hızlı Ön Ayarlar -->
+      <div class="presets-block">
+        <span class="presets-title">SIK KULLANILAN KONGRE EŞLEŞMELERİ</span>
+        <div class="presets-row">
+          <button class="preset-pill" data-src="en-US" data-tgt="tr">İngilizce → Türkçe</button>
+          <button class="preset-pill" data-src="de-DE" data-tgt="tr">Almanca → Türkçe</button>
+          <button class="preset-pill" data-src="fr-FR" data-tgt="tr">Fransızca → Türkçe</button>
+          <button class="preset-pill" data-src="es-ES" data-tgt="tr">İspanyolca → Türkçe</button>
+          <button class="preset-pill" data-src="tr-TR" data-tgt="en">Türkçe → İngilizce</button>
+        </div>
+      </div>
+
+      <!-- Uygulama Eylemi -->
+      <div class="matrix-footer">
+        <button id="applyLangSettingsBtn" class="matrix-submit-btn">
+          <span>Dilleri Kaydet ve Canlı Yayına Dön</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: SİSTEM AYARLARI & GEMINI API
+       ========================================================================= -->
+  <div id="settingsModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modal-title-icon">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <h3 class="modal-heading">Sistem Yapılandırması</h3>
+        </div>
+        <button type="button" id="closeSettingsBtn" class="modal-close-btn" title="Kapat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="field-block">
+          <div class="field-label-row">
+            <label for="geminiApiKeyInput">Google Gemini API Anahtarı</label>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="field-link">Ücretsiz Anahtar Al &rarr;</a>
+          </div>
+          <input type="password" id="geminiApiKeyInput" placeholder="AIzaSy... (Opsiyonel, boş bırakılırsa varsayılan web motoru kullanılır)" class="field-input">
+          <p class="field-description">
+            Gemini API girildiğinde kongre terimleri, tıp, hukuk ve akademik jargon simultane çevirmen kalitesinde aktarılır.
+          </p>
+        </div>
+
+        <div class="field-block">
+          <label for="fontSizeSelect">Altyazı Punto Boyutu</label>
+          <select id="fontSizeSelect" class="field-input">
+            <option value="compact">Kompakt (22px)</option>
+            <option value="standard" selected>Standart / Kongre (30px)</option>
+            <option value="cinema">Büyük Ekran / Projeksiyon (38px)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="cancelSettingsBtn" class="btn-ghost">Vazgeç</button>
+        <button id="saveSettingsBtn" class="btn-solid">Değişiklikleri Uygula</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: YENİ KONUŞMACI EKLE
+       ========================================================================= -->
+  <div id="addSpeakerModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modal-title-icon">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <line x1="19" y1="8" x2="19" y2="14"/>
+            <line x1="22" y1="11" x2="16" y2="11"/>
+          </svg>
+          <h3 class="modal-heading">Yeni Konuşmacı Profili</h3>
+        </div>
+        <button type="button" id="closeAddSpeakerBtn" class="modal-close-btn" title="Kapat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <form id="addSpeakerForm" class="modal-body">
+        <div class="field-block">
+          <label for="speakerNameInput">Konuşmacı Adı veya Ünvanı</label>
+          <input type="text" id="speakerNameInput" required placeholder="Örn: Prof. Dr. Anderson, Panel Moderatörü" class="field-input" autofocus>
+        </div>
+
+        <div class="field-block">
+          <label for="speakerAccentInput">Telaffuz & Lehçe Uyarlaması</label>
+          <select id="speakerAccentInput" class="field-input">
+            <option value="en-US">Amerikan İngilizcesi (en-US)</option>
+            <option value="en-GB">İngiliz İngilizcesi (en-GB)</option>
+            <option value="en-IN">Hint / Güney Asya İngilizcesi (en-IN)</option>
+            <option value="en-AU">Avustralya İngilizcesi (en-AU)</option>
+            <option value="de-DE">Almanca (de-DE)</option>
+            <option value="fr-FR">Fransızca (fr-FR)</option>
+            <option value="es-ES">İspanyolca (es-ES)</option>
+            <option value="tr-TR">Türkçe (tr-TR)</option>
+          </select>
+          <p class="field-description">
+            Doğru lehçe seçimi, ses motorunun konuşmacının fonetik yapısını doğru kavramasını sağlar.
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="cancelAddSpeakerBtn" class="btn-ghost">Vazgeç</button>
+          <button type="submit" class="btn-solid">Konuşmacıyı Ekle</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL: KONUŞMACI DÜZENLEME & SİLME
+       ========================================================================= -->
+  <div id="editSpeakerModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modal-title-icon">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          <h3 class="modal-heading">Konuşmacıyı Düzenle</h3>
+        </div>
+        <button type="button" id="closeEditSpeakerBtn" class="modal-close-btn" title="Kapat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <form id="editSpeakerForm" class="modal-body">
+        <input type="hidden" id="editSpeakerIdInput">
+
+        <div class="field-block">
+          <label for="editSpeakerNameInput">Konuşmacı Adı veya Ünvanı</label>
+          <input type="text" id="editSpeakerNameInput" required placeholder="İsim girin" class="field-input">
+        </div>
+
+        <div class="field-block">
+          <label for="editSpeakerAccentInput">Telaffuz & Lehçe Uyarlaması</label>
+          <select id="editSpeakerAccentInput" class="field-input">
+            <option value="en-US">Amerikan İngilizcesi (en-US)</option>
+            <option value="en-GB">İngiliz İngilizcesi (en-GB)</option>
+            <option value="en-IN">Hint / Güney Asya İngilizcesi (en-IN)</option>
+            <option value="en-AU">Avustralya İngilizcesi (en-AU)</option>
+            <option value="de-DE">Almanca (de-DE)</option>
+            <option value="fr-FR">Fransızca (fr-FR)</option>
+            <option value="es-ES">İspanyolca (es-ES)</option>
+            <option value="tr-TR">Türkçe (tr-TR)</option>
+          </select>
+        </div>
+
+        <div class="modal-footer split">
+          <button type="button" id="deleteSpeakerBtn" class="btn-danger" title="Bu konuşmacıyı kaldır">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18"/>
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+            </svg>
+            <span>Konuşmacıyı Sil</span>
+          </button>
+
+          <div class="footer-actions-right">
+            <button type="button" id="cancelEditSpeakerBtn" class="btn-ghost">Vazgeç</button>
+            <button type="submit" class="btn-solid">Değişiklikleri Kaydet</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sistem Toast Bildirimi -->
+  <div id="systemToast" class="system-toast" role="status" aria-live="polite">Bildirim</div>
+
+  <script src="app.js"></script>
+</body>
+</html>
