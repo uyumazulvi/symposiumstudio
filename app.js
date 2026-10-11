@@ -1268,7 +1268,7 @@ function setupEventListeners() {
       transcriptHistory = [];
       saveWorkspaceData();
       renderTranscriptFeed();
-      liveOriginalStream.textContent = 'Sistemi başlatmak için aşağıdaki konuşmacı tuşuna dokunun veya basılı tutun...';
+      liveOriginalStream.textContent = '';
       liveTranslationStream.textContent = 'Konuşmacı başladığında eşzamanlı çeviri burada görünecektir.';
       showToast('Tutanak temizlendi.');
       closeModal(settingsModal);

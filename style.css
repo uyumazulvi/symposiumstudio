@@ -530,6 +530,10 @@ input:focus-visible {
   word-break: break-word;
 }
 
+.source-stream-text:empty {
+  display: none;
+}
+
 /* BÜYÜK VE NET CANLI ÇEVİRİ ALTYAZISI — KARTSIZ, YALIN EDİTORYAL ALAN */
 .stage-caption-canvas {
   background: transparent;
