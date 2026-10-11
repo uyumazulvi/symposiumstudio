@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#181D26"/>
+      <stop offset="100%" stop-color="#0E1116"/>
+    </linearGradient>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#65C7B0"/>
+      <stop offset="100%" stop-color="#4FB39C"/>
+    </linearGradient>
+  </defs>
+  <!-- Arka Plan -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  <rect width="508" height="508" x="2" y="2" rx="110" fill="none" stroke="rgba(101, 199, 176, 0.25)" stroke-width="4"/>
+  
+  <!-- Ses Dalgası & Mikrofon / Çeviri Sembolü -->
+  <g transform="translate(256, 256)">
+    <!-- Çeviri / Ses Halka Dalgaları -->
+    <circle cx="0" cy="-20" r="140" fill="none" stroke="rgba(101, 199, 176, 0.15)" stroke-width="8"/>
+    <circle cx="0" cy="-20" r="100" fill="none" stroke="rgba(101, 199, 176, 0.3)" stroke-width="8"/>
+    
+    <!-- Mikrofon Kapsülü -->
+    <rect x="-38" y="-95" width="76" height="130" rx="38" fill="url(#brandGrad)"/>
+    
+    <!-- Mikrofon Yuvası -->
+    <path d="M-60 -20 C-60 60 60 60 60 -20" fill="none" stroke="#D6A66B" stroke-width="14" stroke-linecap="round"/>
+    <!-- Mikrofon Ayağı -->
+    <line x1="0" y1="60" x2="0" y2="110" stroke="#D6A66B" stroke-width="14" stroke-linecap="round"/>
+    <line x1="-50" y1="110" x2="50" y2="110" stroke="#D6A66B" stroke-width="14" stroke-linecap="round"/>
+  </g>
+</svg>

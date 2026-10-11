@@ -214,6 +214,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   updateEngineBadge();
   updateStopButtonState(false);
+  initPwaInstallationFlow();
 });
 
 // İlk kullanıcı etkileşiminde mikrofon akışını bağla ve kalıcı tut
@@ -1353,7 +1354,7 @@ function setupEventListeners() {
   });
 
   // Modalların Dışındaki Karanlık Alana Tıklayınca Kapat
-  [addSpeakerModal, editSpeakerModal, settingsModal].forEach(modal => {
+  [addSpeakerModal, editSpeakerModal, settingsModal, iosGuideModal].forEach(modal => {
     if (modal) {
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -1369,6 +1370,7 @@ function setupEventListeners() {
       closeModal(addSpeakerModal);
       closeModal(editSpeakerModal);
       closeModal(settingsModal);
+      closeModal(iosGuideModal);
     }
   });
 
@@ -1422,3 +1424,97 @@ function escapeHtml(str) {
   d.textContent = str || '';
   return d.innerHTML;
 }
+
+// ==========================================================================
+// 12. PWA AKILLI YÜKLEME ŞERİDİ (SMART INSTALL BANNER & IOS REHBERİ)
+// ==========================================================================
+let deferredInstallPrompt = null;
+const pwaSmartBanner = document.getElementById('pwaSmartBanner');
+const pwaInstallActionBtn = document.getElementById('pwaInstallActionBtn');
+const pwaDismissBannerBtn = document.getElementById('pwaDismissBannerBtn');
+const iosGuideModal = document.getElementById('iosGuideModal');
+const closeIosGuideBtn = document.getElementById('closeIosGuideBtn');
+const dismissIosGuideBtn = document.getElementById('dismissIosGuideBtn');
+
+function initPwaInstallationFlow() {
+  if (!pwaSmartBanner) return;
+
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                       window.navigator.standalone === true;
+
+  // Zaten ana ekrandan açılmışsa şeridi asla gösterme
+  if (isStandalone) {
+    pwaSmartBanner.classList.add('hidden');
+    return;
+  }
+
+  // Kullanıcı son 3 gün içinde kapattıysa rahatsız etme
+  const lastDismissed = localStorage.getItem('sym_pwa_dismissed');
+  if (lastDismissed) {
+    const elapsed = Date.now() - parseInt(lastDismissed, 10);
+    if (elapsed < 3 * 24 * 60 * 60 * 1000) {
+      return;
+    }
+  }
+
+  const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+  // Android ve Masaüstü Tarayıcılar İçin Otomatik Yükleme Olayı
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    showPwaBanner();
+  });
+
+  // iPhone (Safari) İçin: Kullanıcı sayfayı gördükten 2 saniye sonra şeridi göster
+  if (isIos) {
+    setTimeout(() => {
+      showPwaBanner();
+    }, 2000);
+  }
+
+  // Ekle Butonuna Basıldığında
+  if (pwaInstallActionBtn) {
+    pwaInstallActionBtn.addEventListener('click', async () => {
+      if (deferredInstallPrompt) {
+        // Android / Desktop Chrome: Resmi sistem yükleme penceresini aç
+        deferredInstallPrompt.prompt();
+        const choice = await deferredInstallPrompt.userChoice;
+        if (choice && choice.outcome === 'accepted') {
+          hidePwaBanner();
+        }
+        deferredInstallPrompt = null;
+      } else if (isIos) {
+        // iPhone (Safari): 2 adımlı şık mini rehberi aç
+        openModal(iosGuideModal);
+      } else {
+        showToast("Tarayıcınızın menüsünden 'Ana Ekrana Ekle' seçeneğini seçebilirsiniz.");
+      }
+    });
+  }
+
+  // Kapat Butonuna Basıldığında (3 gün boyunca tekrar göstermez)
+  if (pwaDismissBannerBtn) {
+    pwaDismissBannerBtn.addEventListener('click', () => {
+      hidePwaBanner();
+      localStorage.setItem('sym_pwa_dismissed', Date.now().toString());
+    });
+  }
+
+  // iOS Rehberi Kapatma Butonları
+  if (closeIosGuideBtn) closeIosGuideBtn.addEventListener('click', () => closeModal(iosGuideModal));
+  if (dismissIosGuideBtn) dismissIosGuideBtn.addEventListener('click', () => closeModal(iosGuideModal));
+}
+
+function showPwaBanner() {
+  if (pwaSmartBanner) {
+    pwaSmartBanner.classList.remove('hidden');
+  }
+}
+
+function hidePwaBanner() {
+  if (pwaSmartBanner) {
+    pwaSmartBanner.classList.add('hidden');
+  }
+}
+
