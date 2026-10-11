@@ -1532,8 +1532,8 @@ input:focus-visible {
 
   .workspace-view {
     height: auto !important;
-    min-height: calc(100dvh - 84px);
-    min-height: calc(100vh - 84px);
+    min-height: calc(100dvh - 80px);
+    min-height: calc(100vh - 80px);
     overflow: visible !important;
     display: flex;
     flex-direction: column;
@@ -1551,8 +1551,9 @@ input:focus-visible {
   }
 
   /* ==========================================================================
-     2. MOBİL ÜST ÇUBUK (STICKY HEADER)
-     Kaydırma esnasında üstte sabit kalır, bulanık arka planla şık durur.
+     2. MOBİL ÜST ÇUBUK (2 SATIRLI DENGELİ GRID - OVERFLOW GEÇİRMEZ)
+     1. Satır: Marka & Canlı Durumu (Sol) | Bas-Konuş Modu (Sağ)
+     2. Satır: Canlı / Çeviri Sekmeleri (Sol) | Hızlı Araçlar (Sağ)
      ========================================================================== */
   .app-header {
     height: auto;
@@ -1560,14 +1561,15 @@ input:focus-visible {
     top: 0;
     z-index: 100;
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
     grid-template-areas:
-      "brand controls"
-      "nav nav";
+      "brand mode"
+      "nav utils";
     gap: 8px 10px;
     padding: calc(6px + env(safe-area-inset-top, 0px)) 12px 8px 12px;
     border-bottom: 1px solid var(--border-hairline);
-    background-color: rgba(23, 24, 22, 0.95);
+    background-color: rgba(23, 24, 22, 0.96);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
@@ -1580,39 +1582,59 @@ input:focus-visible {
     min-width: 0;
   }
 
-  .header-divider,
-  .brand-sub {
-    display: none;
+  .brand-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .wordmark-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    min-width: 0;
   }
 
   .brand-wordmark {
     font-size: 13.5px;
     font-weight: 700;
     letter-spacing: 0.05em;
+    color: var(--text-primary);
+  }
+
+  .brand-sub {
+    display: none;
+  }
+
+  .header-divider {
+    display: none;
   }
 
   .session-pill {
     padding: 3px 7px;
     font-size: 10px;
     font-weight: 600;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
+  /* header-right'ın çocuklarını doğrudan app-header grid alanlarına yayar */
   .header-right {
-    grid-area: controls;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 6px;
-    min-width: 0;
+    display: contents;
   }
 
   .meter-block {
-    display: none; /* Mobilde VU metre gizlenerek yatay taşma önlenir */
+    display: none !important;
   }
 
+  /* 1. Satır Sağ: Mikrofon Çalışma Modu (Bas-Konuş / Sürekli Akış) */
   .mic-mode-toggle {
+    grid-area: mode;
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 2px;
     padding: 2px;
     background-color: var(--bg-surface);
@@ -1625,48 +1647,50 @@ input:focus-visible {
     padding: 4px 7px;
     font-size: 10.5px;
     font-weight: 500;
-    min-height: 28px;
-  }
-
-  .utility-actions {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    flex-shrink: 0;
-  }
-
-  .util-btn {
-    width: 30px;
-    height: 30px;
+    min-height: 26px;
     border-radius: var(--radius-xs);
+    white-space: nowrap;
   }
 
-  .util-btn svg {
-    width: 14px;
-    height: 14px;
+  .mode-pill.active {
+    background-color: var(--bg-surface-elevated);
+    color: var(--text-primary);
+    font-weight: 600;
   }
 
-  /* 2. Satır: Tam Genişlikte %50-%50 Navigasyon Sekmeleri */
+  /* 2. Satır Sol: Swiss Navigasyon Sekmeleri */
   .studio-nav {
     grid-area: nav;
     display: flex;
-    width: 100%;
     gap: 4px;
     padding: 2px;
     background-color: var(--bg-surface);
     border-radius: var(--radius-xs);
     border: 1px solid var(--border-hairline);
+    min-width: 0;
   }
 
   .nav-btn {
     flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
     justify-content: center;
-    padding: 7px 10px;
-    font-size: 12px;
+    gap: 5px;
+    padding: 6px 8px;
+    font-size: 11.5px;
     font-weight: 500;
-    min-height: 34px;
+    min-height: 32px;
     white-space: nowrap;
     border-radius: var(--radius-xs);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nav-btn span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .nav-btn.active {
@@ -1676,13 +1700,41 @@ input:focus-visible {
   }
 
   .nav-btn svg {
-    width: 13px;
-    height: 13px;
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
   }
 
   .lang-tag-indicator {
-    font-size: 9.5px;
-    padding: 1px 5px;
+    font-size: 9px;
+    padding: 1px 4px;
+    flex-shrink: 0;
+  }
+
+  /* 2. Satır Sağ: Araç Butonları (Ayarlar, Kopyala, İndir, Temizle) */
+  .utility-actions {
+    grid-area: utils;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 3px;
+    flex-shrink: 0;
+  }
+
+  .util-btn {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-xs);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+  }
+
+  .util-btn svg {
+    width: 13px;
+    height: 13px;
   }
 
   /* ==========================================================================
@@ -1702,6 +1754,7 @@ input:focus-visible {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    min-width: 0;
   }
 
   .speaker-identity {
@@ -1710,6 +1763,7 @@ input:focus-visible {
     align-items: center;
     min-width: 0;
     flex: 1;
+    overflow: hidden;
   }
 
   .status-indicator-dot {
@@ -1719,26 +1773,27 @@ input:focus-visible {
   }
 
   .speaker-name-hero {
-    font-size: 14.5px;
+    font-size: 13.5px;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 150px;
+    max-width: 130px;
   }
 
   .meta-slash {
     font-size: 11px;
     color: var(--text-dim);
+    flex-shrink: 0;
   }
 
   .speaker-accent-hero {
-    font-size: 11.5px;
+    font-size: 11px;
     color: var(--text-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 110px;
+    max-width: 100px;
   }
 
   .stage-language-bridge {
@@ -1749,11 +1804,12 @@ input:focus-visible {
   }
 
   .language-bridge-btn {
-    padding: 4px 9px;
+    padding: 4px 8px;
     font-size: 11px;
     gap: 5px;
     border-radius: var(--radius-xs);
     background-color: var(--bg-surface);
+    white-space: nowrap;
   }
 
   .bridge-arrow {
@@ -1761,16 +1817,16 @@ input:focus-visible {
     height: 10px;
   }
 
-  /* Orijinal Konuşma ve Canlı Altyazı */
   .stage-source-area {
-    gap: 3px;
+    gap: 2px;
   }
 
   .source-stream-text {
-    font-size: 13px;
+    font-size: 12.5px;
     line-height: 1.45;
-    max-height: none;
-    overflow: visible;
+    color: var(--text-secondary);
+    word-break: break-word;
+    font-style: italic;
   }
 
   .stage-caption-canvas {
@@ -1781,15 +1837,16 @@ input:focus-visible {
   .caption-badge {
     font-size: 9.5px;
     letter-spacing: 0.12em;
+    color: var(--accent-cyan);
   }
 
   .caption-stream-text {
-    font-size: clamp(20px, 5.2vw, 25px);
+    font-size: clamp(19px, 5vw, 24px);
     line-height: 1.38;
-    min-height: 48px;
-    max-height: none;
-    overflow: visible;
+    min-height: 44px;
     letter-spacing: -0.015em;
+    color: #F6F6F2;
+    word-break: break-word;
   }
 
   /* ==========================================================================
@@ -1807,13 +1864,22 @@ input:focus-visible {
 
   .journal-header {
     position: sticky;
-    top: 84px; /* Üstteki yapışkan header'ın hemen altına kilitlenir */
+    top: 80px;
     z-index: 70;
-    background-color: rgba(23, 24, 22, 0.94);
+    background-color: rgba(23, 24, 22, 0.95);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     padding: 8px 14px;
     border-bottom: 1px solid var(--border-hairline);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .journal-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .journal-title {
@@ -1839,7 +1905,7 @@ input:focus-visible {
     height: auto !important;
     max-height: none !important;
     overflow: visible !important;
-    padding: 0 14px 130px 14px; /* Alt dock'un en son satırı örtmemesi için 130px güvenli boşluk */
+    padding: 0 14px 170px 14px; /* Alt sabit dock'un içeriği örtmemesi için 170px güvenli boşluk */
     display: flex;
     flex-direction: column;
   }
@@ -1881,32 +1947,35 @@ input:focus-visible {
   }
 
   .entry-original {
-    font-size: 12.5px;
+    font-size: 12px;
     line-height: 1.45;
   }
 
   .entry-translation {
-    font-size: 15px;
+    font-size: 14.5px;
     font-weight: 500;
     line-height: 1.45;
   }
 
   /* ==========================================================================
-     5. ERGONOMİK ALT DOCK (STICKY HARDWARE SWITCHER CONSOLE)
-     Her daim başparmak hizasında sabit, kolayca konuşmacı değiştirilir.
+     5. SABİT ALT DOCK (FIXED HARDWARE SWITCHER CONSOLE)
+     Her daim ekranın en altında sabit, asla kaybolmaz, başparmak hizasında.
      ========================================================================== */
   .switcher-console {
-    position: sticky;
-    bottom: 0;
-    z-index: 95;
-    background-color: rgba(30, 31, 28, 0.96);
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 90;
+    background-color: rgba(28, 29, 26, 0.97);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-top: 1px solid var(--border-hairline);
-    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6);
     padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px)) 12px;
     gap: 6px;
-    flex-shrink: 0;
+    box-sizing: border-box;
   }
 
   .console-action-bar {
@@ -1915,6 +1984,7 @@ input:focus-visible {
     justify-content: space-between;
     gap: 8px;
     width: 100%;
+    min-width: 0;
   }
 
   .console-hint {
@@ -1923,6 +1993,7 @@ input:focus-visible {
     gap: 6px;
     min-width: 0;
     flex: 1;
+    overflow: hidden;
   }
 
   .hint-accent-bar {
@@ -1947,6 +2018,7 @@ input:focus-visible {
     white-space: nowrap;
     border-radius: var(--radius-xs);
     min-height: 28px;
+    background-color: var(--bg-surface-elevated);
   }
 
   .console-add-speaker-btn svg {
@@ -1979,6 +2051,9 @@ input:focus-visible {
 
   .pad-head {
     gap: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .pad-monogram {
@@ -2036,6 +2111,7 @@ input:focus-visible {
     align-items: center;
     justify-content: center;
     gap: 8px;
+    box-sizing: border-box;
   }
 
   /* ==========================================================================
@@ -2043,7 +2119,7 @@ input:focus-visible {
      ========================================================================== */
   #viewLanguageSection {
     height: auto !important;
-    min-height: calc(100dvh - 84px);
+    min-height: calc(100dvh - 80px);
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
   }
@@ -2164,7 +2240,7 @@ input:focus-visible {
 
   /* Toast: Alt konsolun üzerine hizalanır */
   .system-toast {
-    bottom: calc(85px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(95px + env(safe-area-inset-bottom, 0px));
     max-width: 90%;
     font-size: 12px;
     padding: 8px 16px;
@@ -2173,32 +2249,45 @@ input:focus-visible {
 }
 
 /* ==========================================================================
-   KÜÇÜK EKRANLAR (iPhone SE, Galaxy A, 320px - 400px)
+   KÜÇÜK EKRANLAR (iPhone SE, Galaxy A, 320px - 380px)
    ========================================================================== */
-@media (max-width: 420px) {
+@media (max-width: 380px) {
   .brand-wordmark {
-    font-size: 12.5px;
+    font-size: 12px;
+  }
+  .session-pill {
+    padding: 2px 5px;
+    font-size: 9px;
+  }
+  .mode-pill {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+  .nav-btn {
+    font-size: 10.5px;
+    padding: 5px 6px;
   }
   .speaker-name-hero {
-    max-width: 110px;
-    font-size: 13.5px;
+    max-width: 100px;
+    font-size: 12.5px;
   }
   .speaker-accent-hero {
-    max-width: 85px;
-    font-size: 10.5px;
+    max-width: 80px;
+    font-size: 10px;
   }
   .caption-stream-text {
-    font-size: 19px;
+    font-size: 18px;
   }
   .switcher-strip {
     grid-template-columns: 1fr;
   }
-  .utility-actions {
-    gap: 2px;
-  }
   .util-btn {
     width: 28px;
     height: 28px;
+  }
+  .util-btn svg {
+    width: 12px;
+    height: 12px;
   }
 }
 
