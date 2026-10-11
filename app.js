@@ -232,7 +232,24 @@ function loadWorkspaceData() {
       }
     }
     const h = localStorage.getItem('sym_history_v3');
-    if (h) transcriptHistory = JSON.parse(h);
+    if (h) {
+      transcriptHistory = JSON.parse(h);
+      if (Array.isArray(transcriptHistory) && transcriptHistory.length >= 2) {
+        const getTs = (item) => {
+          if (item && item.timestamp) return item.timestamp;
+          if (item && item.id && item.id.startsWith('tr_')) {
+            const num = parseInt(item.id.replace('tr_', ''), 10);
+            return isNaN(num) ? 0 : num;
+          }
+          return 0;
+        };
+        const firstTs = getTs(transcriptHistory[0]);
+        const lastTs = getTs(transcriptHistory[transcriptHistory.length - 1]);
+        if (firstTs > 0 && lastTs > 0 && firstTs < lastTs) {
+          transcriptHistory.reverse();
+        }
+      }
+    }
     const k = localStorage.getItem('sym_gemini_key');
     if (k) {
       geminiApiKey = k;
@@ -782,9 +799,10 @@ async function archiveSpeechTurnForSpeaker(speaker, textToArchive) {
   // Canlı Altyazıyı Güncelle
   liveTranslationStream.textContent = translated;
 
-  // Tutanağa ekle
+  // Tutanağa ekle (En güncel konuşma her zaman en üstte)
   const entry = {
     id: 'tr_' + Date.now(),
+    timestamp: Date.now(),
     speakerName: speaker.name,
     speakerColor: speaker.color,
     speakerAccent: speaker.accent,
@@ -793,7 +811,7 @@ async function archiveSpeechTurnForSpeaker(speaker, textToArchive) {
     translation: translated
   };
 
-  transcriptHistory.push(entry);
+  transcriptHistory.unshift(entry);
   renderTranscriptFeed();
   saveWorkspaceData();
 }
@@ -1163,7 +1181,7 @@ function renderTranscriptFeed() {
     transcriptFeed.appendChild(entry);
   });
 
-  transcriptFeed.scrollTop = transcriptFeed.scrollHeight;
+  transcriptFeed.scrollTop = 0;
 }
 
 // ==========================================================================
