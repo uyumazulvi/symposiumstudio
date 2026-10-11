@@ -81,6 +81,17 @@ html, body {
   user-select: none;
 }
 
+/* Metin Seçilebilirliği: Altyazı ve Tutanaklar Rahatça Kopyalanabilir */
+.entry-content,
+.entry-translation,
+.entry-original,
+.caption-stream-text,
+.source-stream-text,
+.journal-entry {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
 /* Modal ve Gizlilik Kuralları */
 .hidden,
 .modal-backdrop.hidden {
@@ -1505,19 +1516,60 @@ input:focus-visible {
 }
 
 @media (max-width: 768px) {
-  /* Header: İki Katmanlı, Sıkışmayan Ergonomik Üst Çubuk */
-  /* Header: 2-Satır Grid — Marka ve Kontroller Üstte, Navigasyon Altta */
+  /* ==========================================================================
+     1. KÖK VE SAYFA KAYDIRMA MİMARİSİ (UNLOCKED NATIVE TOUCH SCROLL)
+     Mobilde ekran kilidini kaldırır, tam ve akıcı sayfa kaydırması sağlar.
+     ========================================================================== */
+  html, body {
+    height: auto !important;
+    min-height: 100dvh;
+    min-height: 100vh;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: auto;
+  }
+
+  .workspace-view {
+    height: auto !important;
+    min-height: calc(100dvh - 84px);
+    min-height: calc(100vh - 84px);
+    overflow: visible !important;
+    display: flex;
+    flex-direction: column;
+    flex: none !important;
+  }
+
+  /* Metin Seçilebilirliği: Telefondan tek tıkla kopyalamak için */
+  .entry-content,
+  .entry-translation,
+  .entry-original,
+  .caption-stream-text,
+  .source-stream-text {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  /* ==========================================================================
+     2. MOBİL ÜST ÇUBUK (STICKY HEADER)
+     Kaydırma esnasında üstte sabit kalır, bulanık arka planla şık durur.
+     ========================================================================== */
   .app-header {
     height: auto;
+    position: sticky;
+    top: 0;
+    z-index: 100;
     display: grid;
     grid-template-columns: auto 1fr;
     grid-template-areas:
       "brand controls"
       "nav nav";
     gap: 8px 10px;
-    padding: 8px 12px 10px 12px;
+    padding: calc(6px + env(safe-area-inset-top, 0px)) 12px 8px 12px;
     border-bottom: 1px solid var(--border-hairline);
-    background-color: var(--bg-root);
+    background-color: rgba(23, 24, 22, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
   .header-left {
@@ -1535,11 +1587,14 @@ input:focus-visible {
 
   .brand-wordmark {
     font-size: 13.5px;
-    letter-spacing: 0.06em;
+    font-weight: 700;
+    letter-spacing: 0.05em;
   }
 
   .session-pill {
-    padding: 3px 6px;
+    padding: 3px 7px;
+    font-size: 10px;
+    font-weight: 600;
   }
 
   .header-right {
@@ -1556,31 +1611,42 @@ input:focus-visible {
   }
 
   .mic-mode-toggle {
-    padding: 1px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-xs);
     flex-shrink: 0;
   }
 
   .mode-pill {
     padding: 4px 7px;
     font-size: 10.5px;
+    font-weight: 500;
+    min-height: 28px;
   }
 
   .utility-actions {
-    gap: 2px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
     flex-shrink: 0;
   }
 
   .util-btn {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-xs);
   }
 
   .util-btn svg {
-    width: 13px;
-    height: 13px;
+    width: 14px;
+    height: 14px;
   }
 
-  /* 2. Satır: Tam Genişlikte %50-%50 Eşit Dağılan Navigasyon */
+  /* 2. Satır: Tam Genişlikte %50-%50 Navigasyon Sekmeleri */
   .studio-nav {
     grid-area: nav;
     display: flex;
@@ -1595,105 +1661,80 @@ input:focus-visible {
   .nav-btn {
     flex: 1;
     justify-content: center;
-    padding: 6px 10px;
-    font-size: 11.5px;
-    min-height: 32px;
+    padding: 7px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    min-height: 34px;
     white-space: nowrap;
+    border-radius: var(--radius-xs);
+  }
+
+  .nav-btn.active {
+    background-color: var(--bg-surface-elevated);
+    color: var(--text-primary);
+    font-weight: 600;
   }
 
   .nav-btn svg {
-    width: 12px;
-    height: 12px;
-  }
-
-  .lang-tag-indicator {
-    font-size: 9px;
-    padding: 1px 4px;
-  }
-
-  /* Mobilde VU Metre Sadeleştirilir */
-  .meter-block {
-    padding: 3px 6px;
-    gap: 4px;
-  }
-
-  .meter-label {
-    font-size: 8px;
-  }
-
-  .vu-leds {
-    gap: 2px;
-    height: 9px;
-  }
-
-  .vu-led {
-    width: 2.5px;
-    height: 8px;
-  }
-
-  /* Mod Butonları Mobilde Kompakt */
-  .mic-mode-toggle {
-    padding: 1px;
-  }
-
-  .mode-pill {
-    padding: 4px 8px;
-    font-size: 11px;
-  }
-
-  /* Araç Butonları */
-  .utility-actions {
-    gap: 2px;
-  }
-
-  .util-btn {
-    width: 28px;
-    height: 28px;
-  }
-
-  .util-btn svg {
     width: 13px;
     height: 13px;
   }
 
-  /* Canlı Çeviri Sahnesi (Teleprompter) */
+  .lang-tag-indicator {
+    font-size: 9.5px;
+    padding: 1px 5px;
+  }
+
+  /* ==========================================================================
+     3. CANLI ÇEVİRİ SAHNESİ (TELEPROMPTER)
+     ========================================================================== */
   .teleprompter-stage {
     padding: 14px 14px 12px 14px;
-    gap: 8px;
+    gap: 10px;
+    background-color: var(--bg-root);
+    border-bottom: 1px solid var(--border-hairline);
+    flex-shrink: 0;
   }
 
   .stage-meta-row {
     padding-bottom: 8px;
     gap: 8px;
-    flex-wrap: wrap;
+    display: flex;
+    align-items: center;
     justify-content: space-between;
   }
 
   .speaker-identity {
     gap: 6px;
-    flex-shrink: 1;
+    display: flex;
+    align-items: center;
     min-width: 0;
+    flex: 1;
   }
 
   .status-indicator-dot {
     width: 7px;
     height: 7px;
+    flex-shrink: 0;
   }
 
   .speaker-name-hero {
     font-size: 14.5px;
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 140px;
+    max-width: 150px;
   }
 
   .meta-slash {
     font-size: 11px;
+    color: var(--text-dim);
   }
 
   .speaker-accent-hero {
     font-size: 11.5px;
+    color: var(--text-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1702,13 +1743,17 @@ input:focus-visible {
 
   .stage-language-bridge {
     gap: 6px;
+    display: flex;
+    align-items: center;
     flex-shrink: 0;
   }
 
   .language-bridge-btn {
-    padding: 3px 8px;
+    padding: 4px 9px;
     font-size: 11px;
     gap: 5px;
+    border-radius: var(--radius-xs);
+    background-color: var(--bg-surface);
   }
 
   .bridge-arrow {
@@ -1716,74 +1761,115 @@ input:focus-visible {
     height: 10px;
   }
 
-  /* Kaynak ve Çeviri Metinleri */
+  /* Orijinal Konuşma ve Canlı Altyazı */
   .stage-source-area {
-    gap: 2px;
+    gap: 3px;
   }
 
   .source-stream-text {
-    font-size: 12.5px;
+    font-size: 13px;
     line-height: 1.45;
-    max-height: 38px;
-    overflow-y: auto;
+    max-height: none;
+    overflow: visible;
   }
 
   .stage-caption-canvas {
-    padding: 0;
+    padding: 2px 0 0 0;
     gap: 6px;
   }
 
   .caption-badge {
     font-size: 9.5px;
+    letter-spacing: 0.12em;
   }
 
   .caption-stream-text {
-    font-size: 21px;
-    line-height: 1.4;
-    min-height: 52px;
-    max-height: 160px;
-    overflow-y: auto;
+    font-size: clamp(20px, 5.2vw, 25px);
+    line-height: 1.38;
+    min-height: 48px;
+    max-height: none;
+    overflow: visible;
     letter-spacing: -0.015em;
   }
 
-  /* Oturum Tutanağı (Journal Feed) */
+  /* ==========================================================================
+     4. OTURUM TUTANAĞI (DOĞAL AŞAĞIYA DOĞRU AKAN JOURNAL)
+     ========================================================================== */
   .transcript-journal {
-    min-height: 110px;
+    height: auto !important;
+    min-height: 160px;
+    overflow: visible !important;
+    flex: 1 0 auto !important;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-root);
   }
 
   .journal-header {
+    position: sticky;
+    top: 84px; /* Üstteki yapışkan header'ın hemen altına kilitlenir */
+    z-index: 70;
+    background-color: rgba(23, 24, 22, 0.94);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     padding: 8px 14px;
+    border-bottom: 1px solid var(--border-hairline);
   }
 
   .journal-title {
-    font-size: 10px;
+    font-size: 10.5px;
   }
 
   .journal-count {
-    font-size: 9px;
+    font-size: 9.5px;
     padding: 1px 5px;
   }
 
   .journal-filter-switch {
     padding: 1px;
+    gap: 2px;
   }
 
   .journal-filter-btn {
-    padding: 3px 7px;
+    padding: 3px 8px;
     font-size: 11px;
   }
 
   .journal-feed {
-    padding: 0 14px;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 14px 130px 14px; /* Alt dock'un en son satırı örtmemesi için 130px güvenli boşluk */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .journal-empty-state {
+    padding: 36px 14px;
+  }
+
+  .empty-wave-graphic {
+    width: 40px;
+    height: 20px;
+    margin-bottom: 12px;
+  }
+
+  .empty-primary {
+    font-size: 14px;
+  }
+
+  .empty-secondary {
+    font-size: 12px;
   }
 
   .journal-entry {
-    padding: 10px 0;
+    padding: 11px 0;
     gap: 6px;
+    border-bottom: 1px solid var(--border-hairline);
   }
 
   .entry-speaker-name {
-    font-size: 12px;
+    font-size: 12.5px;
   }
 
   .entry-speaker-accent {
@@ -1795,19 +1881,31 @@ input:focus-visible {
   }
 
   .entry-original {
-    font-size: 12px;
-  }
-
-  .entry-translation {
-    font-size: 14.5px;
+    font-size: 12.5px;
     line-height: 1.45;
   }
 
+  .entry-translation {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.45;
+  }
+
+  /* ==========================================================================
+     5. ERGONOMİK ALT DOCK (STICKY HARDWARE SWITCHER CONSOLE)
+     Her daim başparmak hizasında sabit, kolayca konuşmacı değiştirilir.
+     ========================================================================== */
   .switcher-console {
+    position: sticky;
+    bottom: 0;
+    z-index: 95;
+    background-color: rgba(30, 31, 28, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border-hairline);
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
     padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px)) 12px;
     gap: 6px;
-    background-color: var(--bg-surface);
-    border-top: 1px solid var(--border-hairline);
     flex-shrink: 0;
   }
 
@@ -1829,6 +1927,7 @@ input:focus-visible {
 
   .hint-accent-bar {
     height: 10px;
+    width: 3px;
     flex-shrink: 0;
   }
 
@@ -1842,10 +1941,12 @@ input:focus-visible {
 
   .console-add-speaker-btn {
     flex-shrink: 0;
-    padding: 3px 8px;
+    padding: 4px 9px;
     font-size: 11px;
     gap: 4px;
     white-space: nowrap;
+    border-radius: var(--radius-xs);
+    min-height: 28px;
   }
 
   .console-add-speaker-btn svg {
@@ -1853,10 +1954,10 @@ input:focus-visible {
     height: 11px;
   }
 
-  /* Bütün Konuşmacılar Ekrana Tam Sığar */
+  /* Konuşmacı Tuşları: Ekranı Dolduran Ergonomik Kartlar */
   .switcher-strip {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
     gap: 6px;
     width: 100%;
     overflow: visible;
@@ -1866,13 +1967,14 @@ input:focus-visible {
   .studio-pad {
     width: 100%;
     min-width: 0;
-    padding: 6px 8px;
-    min-height: 50px;
+    padding: 8px 10px;
+    min-height: 52px;
     gap: 3px;
     touch-action: manipulation;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
+    border-radius: var(--radius-xs);
   }
 
   .pad-head {
@@ -1880,27 +1982,29 @@ input:focus-visible {
   }
 
   .pad-monogram {
-    font-size: 9.5px;
-    padding: 1px 5px;
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 2px;
   }
 
   .pad-edit-btn {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-xs);
   }
 
   .pad-edit-btn svg {
-    width: 11px;
-    height: 11px;
+    width: 12px;
+    height: 12px;
   }
 
   .pad-status-dot {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
   }
 
   .pad-name {
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -1908,32 +2012,51 @@ input:focus-visible {
   }
 
   .pad-accent {
-    font-size: 9.5px;
+    font-size: 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .pad-trigger-text {
-    font-size: 7.5px;
+    font-size: 8.5px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .console-stop-btn {
-    padding: 7px 12px;
-    font-size: 12px;
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    min-height: 44px;
+    border-radius: var(--radius-xs);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
 
-  /* Dil Yapılandırma Sayfası */
+  /* ==========================================================================
+     6. DİL VE ÇEVİRİ PANELİ (LANGUAGE SETUP VIEW)
+     ========================================================================== */
+  #viewLanguageSection {
+    height: auto !important;
+    min-height: calc(100dvh - 84px);
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .language-workspace {
-    padding: 16px 14px calc(24px + env(safe-area-inset-bottom, 0px)) 14px;
-    gap: 18px;
+    padding: 16px 14px calc(40px + env(safe-area-inset-bottom, 0px)) 14px;
+    gap: 16px;
+    overflow: visible;
   }
 
   .lang-page-header {
-    padding-bottom: 12px;
+    padding-bottom: 10px;
+    gap: 4px;
   }
 
   .lang-page-title {
@@ -1947,47 +2070,60 @@ input:focus-visible {
   .lang-matrix-board {
     grid-template-columns: 1fr;
     gap: 12px;
-    padding-bottom: 18px;
+    padding-bottom: 16px;
+  }
+
+  .matrix-card {
+    gap: 8px;
   }
 
   .matrix-swap-col {
-    margin: 4px auto;
+    margin: 2px auto;
+    transform: rotate(90deg);
   }
 
   .matrix-swap-btn {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
   }
 
-  /* iOS Auto-Zoom Engelleyici: Mobilde input en az 16px olmalı */
+  /* iOS Auto-Zoom Engelleyici: Mobilde tüm select/input en az 16px olmalı */
   .matrix-select,
   .field-input {
     font-size: 16px !important;
-    padding: 9px 12px;
+    padding: 10px 12px;
+    min-height: 44px;
   }
 
   .presets-block {
-    padding-bottom: 18px;
-    gap: 10px;
+    padding-bottom: 16px;
+    gap: 8px;
   }
 
   .presets-row {
     gap: 6px;
+    flex-wrap: wrap;
   }
 
   .preset-pill {
-    padding: 5px 10px;
-    font-size: 11px;
+    padding: 6px 11px;
+    font-size: 11.5px;
+    min-height: 34px;
   }
 
   .matrix-submit-btn {
     width: 100%;
     justify-content: center;
-    padding: 11px;
-    font-size: 13.5px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    min-height: 46px;
+    border-radius: var(--radius-xs);
   }
 
-  /* Modallar: Mobilde Bottom-Sheet Formuna Geçer */
+  /* ==========================================================================
+     7. MODALLAR VE BİLDİRİMLER (NATIVE BOTTOM-SHEET)
+     ========================================================================== */
   .modal-backdrop {
     padding: 0;
     align-items: flex-end;
@@ -1996,10 +2132,10 @@ input:focus-visible {
   .modal-card {
     max-width: 100%;
     width: 100%;
-    border-radius: 14px 14px 0 0;
+    border-radius: 16px 16px 0 0;
     max-height: 88vh;
     border-bottom: none;
-    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.7);
   }
 
   .modal-header {
@@ -2009,7 +2145,9 @@ input:focus-visible {
   .modal-body {
     padding: 16px 18px;
     gap: 14px;
+    max-height: 65vh;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .modal-footer {
@@ -2019,35 +2157,48 @@ input:focus-visible {
   .btn-solid,
   .btn-ghost,
   .btn-danger {
-    padding: 9px 14px;
-    font-size: 12.5px;
+    padding: 10px 14px;
+    font-size: 13px;
+    min-height: 42px;
   }
 
   /* Toast: Alt konsolun üzerine hizalanır */
   .system-toast {
-    bottom: calc(75px + env(safe-area-inset-bottom, 0px));
-    max-width: 88%;
+    bottom: calc(85px + env(safe-area-inset-bottom, 0px));
+    max-width: 90%;
     font-size: 12px;
-    padding: 7px 14px;
+    padding: 8px 16px;
     text-align: center;
   }
 }
 
-/* Küçük Ekranlar (iPhone SE, 360px - 400px) */
+/* ==========================================================================
+   KÜÇÜK EKRANLAR (iPhone SE, Galaxy A, 320px - 400px)
+   ========================================================================== */
 @media (max-width: 420px) {
+  .brand-wordmark {
+    font-size: 12.5px;
+  }
   .speaker-name-hero {
     max-width: 110px;
+    font-size: 13.5px;
   }
   .speaker-accent-hero {
-    max-width: 90px;
-  }
-  .switcher-pad,
-  .studio-pad {
-    flex: 0 0 135px;
-    min-width: 135px;
+    max-width: 85px;
+    font-size: 10.5px;
   }
   .caption-stream-text {
     font-size: 19px;
+  }
+  .switcher-strip {
+    grid-template-columns: 1fr;
+  }
+  .utility-actions {
+    gap: 2px;
+  }
+  .util-btn {
+    width: 28px;
+    height: 28px;
   }
 }
 
