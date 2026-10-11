@@ -276,6 +276,11 @@ input:focus-visible {
   letter-spacing: 0.04em;
 }
 
+.tab-label-short,
+.mode-text-short {
+  display: none;
+}
+
 /* Sağ Kontroller */
 .header-right {
   display: flex;
@@ -1532,8 +1537,8 @@ input:focus-visible {
 
   .workspace-view {
     height: auto !important;
-    min-height: calc(100dvh - 80px);
-    min-height: calc(100vh - 80px);
+    min-height: calc(100dvh - 76px);
+    min-height: calc(100vh - 76px);
     overflow: visible !important;
     display: flex;
     flex-direction: column;
@@ -1550,10 +1555,24 @@ input:focus-visible {
     -webkit-user-select: text;
   }
 
+  /* Mobilde kısa etiketleri göster, uzun metinleri gizle */
+  .tab-label-full {
+    display: none !important;
+  }
+  .tab-label-short {
+    display: inline !important;
+  }
+  .mode-text-full {
+    display: none !important;
+  }
+  .mode-text-short {
+    display: inline !important;
+  }
+
   /* ==========================================================================
-     2. MOBİL ÜST ÇUBUK (2 SATIRLI DENGELİ GRID - OVERFLOW GEÇİRMEZ)
-     1. Satır: Marka & Canlı Durumu (Sol) | Bas-Konuş Modu (Sağ)
-     2. Satır: Canlı / Çeviri Sekmeleri (Sol) | Hızlı Araçlar (Sağ)
+     2. MOBİL ÜST ÇUBUK (2 SATIRLI DENGELİ GRID - ASLA TAŞMA YAPMAZ)
+     1. Satır: Marka & Durum (Sol) | 4 Hızlı Araç Butonu (Sağ)
+     2. Satır: Canlı / Çeviri Sekmeleri (Sol) | Bas-Konuş Modu (Sağ)
      ========================================================================== */
   .app-header {
     height: auto;
@@ -1564,43 +1583,45 @@ input:focus-visible {
     grid-template-columns: 1fr auto;
     grid-template-rows: auto auto;
     grid-template-areas:
-      "brand mode"
-      "nav utils";
-    gap: 8px 10px;
-    padding: calc(6px + env(safe-area-inset-top, 0px)) 12px 8px 12px;
+      "brand utils"
+      "nav mode";
+    gap: 6px 8px;
+    padding: calc(6px + env(safe-area-inset-top, 0px)) 10px 6px 10px;
     border-bottom: 1px solid var(--border-hairline);
-    background-color: rgba(23, 24, 22, 0.96);
+    background-color: rgba(23, 24, 22, 0.98);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+    align-items: center;
   }
 
   .header-left {
     grid-area: brand;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     min-width: 0;
   }
 
   .brand-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     min-width: 0;
   }
 
   .wordmark-wrap {
     display: flex;
     align-items: baseline;
-    gap: 4px;
+    gap: 3px;
     min-width: 0;
   }
 
   .brand-wordmark {
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 700;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     color: var(--text-primary);
+    white-space: nowrap;
   }
 
   .brand-sub {
@@ -1612,15 +1633,15 @@ input:focus-visible {
   }
 
   .session-pill {
-    padding: 3px 7px;
-    font-size: 10px;
+    padding: 2px 6px;
+    font-size: 9.5px;
     font-weight: 600;
     border-radius: 999px;
     white-space: nowrap;
     flex-shrink: 0;
   }
 
-  /* header-right'ın çocuklarını doğrudan app-header grid alanlarına yayar */
+  /* header-right display: contents ile çocuklarını doğrudan üst ızgaraya yayar */
   .header-right {
     display: contents;
   }
@@ -1629,40 +1650,37 @@ input:focus-visible {
     display: none !important;
   }
 
-  /* 1. Satır Sağ: Mikrofon Çalışma Modu (Bas-Konuş / Sürekli Akış) */
-  .mic-mode-toggle {
-    grid-area: mode;
+  /* 1. Satır Sağ: Araç Butonları (Ayarlar, Kopyala, İndir, Temizle) */
+  .utility-actions {
+    grid-area: utils;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 2px;
-    padding: 2px;
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-hairline);
-    border-radius: var(--radius-xs);
+    gap: 3px;
     flex-shrink: 0;
   }
 
-  .mode-pill {
-    padding: 4px 7px;
-    font-size: 10.5px;
-    font-weight: 500;
-    min-height: 26px;
+  .util-btn {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border-radius: var(--radius-xs);
-    white-space: nowrap;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
   }
 
-  .mode-pill.active {
-    background-color: var(--bg-surface-elevated);
-    color: var(--text-primary);
-    font-weight: 600;
+  .util-btn svg {
+    width: 13px;
+    height: 13px;
   }
 
   /* 2. Satır Sol: Swiss Navigasyon Sekmeleri */
   .studio-nav {
     grid-area: nav;
     display: flex;
-    gap: 4px;
+    gap: 3px;
     padding: 2px;
     background-color: var(--bg-surface);
     border-radius: var(--radius-xs);
@@ -1676,15 +1694,14 @@ input:focus-visible {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    padding: 6px 8px;
-    font-size: 11.5px;
+    gap: 4px;
+    padding: 5px 7px;
+    font-size: 11px;
     font-weight: 500;
-    min-height: 32px;
+    min-height: 29px;
     white-space: nowrap;
     border-radius: var(--radius-xs);
     overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .nav-btn span {
@@ -1700,8 +1717,8 @@ input:focus-visible {
   }
 
   .nav-btn svg {
-    width: 12px;
-    height: 12px;
+    width: 11px;
+    height: 11px;
     flex-shrink: 0;
   }
 
@@ -1711,46 +1728,49 @@ input:focus-visible {
     flex-shrink: 0;
   }
 
-  /* 2. Satır Sağ: Araç Butonları (Ayarlar, Kopyala, İndir, Temizle) */
-  .utility-actions {
-    grid-area: utils;
+  /* 2. Satır Sağ: Mikrofon Çalışma Modu (Bas-Konuş / Sürekli) */
+  .mic-mode-toggle {
+    grid-area: mode;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 3px;
+    gap: 2px;
+    padding: 2px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-xs);
     flex-shrink: 0;
   }
 
-  .util-btn {
-    width: 32px;
-    height: 32px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  .mode-pill {
+    padding: 3px 6px;
+    font-size: 10px;
+    font-weight: 500;
+    min-height: 25px;
     border-radius: var(--radius-xs);
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-hairline);
+    white-space: nowrap;
   }
 
-  .util-btn svg {
-    width: 13px;
-    height: 13px;
+  .mode-pill.active {
+    background-color: var(--bg-surface-elevated);
+    color: var(--text-primary);
+    font-weight: 600;
   }
 
   /* ==========================================================================
      3. CANLI ÇEVİRİ SAHNESİ (TELEPROMPTER)
      ========================================================================== */
   .teleprompter-stage {
-    padding: 14px 14px 12px 14px;
-    gap: 10px;
+    padding: 10px 12px 8px 12px;
+    gap: 6px;
     background-color: var(--bg-root);
     border-bottom: 1px solid var(--border-hairline);
     flex-shrink: 0;
   }
 
   .stage-meta-row {
-    padding-bottom: 8px;
-    gap: 8px;
+    padding-bottom: 6px;
+    gap: 6px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1758,7 +1778,7 @@ input:focus-visible {
   }
 
   .speaker-identity {
-    gap: 6px;
+    gap: 5px;
     display: flex;
     align-items: center;
     min-width: 0;
@@ -1773,12 +1793,12 @@ input:focus-visible {
   }
 
   .speaker-name-hero {
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 130px;
+    max-width: 110px;
   }
 
   .meta-slash {
@@ -1793,28 +1813,28 @@ input:focus-visible {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100px;
+    max-width: 90px;
   }
 
   .stage-language-bridge {
-    gap: 6px;
+    gap: 4px;
     display: flex;
     align-items: center;
     flex-shrink: 0;
   }
 
   .language-bridge-btn {
-    padding: 4px 8px;
-    font-size: 11px;
-    gap: 5px;
+    padding: 3px 7px;
+    font-size: 10.5px;
+    gap: 4px;
     border-radius: var(--radius-xs);
     background-color: var(--bg-surface);
     white-space: nowrap;
   }
 
   .bridge-arrow {
-    width: 10px;
-    height: 10px;
+    width: 9px;
+    height: 9px;
   }
 
   .stage-source-area {
@@ -1822,28 +1842,30 @@ input:focus-visible {
   }
 
   .source-stream-text {
-    font-size: 12.5px;
-    line-height: 1.45;
+    font-size: 11.5px;
+    line-height: 1.4;
     color: var(--text-secondary);
     word-break: break-word;
     font-style: italic;
+    max-height: 36px;
+    overflow-y: auto;
   }
 
   .stage-caption-canvas {
-    padding: 2px 0 0 0;
-    gap: 6px;
+    padding: 0;
+    gap: 4px;
   }
 
   .caption-badge {
-    font-size: 9.5px;
+    font-size: 9px;
     letter-spacing: 0.12em;
     color: var(--accent-cyan);
   }
 
   .caption-stream-text {
-    font-size: clamp(19px, 5vw, 24px);
-    line-height: 1.38;
-    min-height: 44px;
+    font-size: clamp(16.5px, 4.4vw, 20px);
+    line-height: 1.35;
+    min-height: 38px;
     letter-spacing: -0.015em;
     color: #F6F6F2;
     word-break: break-word;
@@ -1854,7 +1876,7 @@ input:focus-visible {
      ========================================================================== */
   .transcript-journal {
     height: auto !important;
-    min-height: 160px;
+    min-height: 140px;
     overflow: visible !important;
     flex: 1 0 auto !important;
     display: flex;
@@ -1864,12 +1886,12 @@ input:focus-visible {
 
   .journal-header {
     position: sticky;
-    top: 80px;
+    top: 76px;
     z-index: 70;
-    background-color: rgba(23, 24, 22, 0.95);
+    background-color: rgba(23, 24, 22, 0.96);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    padding: 8px 14px;
+    padding: 6px 12px;
     border-bottom: 1px solid var(--border-hairline);
     display: flex;
     align-items: center;
@@ -1879,16 +1901,16 @@ input:focus-visible {
   .journal-title-wrap {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
   }
 
   .journal-title {
-    font-size: 10.5px;
+    font-size: 10px;
   }
 
   .journal-count {
-    font-size: 9.5px;
-    padding: 1px 5px;
+    font-size: 9px;
+    padding: 1px 4px;
   }
 
   .journal-filter-switch {
@@ -1897,64 +1919,64 @@ input:focus-visible {
   }
 
   .journal-filter-btn {
-    padding: 3px 8px;
-    font-size: 11px;
+    padding: 3px 6px;
+    font-size: 10.5px;
   }
 
   .journal-feed {
     height: auto !important;
     max-height: none !important;
     overflow: visible !important;
-    padding: 0 14px 170px 14px; /* Alt sabit dock'un içeriği örtmemesi için 170px güvenli boşluk */
+    padding: 0 12px 160px 12px !important; /* Alt sabit dock'un içeriği örtmemesi için 160px güvenli boşluk */
     display: flex;
     flex-direction: column;
   }
 
   .journal-empty-state {
-    padding: 36px 14px;
+    padding: 24px 12px;
   }
 
   .empty-wave-graphic {
-    width: 40px;
-    height: 20px;
-    margin-bottom: 12px;
+    width: 36px;
+    height: 18px;
+    margin-bottom: 8px;
   }
 
   .empty-primary {
-    font-size: 14px;
+    font-size: 13.5px;
   }
 
   .empty-secondary {
-    font-size: 12px;
+    font-size: 11.5px;
   }
 
   .journal-entry {
-    padding: 11px 0;
-    gap: 6px;
+    padding: 9px 0;
+    gap: 5px;
     border-bottom: 1px solid var(--border-hairline);
   }
 
   .entry-speaker-name {
-    font-size: 12.5px;
+    font-size: 12px;
   }
 
   .entry-speaker-accent {
-    font-size: 11px;
+    font-size: 10.5px;
   }
 
   .entry-timestamp {
-    font-size: 10px;
+    font-size: 9.5px;
   }
 
   .entry-original {
-    font-size: 12px;
-    line-height: 1.45;
+    font-size: 11.5px;
+    line-height: 1.4;
   }
 
   .entry-translation {
-    font-size: 14.5px;
+    font-size: 14px;
     font-weight: 500;
-    line-height: 1.45;
+    line-height: 1.4;
   }
 
   /* ==========================================================================
@@ -1967,22 +1989,24 @@ input:focus-visible {
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
-    z-index: 90;
-    background-color: rgba(28, 29, 26, 0.97);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-top: 1px solid var(--border-hairline);
-    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6);
-    padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px)) 12px;
-    gap: 6px;
-    box-sizing: border-box;
+    z-index: 1000 !important;
+    background-color: rgba(26, 27, 24, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-top: 1px solid var(--border-hairline) !important;
+    box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.7) !important;
+    padding: 6px 10px calc(8px + env(safe-area-inset-bottom, 0px)) 10px !important;
+    gap: 5px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   .console-action-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
     min-width: 0;
   }
@@ -1990,7 +2014,7 @@ input:focus-visible {
   .console-hint {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     min-width: 0;
     flex: 1;
     overflow: hidden;
@@ -2003,7 +2027,7 @@ input:focus-visible {
   }
 
   .hint-label {
-    font-size: 11px;
+    font-size: 10.5px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2012,25 +2036,25 @@ input:focus-visible {
 
   .console-add-speaker-btn {
     flex-shrink: 0;
-    padding: 4px 9px;
-    font-size: 11px;
-    gap: 4px;
+    padding: 3px 8px;
+    font-size: 10.5px;
+    gap: 3px;
     white-space: nowrap;
     border-radius: var(--radius-xs);
-    min-height: 28px;
+    min-height: 26px;
     background-color: var(--bg-surface-elevated);
   }
 
   .console-add-speaker-btn svg {
-    width: 11px;
-    height: 11px;
+    width: 10px;
+    height: 10px;
   }
 
   /* Konuşmacı Tuşları: Ekranı Dolduran Ergonomik Kartlar */
   .switcher-strip {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 6px;
+    gap: 5px;
     width: 100%;
     overflow: visible;
   }
@@ -2039,8 +2063,8 @@ input:focus-visible {
   .studio-pad {
     width: 100%;
     min-width: 0;
-    padding: 8px 10px;
-    min-height: 52px;
+    padding: 7px 10px;
+    min-height: 48px;
     gap: 3px;
     touch-action: manipulation;
     -webkit-touch-callout: none;
@@ -2057,29 +2081,29 @@ input:focus-visible {
   }
 
   .pad-monogram {
-    font-size: 10px;
+    font-size: 9.5px;
     padding: 2px 5px;
     border-radius: 2px;
   }
 
   .pad-edit-btn {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     border-radius: var(--radius-xs);
   }
 
   .pad-edit-btn svg {
-    width: 12px;
-    height: 12px;
+    width: 11px;
+    height: 11px;
   }
 
   .pad-status-dot {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
 
   .pad-name {
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -2087,14 +2111,14 @@ input:focus-visible {
   }
 
   .pad-accent {
-    font-size: 10px;
+    font-size: 9.5px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .pad-trigger-text {
-    font-size: 8.5px;
+    font-size: 8px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2102,15 +2126,15 @@ input:focus-visible {
 
   .console-stop-btn {
     width: 100%;
-    padding: 10px 14px;
-    font-size: 13px;
+    padding: 9px 12px;
+    font-size: 12.5px;
     font-weight: 600;
-    min-height: 44px;
+    min-height: 42px;
     border-radius: var(--radius-xs);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     box-sizing: border-box;
   }
 
@@ -2119,38 +2143,38 @@ input:focus-visible {
      ========================================================================== */
   #viewLanguageSection {
     height: auto !important;
-    min-height: calc(100dvh - 80px);
+    min-height: calc(100dvh - 76px);
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
   }
 
   .language-workspace {
-    padding: 16px 14px calc(40px + env(safe-area-inset-bottom, 0px)) 14px;
-    gap: 16px;
+    padding: 14px 12px calc(40px + env(safe-area-inset-bottom, 0px)) 12px;
+    gap: 14px;
     overflow: visible;
   }
 
   .lang-page-header {
-    padding-bottom: 10px;
-    gap: 4px;
+    padding-bottom: 8px;
+    gap: 3px;
   }
 
   .lang-page-title {
-    font-size: 18px;
+    font-size: 17px;
   }
 
   .lang-page-desc {
-    font-size: 12.5px;
+    font-size: 12px;
   }
 
   .lang-matrix-board {
     grid-template-columns: 1fr;
-    gap: 12px;
-    padding-bottom: 16px;
+    gap: 10px;
+    padding-bottom: 14px;
   }
 
   .matrix-card {
-    gap: 8px;
+    gap: 6px;
   }
 
   .matrix-swap-col {
@@ -2159,41 +2183,41 @@ input:focus-visible {
   }
 
   .matrix-swap-btn {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
   }
 
   /* iOS Auto-Zoom Engelleyici: Mobilde tüm select/input en az 16px olmalı */
   .matrix-select,
   .field-input {
     font-size: 16px !important;
-    padding: 10px 12px;
-    min-height: 44px;
+    padding: 9px 12px;
+    min-height: 42px;
   }
 
   .presets-block {
-    padding-bottom: 16px;
-    gap: 8px;
+    padding-bottom: 14px;
+    gap: 6px;
   }
 
   .presets-row {
-    gap: 6px;
+    gap: 5px;
     flex-wrap: wrap;
   }
 
   .preset-pill {
-    padding: 6px 11px;
-    font-size: 11.5px;
-    min-height: 34px;
+    padding: 5px 10px;
+    font-size: 11px;
+    min-height: 32px;
   }
 
   .matrix-submit-btn {
     width: 100%;
     justify-content: center;
-    padding: 12px;
-    font-size: 14px;
+    padding: 11px;
+    font-size: 13.5px;
     font-weight: 600;
-    min-height: 46px;
+    min-height: 44px;
     border-radius: var(--radius-xs);
   }
 
@@ -2215,35 +2239,35 @@ input:focus-visible {
   }
 
   .modal-header {
-    padding: 14px 18px;
+    padding: 12px 16px;
   }
 
   .modal-body {
-    padding: 16px 18px;
-    gap: 14px;
+    padding: 14px 16px;
+    gap: 12px;
     max-height: 65vh;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
 
   .modal-footer {
-    padding: 12px 18px calc(14px + env(safe-area-inset-bottom, 0px)) 18px;
+    padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px)) 16px;
   }
 
   .btn-solid,
   .btn-ghost,
   .btn-danger {
-    padding: 10px 14px;
-    font-size: 13px;
-    min-height: 42px;
+    padding: 9px 14px;
+    font-size: 12.5px;
+    min-height: 40px;
   }
 
   /* Toast: Alt konsolun üzerine hizalanır */
   .system-toast {
-    bottom: calc(95px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(90px + env(safe-area-inset-bottom, 0px));
     max-width: 90%;
-    font-size: 12px;
-    padding: 8px 16px;
+    font-size: 11.5px;
+    padding: 7px 14px;
     text-align: center;
   }
 }
@@ -2252,6 +2276,10 @@ input:focus-visible {
    KÜÇÜK EKRANLAR (iPhone SE, Galaxy A, 320px - 380px)
    ========================================================================== */
 @media (max-width: 380px) {
+  .app-header {
+    padding: calc(5px + env(safe-area-inset-top, 0px)) 8px 5px 8px;
+    gap: 5px 6px;
+  }
   .brand-wordmark {
     font-size: 12px;
   }
@@ -2259,35 +2287,37 @@ input:focus-visible {
     padding: 2px 5px;
     font-size: 9px;
   }
-  .mode-pill {
-    padding: 3px 6px;
-    font-size: 10px;
-  }
-  .nav-btn {
-    font-size: 10.5px;
-    padding: 5px 6px;
-  }
-  .speaker-name-hero {
-    max-width: 100px;
-    font-size: 12.5px;
-  }
-  .speaker-accent-hero {
-    max-width: 80px;
-    font-size: 10px;
-  }
-  .caption-stream-text {
-    font-size: 18px;
-  }
-  .switcher-strip {
-    grid-template-columns: 1fr;
-  }
   .util-btn {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
   }
   .util-btn svg {
     width: 12px;
     height: 12px;
+  }
+  .nav-btn {
+    font-size: 10.5px;
+    padding: 4px 6px;
+    min-height: 27px;
+  }
+  .mode-pill {
+    padding: 3px 5px;
+    font-size: 9.5px;
+    min-height: 24px;
+  }
+  .speaker-name-hero {
+    max-width: 95px;
+    font-size: 12px;
+  }
+  .speaker-accent-hero {
+    max-width: 75px;
+    font-size: 10px;
+  }
+  .caption-stream-text {
+    font-size: 16px;
+  }
+  .switcher-strip {
+    grid-template-columns: 1fr;
   }
 }
 
