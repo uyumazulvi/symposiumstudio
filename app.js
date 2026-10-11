@@ -1226,8 +1226,11 @@ function setupEventListeners() {
     renderTranscriptFeed();
   });
 
-  // Panoya Kopyala
-  copyScriptBtn.addEventListener('click', () => {
+  const modalCopyBtn = document.getElementById('modalCopyBtn');
+  const modalDownloadBtn = document.getElementById('modalDownloadBtn');
+  const modalClearBtn = document.getElementById('modalClearBtn');
+
+  function copyTranscriptAction() {
     if (transcriptHistory.length === 0) {
       showToast('Kopyalanacak tutanak kaydı yok.');
       return;
@@ -1240,10 +1243,9 @@ function setupEventListeners() {
     navigator.clipboard.writeText(text).then(() => {
       showToast('Tutanak panoya kopyalandı.');
     });
-  });
+  }
 
-  // TXT Olarak İndir
-  downloadScriptBtn.addEventListener('click', () => {
+  function downloadTranscriptAction() {
     if (transcriptHistory.length === 0) {
       showToast('İndirilecek kayıt yok.');
       return;
@@ -1259,10 +1261,9 @@ function setupEventListeners() {
     a.download = `symposium_tutanak_${new Date().toISOString().slice(0, 10)}.txt`;
     a.click();
     showToast('Tutanak TXT olarak indirildi.');
-  });
+  }
 
-  // Sıfırla
-  clearBtn.addEventListener('click', () => {
+  function clearTranscriptAction() {
     if (confirm('Tüm oturum tutanağını silmek istediğinize emin misiniz?')) {
       transcriptHistory = [];
       saveWorkspaceData();
@@ -1270,8 +1271,21 @@ function setupEventListeners() {
       liveOriginalStream.textContent = 'Sistemi başlatmak için aşağıdaki konuşmacı tuşuna dokunun veya basılı tutun...';
       liveTranslationStream.textContent = 'Konuşmacı başladığında eşzamanlı çeviri burada görünecektir.';
       showToast('Tutanak temizlendi.');
+      closeModal(settingsModal);
     }
-  });
+  }
+
+  // Panoya Kopyala
+  copyScriptBtn.addEventListener('click', copyTranscriptAction);
+  if (modalCopyBtn) modalCopyBtn.addEventListener('click', copyTranscriptAction);
+
+  // TXT Olarak İndir
+  downloadScriptBtn.addEventListener('click', downloadTranscriptAction);
+  if (modalDownloadBtn) modalDownloadBtn.addEventListener('click', downloadTranscriptAction);
+
+  // Sıfırla
+  clearBtn.addEventListener('click', clearTranscriptAction);
+  if (modalClearBtn) modalClearBtn.addEventListener('click', clearTranscriptAction);
 
   // Ayarlar Modalı
   settingsBtn.addEventListener('click', () => {

@@ -1394,6 +1394,54 @@ input:focus-visible {
   color: var(--text-tertiary);
 }
 
+.modal-session-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.session-tool-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background-color: var(--bg-root);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xs);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.session-tool-btn svg {
+  width: 14px;
+  height: 14px;
+  color: var(--text-secondary);
+}
+
+.session-tool-btn:hover {
+  background-color: var(--bg-surface-elevated);
+  border-color: var(--text-tertiary);
+}
+
+.session-tool-btn.danger {
+  color: #FF5C5C;
+}
+
+.session-tool-btn.danger svg {
+  color: #FF5C5C;
+}
+
+.session-tool-btn.danger:hover {
+  background-color: rgba(255, 92, 92, 0.12);
+  border-color: rgba(255, 92, 92, 0.4);
+}
+
+
 .modal-footer {
   padding: 14px 22px;
   border-top: 1px solid var(--border-hairline);
@@ -1570,198 +1618,176 @@ input:focus-visible {
   }
 
   /* ==========================================================================
-     2. MOBİL ÜST ÇUBUK (2 SATIRLI DENGELİ GRID - ASLA TAŞMA YAPMAZ)
-     1. Satır: Marka & Durum (Sol) | 4 Hızlı Araç Butonu (Sağ)
-     2. Satır: Canlı / Çeviri Sekmeleri (Sol) | Bas-Konuş Modu (Sağ)
+     2. MOBİL ÜST ÇUBUK (TEK SATIRLI, MİNİMALİST VE FERAH STÜDYO BAR)
      ========================================================================== */
   .app-header {
-    height: auto;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto;
-    grid-template-areas:
-      "brand utils"
-      "nav mode";
-    gap: 6px 8px;
-    padding: calc(6px + env(safe-area-inset-top, 0px)) 10px 6px 10px;
-    border-bottom: 1px solid var(--border-hairline);
-    background-color: rgba(23, 24, 22, 0.98);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    align-items: center;
+    height: 48px !important;
+    min-height: 48px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    padding: calc(6px + env(safe-area-inset-top, 0px)) 12px 6px 12px !important;
+    border-bottom: 1px solid var(--border-hairline) !important;
+    background-color: rgba(18, 20, 24, 0.98) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
   }
 
   .header-left {
-    grid-area: brand;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
   }
 
   .brand-group {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
   }
 
   .wordmark-wrap {
-    display: flex;
-    align-items: baseline;
-    gap: 3px;
-    min-width: 0;
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 2px !important;
   }
 
   .brand-wordmark {
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: var(--text-primary);
-    white-space: nowrap;
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.04em !important;
+    color: var(--text-primary) !important;
   }
 
   .brand-sub {
-    display: none;
+    display: none !important;
   }
 
   .header-divider {
-    display: none;
+    display: none !important;
   }
 
   .session-pill {
-    padding: 2px 6px;
-    font-size: 9.5px;
-    font-weight: 600;
-    border-radius: 999px;
-    white-space: nowrap;
-    flex-shrink: 0;
+    padding: 2px 5px !important;
+    font-size: 9px !important;
+    border-radius: 999px !important;
   }
 
-  /* header-right display: contents ile çocuklarını doğrudan üst ızgaraya yayar */
+  /* Orta: Dil Değiştirme Sekmesi (Swiss Nav - Tek ve Zarif Rozet) */
+  .studio-nav {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  /* Canlı sekmesi mobilde gizlenir (kullanıcı zaten sahnede) */
+  #tabLiveBtn {
+    display: none !important;
+  }
+
+  /* Çeviri butonu doğrudan tek bir şık dil köprüsüne dönüşür */
+  #tabLangBtn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    padding: 4px 10px !important;
+    min-height: 28px !important;
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--border-hairline) !important;
+    border-radius: var(--radius-xs) !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    color: var(--text-primary) !important;
+    white-space: nowrap !important;
+  }
+
+  #tabLangBtn .nav-btn-icon {
+    display: none !important;
+  }
+
+  #tabLangBtn .tab-label-full,
+  #tabLangBtn .tab-label-short {
+    display: none !important;
+  }
+
+  #activeLangBadgePill {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: var(--accent-turquoise, #65C7B0) !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
+  /* Sağ: Mod Toggle ve Tek Ayarlar Butonu */
   .header-right {
-    display: contents;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 6px !important;
+    flex-shrink: 0 !important;
   }
 
   .meter-block {
     display: none !important;
   }
 
-  /* 1. Satır Sağ: Araç Butonları (Ayarlar, Kopyala, İndir, Temizle) */
-  .utility-actions {
-    grid-area: utils;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 3px;
-    flex-shrink: 0;
-  }
-
-  .util-btn {
-    width: 28px;
-    height: 28px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-xs);
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-hairline);
-  }
-
-  .util-btn svg {
-    width: 13px;
-    height: 13px;
-  }
-
-  /* 2. Satır Sol: Swiss Navigasyon Sekmeleri */
-  .studio-nav {
-    grid-area: nav;
-    display: flex;
-    gap: 3px;
-    padding: 2px;
-    background-color: var(--bg-surface);
-    border-radius: var(--radius-xs);
-    border: 1px solid var(--border-hairline);
-    min-width: 0;
-  }
-
-  .nav-btn {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    padding: 5px 7px;
-    font-size: 11px;
-    font-weight: 500;
-    min-height: 29px;
-    white-space: nowrap;
-    border-radius: var(--radius-xs);
-    overflow: hidden;
-  }
-
-  .nav-btn span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .nav-btn.active {
-    background-color: var(--bg-surface-elevated);
-    color: var(--text-primary);
-    font-weight: 600;
-  }
-
-  .nav-btn svg {
-    width: 11px;
-    height: 11px;
-    flex-shrink: 0;
-  }
-
-  .lang-tag-indicator {
-    font-size: 9px;
-    padding: 1px 4px;
-    flex-shrink: 0;
-  }
-
-  /* 2. Satır Sağ: Mikrofon Çalışma Modu (Bas-Konuş / Sürekli) */
   .mic-mode-toggle {
-    grid-area: mode;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 2px;
-    padding: 2px;
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-hairline);
-    border-radius: var(--radius-xs);
-    flex-shrink: 0;
+    display: flex !important;
+    padding: 2px !important;
+    gap: 2px !important;
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--border-hairline) !important;
+    border-radius: var(--radius-xs) !important;
   }
 
   .mode-pill {
-    padding: 3px 6px;
-    font-size: 10px;
-    font-weight: 500;
-    min-height: 25px;
-    border-radius: var(--radius-xs);
-    white-space: nowrap;
+    padding: 3px 6px !important;
+    font-size: 9.5px !important;
+    min-height: 24px !important;
+    border-radius: var(--radius-xs) !important;
   }
 
-  .mode-pill.active {
-    background-color: var(--bg-surface-elevated);
-    color: var(--text-primary);
-    font-weight: 600;
+  /* 4 araç butonundan sadece Ayarlar kalır, diğerleri Ayarlar modalında! */
+  .utility-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0 !important;
+  }
+
+  #copyScriptBtn,
+  #downloadScriptBtn,
+  #clearBtn {
+    display: none !important;
+  }
+
+  #settingsBtn {
+    width: 28px !important;
+    height: 28px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--border-hairline) !important;
+    border-radius: var(--radius-xs) !important;
   }
 
   /* ==========================================================================
      3. CANLI ÇEVİRİ SAHNESİ (TELEPROMPTER)
      ========================================================================== */
   .teleprompter-stage {
-    padding: 10px 12px 8px 12px;
+    padding: 10px 12px 10px 12px;
     gap: 6px;
     background-color: var(--bg-root);
     border-bottom: 1px solid var(--border-hairline);
@@ -1769,7 +1795,7 @@ input:focus-visible {
   }
 
   .stage-meta-row {
-    padding-bottom: 6px;
+    padding-bottom: 4px;
     gap: 6px;
     display: flex;
     align-items: center;
@@ -1778,7 +1804,7 @@ input:focus-visible {
   }
 
   .speaker-identity {
-    gap: 5px;
+    gap: 6px;
     display: flex;
     align-items: center;
     min-width: 0;
@@ -1798,7 +1824,7 @@ input:focus-visible {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 110px;
+    max-width: 130px;
   }
 
   .meta-slash {
@@ -1813,28 +1839,12 @@ input:focus-visible {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 90px;
+    max-width: 110px;
   }
 
+  /* Duplicate Dil Rozeti mobilde gizlenir - tek rozet üst barda yer alıyor */
   .stage-language-bridge {
-    gap: 4px;
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-  }
-
-  .language-bridge-btn {
-    padding: 3px 7px;
-    font-size: 10.5px;
-    gap: 4px;
-    border-radius: var(--radius-xs);
-    background-color: var(--bg-surface);
-    white-space: nowrap;
-  }
-
-  .bridge-arrow {
-    width: 9px;
-    height: 9px;
+    display: none !important;
   }
 
   .stage-source-area {
@@ -1842,32 +1852,31 @@ input:focus-visible {
   }
 
   .source-stream-text {
-    font-size: 11.5px;
+    font-size: 12px;
     line-height: 1.4;
     color: var(--text-secondary);
     word-break: break-word;
     font-style: italic;
-    max-height: 36px;
+    max-height: 38px;
     overflow-y: auto;
   }
 
   .stage-caption-canvas {
-    padding: 0;
+    padding: 2px 0 0 0;
     gap: 4px;
   }
 
   .caption-badge {
-    font-size: 9px;
-    letter-spacing: 0.12em;
-    color: var(--accent-cyan);
+    display: none !important; /* Mobilde sahte AI hissi veren ekstra rozet gizlenir */
   }
 
   .caption-stream-text {
-    font-size: clamp(16.5px, 4.4vw, 20px);
-    line-height: 1.35;
-    min-height: 38px;
+    font-size: clamp(20px, 5.5vw, 26px) !important;
+    line-height: 1.35 !important;
+    min-height: 48px;
     letter-spacing: -0.015em;
-    color: #F6F6F2;
+    font-weight: 500 !important;
+    color: #FFFFFF !important;
     word-break: break-word;
   }
 
@@ -1886,9 +1895,9 @@ input:focus-visible {
 
   .journal-header {
     position: sticky;
-    top: 76px;
+    top: 48px !important; /* Yeni 48px tek satırlı üst çubuk ile tam hizalı */
     z-index: 70;
-    background-color: rgba(23, 24, 22, 0.96);
+    background-color: rgba(18, 20, 24, 0.96) !important;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     padding: 6px 12px;
@@ -1906,6 +1915,7 @@ input:focus-visible {
 
   .journal-title {
     font-size: 10px;
+    font-weight: 600;
   }
 
   .journal-count {
@@ -1920,14 +1930,14 @@ input:focus-visible {
 
   .journal-filter-btn {
     padding: 3px 6px;
-    font-size: 10.5px;
+    font-size: 10px;
   }
 
   .journal-feed {
     height: auto !important;
     max-height: none !important;
     overflow: visible !important;
-    padding: 0 12px 160px 12px !important; /* Alt sabit dock'un içeriği örtmemesi için 160px güvenli boşluk */
+    padding: 0 12px calc(76px + env(safe-area-inset-bottom, 0px)) 12px !important; /* Alt 54px dock ve serbest pay */
     display: flex;
     flex-direction: column;
   }
@@ -1951,8 +1961,8 @@ input:focus-visible {
   }
 
   .journal-entry {
-    padding: 9px 0;
-    gap: 5px;
+    padding: 8px 0;
+    gap: 4px;
     border-bottom: 1px solid var(--border-hairline);
   }
 
@@ -1961,7 +1971,7 @@ input:focus-visible {
   }
 
   .entry-speaker-accent {
-    font-size: 10.5px;
+    font-size: 10px;
   }
 
   .entry-timestamp {
@@ -1980,8 +1990,8 @@ input:focus-visible {
   }
 
   /* ==========================================================================
-     5. SABİT ALT DOCK (FIXED HARDWARE SWITCHER CONSOLE)
-     Her daim ekranın en altında sabit, asla kaybolmaz, başparmak hizasında.
+     5. SABİT ALT DOCK (TEK SATIRLI ERGONOMİK 54px AKSİYON DOCK'I)
+     Her daim ekranın en altında sabit, tek satır, ferah, başparmak ergonomisinde.
      ========================================================================== */
   .switcher-console {
     position: fixed !important;
@@ -1990,152 +2000,181 @@ input:focus-visible {
     right: 0 !important;
     width: 100% !important;
     z-index: 1000 !important;
-    background-color: rgba(26, 27, 24, 0.98) !important;
+    background-color: rgba(18, 20, 24, 0.98) !important;
     backdrop-filter: blur(20px) !important;
     -webkit-backdrop-filter: blur(20px) !important;
     border-top: 1px solid var(--border-hairline) !important;
-    box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.7) !important;
-    padding: 6px 10px calc(8px + env(safe-area-inset-bottom, 0px)) 10px !important;
-    gap: 5px !important;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.7) !important;
+    padding: 7px 10px calc(7px + env(safe-area-inset-bottom, 0px)) 10px !important;
+    gap: 8px !important;
     box-sizing: border-box !important;
     display: flex !important;
-    flex-direction: column !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    height: auto !important;
+    min-height: 52px !important;
   }
 
   .console-action-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-    width: 100%;
-    min-width: 0;
+    display: contents !important;
   }
 
   .console-hint {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    min-width: 0;
-    flex: 1;
-    overflow: hidden;
+    display: none !important; /* Kalabalık yapan metin mobilde gizlenir */
   }
 
-  .hint-accent-bar {
-    height: 10px;
-    width: 3px;
-    flex-shrink: 0;
-  }
-
-  .hint-label {
-    font-size: 10.5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 0;
-  }
-
+  /* Konuşmacı Ekle: Tek Satırlı Şık Dairesel [+] Butonu */
   .console-add-speaker-btn {
-    flex-shrink: 0;
-    padding: 3px 8px;
-    font-size: 10.5px;
-    gap: 3px;
-    white-space: nowrap;
-    border-radius: var(--radius-xs);
-    min-height: 26px;
-    background-color: var(--bg-surface-elevated);
+    flex-shrink: 0 !important;
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: var(--bg-surface-elevated) !important;
+    border: 1px solid var(--border-hairline) !important;
+    color: var(--text-primary) !important;
+    cursor: pointer !important;
   }
 
   .console-add-speaker-btn svg {
-    width: 10px;
-    height: 10px;
+    width: 15px !important;
+    height: 15px !important;
+    margin: 0 !important;
   }
 
-  /* Konuşmacı Tuşları: Ekranı Dolduran Ergonomik Kartlar */
+  .console-add-speaker-btn span {
+    display: none !important;
+  }
+
+  /* Konuşmacı Tuşları: Yatay Kapsül Şerit */
   .switcher-strip {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 5px;
-    width: 100%;
-    overflow: visible;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    gap: 6px !important;
+    padding: 2px 0 !important;
   }
 
+  .switcher-strip::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Kapsül Hap Buton (Ergonomik, Minimalist) */
   .switcher-pad,
   .studio-pad {
-    width: 100%;
-    min-width: 0;
-    padding: 7px 10px;
-    min-height: 48px;
-    gap: 3px;
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 6px !important;
+    width: auto !important;
+    min-width: auto !important;
+    max-width: 145px !important;
+    padding: 4px 10px 4px 6px !important;
+    min-height: 36px !important;
+    height: 36px !important;
+    border-radius: 999px !important;
+    flex-shrink: 0 !important;
     touch-action: manipulation;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
-    border-radius: var(--radius-xs);
+    border: 1px solid var(--border-hairline) !important;
+    background-color: var(--bg-surface) !important;
+  }
+
+  .switcher-pad.active,
+  .studio-pad.active {
+    background-color: var(--bg-surface-elevated) !important;
+    border-color: var(--accent-cyan) !important;
+    box-shadow: 0 0 12px rgba(101, 199, 176, 0.25) !important;
   }
 
   .pad-head {
-    gap: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    flex-shrink: 0 !important;
   }
 
   .pad-monogram {
-    font-size: 9.5px;
-    padding: 2px 5px;
-    border-radius: 2px;
-  }
-
-  .pad-edit-btn {
-    width: 22px;
-    height: 22px;
-    border-radius: var(--radius-xs);
-  }
-
-  .pad-edit-btn svg {
-    width: 11px;
-    height: 11px;
+    font-size: 9.5px !important;
+    padding: 2px 5px !important;
+    border-radius: 4px !important;
   }
 
   .pad-status-dot {
-    width: 5px;
-    height: 5px;
+    width: 6px !important;
+    height: 6px !important;
+    flex-shrink: 0 !important;
   }
 
   .pad-name {
-    font-size: 11.5px;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 65px !important;
+    color: var(--text-primary) !important;
   }
 
-  .pad-accent {
-    font-size: 9.5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
+  .pad-accent,
   .pad-trigger-text {
-    font-size: 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: none !important;
   }
 
+  .pad-edit-btn {
+    width: 18px !important;
+    height: 18px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 0.6 !important;
+  }
+
+  .pad-edit-btn svg {
+    width: 10px !important;
+    height: 10px !important;
+  }
+
+  /* Sürekli Akış Modunda Dinlemeyi Başlat / Durdur Butonu (Inline Kapsül) */
   .console-stop-btn {
-    width: 100%;
-    padding: 9px 12px;
-    font-size: 12.5px;
-    font-weight: 600;
-    min-height: 42px;
-    border-radius: var(--radius-xs);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    box-sizing: border-box;
+    flex-shrink: 0 !important;
+    width: auto !important;
+    min-width: auto !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 12px !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    border-radius: 999px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    box-sizing: border-box !important;
+    white-space: nowrap !important;
+  }
+
+  .console-stop-btn.hidden {
+    display: none !important;
+  }
+
+  .console-stop-btn svg {
+    width: 12px !important;
+    height: 12px !important;
   }
 
   /* ==========================================================================
@@ -2282,47 +2321,41 @@ input:focus-visible {
    ========================================================================== */
 @media (max-width: 380px) {
   .app-header {
-    padding: calc(5px + env(safe-area-inset-top, 0px)) 8px 5px 8px;
-    gap: 5px 6px;
+    padding: calc(5px + env(safe-area-inset-top, 0px)) 8px 5px 8px !important;
+    gap: 4px !important;
   }
   .brand-wordmark {
-    font-size: 12px;
+    font-size: 12px !important;
   }
   .session-pill {
-    padding: 2px 5px;
-    font-size: 9px;
+    display: none !important;
   }
-  .util-btn {
-    width: 26px;
-    height: 26px;
-  }
-  .util-btn svg {
-    width: 12px;
-    height: 12px;
-  }
-  .nav-btn {
-    font-size: 10.5px;
-    padding: 4px 6px;
-    min-height: 27px;
+  #tabLangBtn {
+    padding: 3px 6px !important;
+    font-size: 10.5px !important;
   }
   .mode-pill {
-    padding: 3px 5px;
-    font-size: 9.5px;
-    min-height: 24px;
+    padding: 2px 4px !important;
+    font-size: 8.5px !important;
   }
   .speaker-name-hero {
-    max-width: 95px;
-    font-size: 12px;
+    max-width: 85px !important;
+    font-size: 12px !important;
   }
   .speaker-accent-hero {
-    max-width: 75px;
-    font-size: 10px;
+    max-width: 70px !important;
+    font-size: 10px !important;
   }
   .caption-stream-text {
-    font-size: 16px;
+    font-size: 18px !important;
   }
-  .switcher-strip {
-    grid-template-columns: 1fr;
+  .switcher-pad,
+  .studio-pad {
+    max-width: 115px !important;
+    padding: 3px 8px 3px 5px !important;
+  }
+  .pad-name {
+    max-width: 45px !important;
   }
 }
 
