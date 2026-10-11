@@ -67,7 +67,26 @@ const ACCENT_REGISTRY = {
   'de-DE': { name: 'Almanca', flag: 'DE', code: 'de-DE' },
   'fr-FR': { name: 'Fransızca', flag: 'FR', code: 'fr-FR' },
   'es-ES': { name: 'İspanyolca', flag: 'ES', code: 'es-ES' },
+  'it-IT': { name: 'İtalyanca', flag: 'IT', code: 'it-IT' },
+  'ru-RU': { name: 'Rusça', flag: 'RU', code: 'ru-RU' },
+  'ar-SA': { name: 'Arapça', flag: 'SA', code: 'ar-SA' },
+  'zh-CN': { name: 'Çince (Mandarin)', flag: 'CN', code: 'zh-CN' },
+  'ja-JP': { name: 'Japonca', flag: 'JP', code: 'ja-JP' },
   'tr-TR': { name: 'Türkçe', flag: 'TR', code: 'tr-TR' }
+};
+
+// Hedef Dilden Konuşma Tanıma Koduna Eşleme
+const DEFAULT_SPEECH_LOCALES = {
+  'tr': 'tr-TR',
+  'en': 'en-US',
+  'de': 'de-DE',
+  'fr': 'fr-FR',
+  'es': 'es-ES',
+  'it': 'it-IT',
+  'ru': 'ru-RU',
+  'ar': 'ar-SA',
+  'zh': 'zh-CN',
+  'ja': 'ja-JP'
 };
 
 // Profesyonel Konuşmacı Renk Paleti (Editoryal & Muted)
@@ -185,7 +204,13 @@ window.addEventListener('DOMContentLoaded', () => {
   updateLanguageDisplayBadges();
 
   if (speakers.length > 0) {
-    setActiveSpeaker(speakers[0].id, false);
+    const curSpk = speakers[0];
+    const srcFamily = (sourceLanguage || 'en').split('-')[0].toLowerCase();
+    const curFamily = (curSpk.accent || '').split('-')[0].toLowerCase();
+    if (srcFamily !== curFamily) {
+      curSpk.accent = sourceLanguage;
+    }
+    setActiveSpeaker(curSpk.id, false);
   }
   updateEngineBadge();
   updateStopButtonState(false);
@@ -285,22 +310,92 @@ function applySelectedLanguages() {
   sourceLanguage = meetingSourceLangSelect.value;
   targetLanguage = meetingTargetLangSelect.value;
 
+  // Aktif konuşmacının aksanını yeni kaynak dille senkronize et
+  const cur = getActiveSpeaker();
+  if (cur) {
+    const srcFamily = (sourceLanguage || '').split('-')[0].toLowerCase();
+    const curFamily = (cur.accent || '').split('-')[0].toLowerCase();
+    if (srcFamily !== curFamily) {
+      cur.accent = sourceLanguage;
+      renderSoundboardPads();
+      setActiveSpeaker(cur.id, false);
+    }
+  }
+
   updateLanguageDisplayBadges();
   saveWorkspaceData();
 
   // Eğer ses tanıma motoru çalışıyorsa yeni kaynak dile uyarla
-  if (isRecording && recognition && isRecognitionActive) {
-    const cur = getActiveSpeaker();
-    pendingLangSwitch = getSpeakerLang(cur);
-    isRecognitionStopping = true;
-    try {
-      recognition.stop();
-    } catch (e) {}
+  if (recognition) {
+    const targetRecLang = getSpeakerLang(getActiveSpeaker());
+    if (isRecording && isRecognitionActive) {
+      pendingLangSwitch = targetRecLang;
+      isRecognitionStopping = true;
+      try {
+        recognition.stop();
+      } catch (e) {}
+    } else {
+      recognition.lang = targetRecLang;
+    }
   }
+
+  // Akış tamponlarını temizle
+  lastTranslatedSourceText = '';
 
   // Canlı Sahneye Geri Dön
   switchTab('live');
   showToast(`Toplantı Dili: ${SOURCE_LANG_NAMES[sourceLanguage]} ➔ Çeviri: ${LANGUAGE_NAMES[targetLanguage]}`);
+}
+
+function swapLanguages() {
+  const curSource = meetingSourceLangSelect ? meetingSourceLangSelect.value : sourceLanguage;
+  const curTarget = meetingTargetLangSelect ? meetingTargetLangSelect.value : targetLanguage;
+
+  const srcPrefix = (curSource || 'en').split('-')[0].toLowerCase();
+  const tgtPrefix = (curTarget || 'tr').split('-')[0].toLowerCase();
+
+  // Hedef dili yeni kaynak dil yap (Bölgesel konuşma tanıma yerel kodu ile)
+  const newSourceLocale = DEFAULT_SPEECH_LOCALES[tgtPrefix] || (tgtPrefix + '-' + tgtPrefix.toUpperCase());
+  // Eski kaynak dili yeni hedef dil yap
+  const newTargetCode = srcPrefix;
+
+  sourceLanguage = newSourceLocale;
+  targetLanguage = newTargetCode;
+
+  if (meetingSourceLangSelect) meetingSourceLangSelect.value = sourceLanguage;
+  if (meetingTargetLangSelect) meetingTargetLangSelect.value = targetLanguage;
+
+  // Aktif konuşmacı aksanını yeni kaynak dile adapte et
+  const cur = getActiveSpeaker();
+  if (cur) {
+    cur.accent = newSourceLocale;
+    renderSoundboardPads();
+    setActiveSpeaker(cur.id, false);
+  }
+
+  updateLanguageDisplayBadges();
+  saveWorkspaceData();
+
+  // Ses tanıma motorunun dilini anında güncelle
+  if (recognition) {
+    const targetRecLang = getSpeakerLang(getActiveSpeaker());
+    if (isRecording && isRecognitionActive) {
+      pendingLangSwitch = targetRecLang;
+      isRecognitionStopping = true;
+      try { recognition.stop(); } catch (e) {}
+    } else {
+      recognition.lang = targetRecLang;
+    }
+  }
+
+  // Ekran tamponlarını ve referans metinleri temizle
+  lastTranslatedSourceText = '';
+  liveOriginalStream.textContent = 'Dinleniyor...';
+  liveTranslationStream.textContent = '...';
+
+  const srcName = SOURCE_LANG_NAMES[sourceLanguage] || sourceLanguage;
+  const tgtName = LANGUAGE_NAMES[targetLanguage] || targetLanguage;
+  showToast(`Diller Değiştirildi: ${srcName.split(' ')[0]} ⇄ ${tgtName}`);
 }
 
 function switchTab(tabName) {
@@ -518,12 +613,48 @@ function initRecognitionEngine() {
 }
 
 // ==========================================================================
-// 5. ÇOK DİLLİ ÇEVİRİ PİPELİNE'I (GEMINI LLM & GOOGLE GTX)
+// 5. ÇOK DİLLİ ÇEVİRİ PİPELİNE'I (GEMINI LLM, GOOGLE GTX & MYMEMORY FALLBACK)
 // ==========================================================================
 let liveTranslateTimer = null;
 let liveTranslateSeq = 0;
 let lastTranslatedSourceText = '';
 const liveTranslationCache = new Map();
+
+async function fetchWebTranslation(cleanText, srcCode, tgtCode) {
+  if (!cleanText || srcCode === tgtCode) return cleanText;
+
+  // 1. Google GTX (Özel Kaynak ve Hedef Dil Parametreleri ile)
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${srcCode}&tl=${tgtCode}&dt=t&q=${encodeURIComponent(cleanText)}`;
+    const res = await fetch(url);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data[0]) {
+        const result = data[0].map(s => s[0]).join('').trim();
+        if (result) return result;
+      }
+    }
+  } catch (err) {
+    console.warn('Google GTX çeviri hatası, yedek servise geçiliyor:', err);
+  }
+
+  // 2. Yedek Servis: MyMemory API (Ağ engeli veya kota aşımlarında devreye girer)
+  try {
+    const fallbackUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(cleanText)}&langpair=${srcCode}|${tgtCode}`;
+    const fbRes = await fetch(fallbackUrl);
+    if (fbRes.ok) {
+      const fbData = await fbRes.json();
+      const fbResult = fbData?.responseData?.translatedText;
+      if (fbResult && !fbResult.startsWith('MYMEMORY WARNING:')) {
+        return fbResult.trim();
+      }
+    }
+  } catch (fbErr) {
+    console.warn('Yedek çeviri servisi hatası:', fbErr);
+  }
+
+  return cleanText;
+}
 
 function triggerLiveTranslation(sourceText) {
   if (!sourceText || sourceText.trim().length === 0) return;
@@ -531,7 +662,16 @@ function triggerLiveTranslation(sourceText) {
   if (clean === lastTranslatedSourceText) return;
   if (clean === 'Dinleniyor...' || clean.startsWith('Sistemi başlatmak')) return;
 
-  const cacheKey = `${sourceLanguage}_${targetLanguage}_${clean}`;
+  const srcCode = (sourceLanguage || 'en').split('-')[0].toLowerCase();
+  const tgtCode = (targetLanguage || 'tr').split('-')[0].toLowerCase();
+
+  if (srcCode === tgtCode) {
+    liveTranslationStream.textContent = clean;
+    lastTranslatedSourceText = clean;
+    return;
+  }
+
+  const cacheKey = `${srcCode}_${tgtCode}_${clean}`;
   if (liveTranslationCache.has(cacheKey)) {
     liveTranslationStream.textContent = liveTranslationCache.get(cacheKey);
     lastTranslatedSourceText = clean;
@@ -542,21 +682,14 @@ function triggerLiveTranslation(sourceText) {
   liveTranslateTimer = setTimeout(async () => {
     const currentSeq = ++liveTranslateSeq;
     try {
-      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLanguage}&dt=t&q=${encodeURIComponent(clean)}`;
-      const res = await fetch(url);
-      if (res.ok && currentSeq === liveTranslateSeq) {
-        const data = await res.json();
-        if (data && data[0]) {
-          const translated = data[0].map(s => s[0]).join('').trim();
-          if (translated && currentSeq === liveTranslateSeq) {
-            liveTranslationStream.textContent = translated;
-            lastTranslatedSourceText = clean;
-            liveTranslationCache.set(cacheKey, translated);
-            if (liveTranslationCache.size > 200) {
-              const firstKey = liveTranslationCache.keys().next().value;
-              liveTranslationCache.delete(firstKey);
-            }
-          }
+      const translated = await fetchWebTranslation(clean, srcCode, tgtCode);
+      if (translated && currentSeq === liveTranslateSeq) {
+        liveTranslationStream.textContent = translated;
+        lastTranslatedSourceText = clean;
+        liveTranslationCache.set(cacheKey, translated);
+        if (liveTranslationCache.size > 200) {
+          const firstKey = liveTranslationCache.keys().next().value;
+          liveTranslationCache.delete(firstKey);
         }
       }
     } catch (e) {
@@ -567,9 +700,14 @@ function triggerLiveTranslation(sourceText) {
 
 async function translateSpeechTurn(sourceText) {
   if (!sourceText || sourceText.trim() === '') return '';
-
   const cleanText = sourceText.trim();
-  const tgtLangName = LANGUAGE_NAMES[targetLanguage] || targetLanguage;
+
+  const srcCode = (sourceLanguage || 'en').split('-')[0].toLowerCase();
+  const tgtCode = (targetLanguage || 'tr').split('-')[0].toLowerCase();
+
+  if (srcCode === tgtCode) return cleanText;
+
+  const tgtLangName = LANGUAGE_NAMES[tgtCode] || targetLanguage;
 
   // 1. Google Gemini 1.5 Flash (Varsa Profesyonel Kongre Çevirmeni)
   if (geminiApiKey && geminiApiKey.trim() !== '') {
@@ -600,25 +738,16 @@ async function translateSpeechTurn(sourceText) {
   }
 
   // Önbellekten kontrol et
-  const cacheKey = `${sourceLanguage}_${targetLanguage}_${cleanText}`;
+  const cacheKey = `${srcCode}_${tgtCode}_${cleanText}`;
   if (liveTranslationCache.has(cacheKey)) {
     return liveTranslationCache.get(cacheKey);
   }
 
-  // 2. Standart Hızlı Web Çevirisi (GTX Uç Noktası - Hedef Dile Dinamik Çağrı)
-  try {
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLanguage}&dt=t&q=${encodeURIComponent(cleanText)}`;
-    const res = await fetch(url);
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data[0]) {
-        const result = data[0].map(s => s[0]).join('').trim();
-        liveTranslationCache.set(cacheKey, result);
-        return result;
-      }
-    }
-  } catch (err) {
-    console.warn('Web çeviri hatası:', err);
+  // 2. Standart Hızlı Web Çevirisi (GTX + MyMemory Fallback)
+  const result = await fetchWebTranslation(cleanText, srcCode, tgtCode);
+  if (result) {
+    liveTranslationCache.set(cacheKey, result);
+    return result;
   }
 
   return cleanText;
@@ -1043,25 +1172,11 @@ function setupEventListeners() {
   // Ana Sekme Geçişleri
   tabLiveBtn.addEventListener('click', () => switchTab('live'));
   tabLangBtn.addEventListener('click', () => switchTab('lang'));
-  quickLangBadgeBtn.addEventListener('click', () => switchTab('lang'));
+  quickLangBadgeBtn.addEventListener('click', swapLanguages);
 
   // Dil Paneli Olayları
   applyLangSettingsBtn.addEventListener('click', applySelectedLanguages);
-
-  // Dil Değiştir (Swap) Butonu
-  swapLanguagesBtn.addEventListener('click', () => {
-    const curSource = meetingSourceLangSelect.value;
-    const curTarget = meetingTargetLangSelect.value;
-
-    // Basit swap haritalama
-    const targetMap = { 'tr': 'tr-TR', 'en': 'en-US', 'de': 'de-DE', 'fr': 'fr-FR', 'es': 'es-ES' };
-    const sourceMap = { 'tr-TR': 'tr', 'en-US': 'en', 'en-GB': 'en', 'de-DE': 'de', 'fr-FR': 'fr', 'es-ES': 'es' };
-
-    if (targetMap[curTarget]) meetingSourceLangSelect.value = targetMap[curTarget];
-    if (sourceMap[curSource]) meetingTargetLangSelect.value = sourceMap[curSource];
-
-    showToast('Diller karşılıklı yer değiştirdi.');
-  });
+  swapLanguagesBtn.addEventListener('click', swapLanguages);
 
   // Hızlı Dil Şablonları (Presets)
   presetPills.forEach(pill => {
