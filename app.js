@@ -1439,25 +1439,27 @@ const dismissIosGuideBtn = document.getElementById('dismissIosGuideBtn');
 function initPwaInstallationFlow() {
   if (!pwaSmartBanner) return;
 
+  // Önceki kapatma kayıtlarını temizle (her sayfa yenilendiğinde garanti çıkması için)
+  try { localStorage.removeItem('sym_pwa_dismissed'); } catch (e) {}
+
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
                        window.navigator.standalone === true;
 
-  // Zaten ana ekrandan açılmışsa şeridi asla gösterme
+  // Yalnızca uygulama ana ekrandan tam ekran açılmışsa gizle
   if (isStandalone) {
     pwaSmartBanner.classList.add('hidden');
     return;
   }
 
-  // Kullanıcı son 3 gün içinde kapattıysa rahatsız etme
-  const lastDismissed = localStorage.getItem('sym_pwa_dismissed');
-  if (lastDismissed) {
-    const elapsed = Date.now() - parseInt(lastDismissed, 10);
-    if (elapsed < 3 * 24 * 60 * 60 * 1000) {
-      return;
-    }
-  }
-
   const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  // MOBİLDE HER SAYFA YENİLENDİĞİNDE ŞERİDİ GÖSTER
+  if (isMobile) {
+    setTimeout(() => {
+      showPwaBanner();
+    }, 350);
+  }
 
   // Android ve Masaüstü Tarayıcılar İçin Otomatik Yükleme Olayı
   window.addEventListener('beforeinstallprompt', (e) => {
@@ -1465,13 +1467,6 @@ function initPwaInstallationFlow() {
     deferredInstallPrompt = e;
     showPwaBanner();
   });
-
-  // iPhone (Safari) İçin: Kullanıcı sayfayı gördükten 2 saniye sonra şeridi göster
-  if (isIos) {
-    setTimeout(() => {
-      showPwaBanner();
-    }, 2000);
-  }
 
   // Ekle Butonuna Basıldığında
   if (pwaInstallActionBtn) {
@@ -1488,16 +1483,15 @@ function initPwaInstallationFlow() {
         // iPhone (Safari): 2 adımlı şık mini rehberi aç
         openModal(iosGuideModal);
       } else {
-        showToast("Tarayıcınızın menüsünden 'Ana Ekrana Ekle' seçeneğini seçebilirsiniz.");
+        openModal(iosGuideModal);
       }
     });
   }
 
-  // Kapat Butonuna Basıldığında (3 gün boyunca tekrar göstermez)
+  // Kapat Butonuna Basıldığında: Sadece o an kapatır, sayfa yenilendiğinde tekrar gelir
   if (pwaDismissBannerBtn) {
     pwaDismissBannerBtn.addEventListener('click', () => {
       hidePwaBanner();
-      localStorage.setItem('sym_pwa_dismissed', Date.now().toString());
     });
   }
 
