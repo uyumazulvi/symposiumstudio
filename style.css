@@ -1264,7 +1264,7 @@ input:focus-visible {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  z-index: 100;
+  z-index: 20000;
 }
 
 .modal-card {
@@ -2227,15 +2227,20 @@ input:focus-visible {
   .modal-backdrop {
     padding: 0;
     align-items: flex-end;
+    z-index: 20000 !important;
+    background-color: rgba(10, 12, 16, 0.88) !important;
   }
 
   .modal-card {
     max-width: 100%;
     width: 100%;
-    border-radius: 16px 16px 0 0;
+    border-radius: 18px 18px 0 0;
     max-height: 88vh;
     border-bottom: none;
-    box-shadow: 0 -8px 36px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.9);
+    position: relative;
+    z-index: 20001 !important;
+    margin-bottom: 0;
   }
 
   .modal-header {
@@ -2458,45 +2463,51 @@ input:focus-visible {
   color: var(--text-primary, #F5F7FA);
 }
 
-/* Mobil Cihazlarda Alt Konsolun Üzerine Yerleşim */
+/* Mobil Cihazlarda: Üst Başlığın Hemen Altına Şık Akıllı Şerit Olarak Konumlandır */
 @media (max-width: 768px) {
   .pwa-smart-banner {
-    bottom: calc(105px + env(safe-area-inset-bottom, 0px));
-    left: 10px;
-    right: 10px;
-    max-width: 100%;
-    padding: 8px 12px;
+    position: fixed !important;
+    top: calc(74px + env(safe-area-inset-top, 0px)) !important;
+    bottom: auto !important;
+    left: 10px !important;
+    right: 10px !important;
+    max-width: calc(100% - 20px) !important;
+    padding: 8px 12px !important;
+    z-index: 500 !important;
   }
 }
 
 /* iOS Rehber Modal İçeriği */
 .ios-guide-card {
   max-width: 440px;
+  background-color: #171A21 !important;
+  border: 1px solid rgba(101, 199, 176, 0.3) !important;
 }
 
 .ios-guide-body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  padding: 16px 18px !important;
 }
 
 .ios-step-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-hairline, rgba(255, 255, 255, 0.07));
-  border-radius: 8px;
+  padding: 13px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
 }
 
 .ios-step-num {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: var(--accent-turquoise, #65C7B0);
   color: #0E1116;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -2505,7 +2516,8 @@ input:focus-visible {
 }
 
 .ios-step-text {
-  font-size: 13px;
+  font-size: 13.5px;
+  font-weight: 500;
   color: var(--text-primary, #F5F7FA);
   line-height: 1.45;
 }
