@@ -18,6 +18,14 @@ let geminiApiKey = '';
 let currentFilter = 'all'; // 'all' | 'tr'
 let currentFontSize = 'standard';
 
+// Sesli Tercüman (TTS / Kulaklıkla Dinleme) Durumu
+let isTtsActive = false;
+let ttsSpeed = 1.05; // Canlı kongre için akıcı eşzamanlı hız
+let ttsSpeechQueue = [];
+let isTtsSpeaking = false;
+let availableVoices = [];
+let currentTtsUtterance = null;
+
 // Dil Ayarları (Toplantı Dili & Çevrilecek Hedef Dil)
 let sourceLanguage = 'en-US'; // Sahnede konuşulan dil
 let targetLanguage = 'tr';    // Hedef çeviri dili
@@ -182,6 +190,8 @@ const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
 const saveSettingsBtn = document.getElementById('saveSettingsBtn');
 const geminiApiKeyInput = document.getElementById('geminiApiKeyInput');
 const fontSizeSelect = document.getElementById('fontSizeSelect');
+const ttsSpeedSelect = document.getElementById('ttsSpeedSelect');
+const headphoneTtsBtn = document.getElementById('headphoneTtsBtn');
 
 const addNewSpeakerBtn = document.getElementById('addNewSpeakerBtn');
 const addSpeakerModal = document.getElementById('addSpeakerModal');
@@ -228,6 +238,7 @@ window.addEventListener('DOMContentLoaded', () => {
   renderSoundboardPads();
   renderTranscriptFeed();
   initRecognitionEngine();
+  initTtsEngine();
   initStudioVuMeter();
   setupEventListeners();
   updateLanguageDisplayBadges();
@@ -308,6 +319,18 @@ function loadWorkspaceData() {
       targetLanguage = 'tr';
       if (headerNativeLangSelect) headerNativeLangSelect.value = 'tr';
     }
+    const t = localStorage.getItem('sym_tts_pref');
+    if (t === 'true') {
+      isTtsActive = true;
+    }
+    const sp = localStorage.getItem('sym_tts_speed');
+    if (sp) {
+      const parsedSpeed = parseFloat(sp);
+      if (!isNaN(parsedSpeed) && parsedSpeed >= 0.7 && parsedSpeed <= 1.5) {
+        ttsSpeed = parsedSpeed;
+        if (ttsSpeedSelect) ttsSpeedSelect.value = sp;
+      }
+    }
   } catch (err) {
     console.warn('Veri yükleme hatası:', err);
   }
@@ -322,6 +345,8 @@ function saveWorkspaceData() {
     localStorage.setItem('sym_font_pref', currentFontSize);
     localStorage.setItem('sym_source_lang', sourceLanguage);
     localStorage.setItem('sym_target_lang', targetLanguage);
+    localStorage.setItem('sym_tts_pref', isTtsActive ? 'true' : 'false');
+    localStorage.setItem('sym_tts_speed', ttsSpeed.toString());
   } catch (err) {
     console.warn('Veri kayıt hatası:', err);
   }
@@ -408,6 +433,7 @@ function applySelectedLanguages() {
 
   // Akış tamponlarını temizle
   lastTranslatedSourceText = '';
+  stopTtsSpeaking();
 
   // Canlı Sahneye Geri Dön
   switchTab('live');
@@ -452,6 +478,7 @@ function swapLanguages() {
   lastTranslatedSourceText = '';
   liveOriginalStream.textContent = 'Dinleniyor...';
   liveTranslationStream.textContent = '...';
+  stopTtsSpeaking();
 
   const srcAcc = ACCENT_REGISTRY[curSpk.accent] || { name: curSpk.accent };
   const tgtName = LANGUAGE_NAMES[targetLanguage] || targetLanguage;
@@ -876,6 +903,17 @@ async function archiveSpeechTurnForSpeaker(speaker, textToArchive) {
   // Canlı Altyazıyı Güncelle
   liveTranslationStream.textContent = translated;
 
+  // Sesli Tercüman (TTS / Kulaklıkla Simultane Dinleme):
+  // Konuşmacı dinleyicinin seçtiği ana dilden farklı bir dilde konuşuyorsa çeviriyi seslendir
+  if (isTtsActive && translated) {
+    const spkLocale = getSpeakerLang(speaker);
+    const srcFamily = (spkLocale || 'en').split('-')[0].toLowerCase();
+    const tgtFamily = (targetLanguage || 'tr').split('-')[0].toLowerCase();
+    if (srcFamily !== tgtFamily) {
+      speakTranslatedText(translated, tgtFamily);
+    }
+  }
+
   // Tutanağa ekle (En güncel konuşma her zaman en üstte)
   const entry = {
     id: 'tr_' + Date.now(),
@@ -891,6 +929,197 @@ async function archiveSpeechTurnForSpeaker(speaker, textToArchive) {
   transcriptHistory.unshift(entry);
   renderTranscriptFeed();
   saveWorkspaceData();
+}
+
+// ==========================================================================
+// 6.5. SESLİ SİMULTANE TERCÜMAN (TTS / KULAKLIKLA DİNLEME MOTORU)
+// ==========================================================================
+function initTtsEngine() {
+  if (!('speechSynthesis' in window)) {
+    console.warn('Web Speech Synthesis API bu tarayıcıda desteklenmiyor.');
+    if (headphoneTtsBtn) {
+      headphoneTtsBtn.style.display = 'none';
+    }
+    return;
+  }
+
+  loadTtsVoices();
+  if (window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = loadTtsVoices;
+  }
+
+  updateHeadphoneButtonState();
+}
+
+function loadTtsVoices() {
+  if (!('speechSynthesis' in window)) return;
+  const voices = window.speechSynthesis.getVoices();
+  if (voices && voices.length > 0) {
+    availableVoices = voices;
+  }
+}
+
+function updateHeadphoneButtonState() {
+  if (!headphoneTtsBtn) return;
+  if (isTtsActive) {
+    headphoneTtsBtn.classList.add('active');
+    headphoneTtsBtn.setAttribute('aria-pressed', 'true');
+    headphoneTtsBtn.setAttribute('title', 'Kulaklıkla Sesli Simultane Tercüman Aktif (Tıkla ve Kapat)');
+  } else {
+    headphoneTtsBtn.classList.remove('active', 'speaking');
+    headphoneTtsBtn.setAttribute('aria-pressed', 'false');
+    headphoneTtsBtn.setAttribute('title', 'Kulaklıkla Sesli Simultane Tercümanı Aç (Çevirileri Seslendir)');
+  }
+}
+
+function toggleTtsInterpretation() {
+  if (!('speechSynthesis' in window)) {
+    showToast('Tarayıcınız ses sentezi (TTS) desteklemiyor.');
+    return;
+  }
+
+  isTtsActive = !isTtsActive;
+  updateHeadphoneButtonState();
+  saveWorkspaceData();
+
+  if (isTtsActive) {
+    const langName = LANGUAGE_NAMES[targetLanguage] || targetLanguage.toUpperCase();
+    showToast(`Kulaklık Modu Açık: ${langName} sesli tercüme aktif`);
+    // Tarayıcı audio/autoplay kısıtını açmak için kullanıcı jestiyle sessiz mikro utterance tetikle
+    try {
+      const primer = new SpeechSynthesisUtterance(' ');
+      primer.volume = 0;
+      window.speechSynthesis.speak(primer);
+    } catch (e) {}
+  } else {
+    stopTtsSpeaking();
+    showToast('Sesli tercüman kapatıldı.');
+  }
+}
+
+function stopTtsSpeaking() {
+  ttsSpeechQueue = [];
+  isTtsSpeaking = false;
+  currentTtsUtterance = null;
+  if ('speechSynthesis' in window) {
+    try {
+      window.speechSynthesis.cancel();
+    } catch (e) {}
+  }
+  if (headphoneTtsBtn) {
+    headphoneTtsBtn.classList.remove('speaking');
+  }
+}
+
+function getVoiceForLanguage(langCode) {
+  if (!availableVoices || availableVoices.length === 0) {
+    loadTtsVoices();
+  }
+  if (!availableVoices || availableVoices.length === 0) return null;
+
+  const codeLower = (langCode || 'tr').toLowerCase();
+  const defaultLocale = (DEFAULT_SPEECH_LOCALES[codeLower] || `${codeLower}-${codeLower.toUpperCase()}`).toLowerCase();
+
+  // 1. Varsayılan tam yerel kod eşleşmesi (örn: 'tr-tr', 'en-us')
+  let matched = availableVoices.find(v => v.lang && v.lang.toLowerCase().replace('_', '-') === defaultLocale);
+  if (matched) return matched;
+
+  // 2. Dil ailesi eşleşmesi (örn: 'tr', 'en')
+  const langPrefix = codeLower.split('-')[0];
+  matched = availableVoices.find(v => v.lang && v.lang.toLowerCase().startsWith(langPrefix));
+  if (matched) return matched;
+
+  return null;
+}
+
+function speakTranslatedText(text, langCode) {
+  if (!isTtsActive || !('speechSynthesis' in window)) return;
+  if (!text || typeof text !== 'string') return;
+
+  const clean = text
+    .replace(/[*_#`~[\]()]/g, '')
+    .replace(/https?:\/\/\S+/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!clean || clean.length < 2) return;
+
+  // Canlı kongre temposunda yığılmayı önlemek için bekleme kuyruğunu maksimum 2 cümlede tut
+  if (ttsSpeechQueue.length >= 2) {
+    ttsSpeechQueue.shift();
+  }
+
+  const targetLang = langCode || targetLanguage || 'tr';
+  ttsSpeechQueue.push({ text: clean, lang: targetLang });
+
+  if (!isTtsSpeaking) {
+    processTtsQueue();
+  }
+}
+
+function processTtsQueue() {
+  if (!isTtsActive || ttsSpeechQueue.length === 0) {
+    isTtsSpeaking = false;
+    currentTtsUtterance = null;
+    if (headphoneTtsBtn) {
+      headphoneTtsBtn.classList.remove('speaking');
+    }
+    return;
+  }
+
+  isTtsSpeaking = true;
+  if (headphoneTtsBtn) {
+    headphoneTtsBtn.classList.add('speaking');
+  }
+
+  const nextItem = ttsSpeechQueue.shift();
+  const utterance = new SpeechSynthesisUtterance(nextItem.text);
+  currentTtsUtterance = utterance;
+
+  const langPrefix = (nextItem.lang || 'tr').toLowerCase();
+  const defaultLocale = DEFAULT_SPEECH_LOCALES[langPrefix] || `${langPrefix}-${langPrefix.toUpperCase()}`;
+  utterance.lang = defaultLocale;
+
+  const voice = getVoiceForLanguage(langPrefix);
+  if (voice) {
+    utterance.voice = voice;
+  }
+
+  utterance.rate = ttsSpeed || 1.05;
+  utterance.pitch = 1.0;
+
+  utterance.onend = () => {
+    isTtsSpeaking = false;
+    currentTtsUtterance = null;
+    if (ttsSpeechQueue.length > 0) {
+      processTtsQueue();
+    } else {
+      if (headphoneTtsBtn) {
+        headphoneTtsBtn.classList.remove('speaking');
+      }
+    }
+  };
+
+  utterance.onerror = (e) => {
+    isTtsSpeaking = false;
+    currentTtsUtterance = null;
+    if (ttsSpeechQueue.length > 0) {
+      setTimeout(processTtsQueue, 50);
+    } else {
+      if (headphoneTtsBtn) {
+        headphoneTtsBtn.classList.remove('speaking');
+      }
+    }
+  };
+
+  try {
+    window.speechSynthesis.speak(utterance);
+  } catch (err) {
+    console.warn('speechSynthesis.speak hatası:', err);
+    isTtsSpeaking = false;
+    currentTtsUtterance = null;
+    if (headphoneTtsBtn) headphoneTtsBtn.classList.remove('speaking');
+  }
 }
 
 // ==========================================================================
@@ -1400,11 +1629,17 @@ function setupEventListeners() {
   if (tabLangBtn) tabLangBtn.addEventListener('click', () => switchTab('lang'));
   if (quickLangBadgeBtn) quickLangBadgeBtn.addEventListener('click', swapLanguages);
 
+  // Kulaklıkla Sesli Simultane Tercüman Butonu
+  if (headphoneTtsBtn) {
+    headphoneTtsBtn.addEventListener('click', toggleTtsInterpretation);
+  }
+
   // Header Ana Dil Seçici Olayı (Dinleyici Ana Dili Değişimi)
   if (headerNativeLangSelect) {
     headerNativeLangSelect.addEventListener('change', () => {
       targetLanguage = headerNativeLangSelect.value;
       if (meetingTargetLangSelect) meetingTargetLangSelect.value = targetLanguage;
+      stopTtsSpeaking();
       saveWorkspaceData();
       updateLanguageDisplayBadges();
       renderSoundboardPads();
@@ -1420,6 +1655,7 @@ function setupEventListeners() {
     meetingTargetLangSelect.addEventListener('change', () => {
       targetLanguage = meetingTargetLangSelect.value;
       if (headerNativeLangSelect) headerNativeLangSelect.value = targetLanguage;
+      stopTtsSpeaking();
       saveWorkspaceData();
       updateLanguageDisplayBadges();
       renderSoundboardPads();
@@ -1540,6 +1776,7 @@ function setupEventListeners() {
   settingsBtn.addEventListener('click', () => {
     geminiApiKeyInput.value = geminiApiKey;
     fontSizeSelect.value = currentFontSize;
+    if (ttsSpeedSelect) ttsSpeedSelect.value = ttsSpeed.toString();
     openModal(settingsModal);
   });
 
@@ -1549,6 +1786,12 @@ function setupEventListeners() {
   saveSettingsBtn.addEventListener('click', () => {
     geminiApiKey = geminiApiKeyInput.value.trim();
     currentFontSize = fontSizeSelect.value;
+    if (ttsSpeedSelect) {
+      const sp = parseFloat(ttsSpeedSelect.value);
+      if (!isNaN(sp) && sp >= 0.7 && sp <= 1.5) {
+        ttsSpeed = sp;
+      }
+    }
     applyFontSize(currentFontSize);
     updateEngineBadge();
     saveWorkspaceData();

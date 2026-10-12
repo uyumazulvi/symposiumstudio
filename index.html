@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>SYMPOSIUM STUDIO — Canlı Konferans & Simultane Çeviri</title>
-  <link rel="stylesheet" href="style.css?v=20261012c">
+  <link rel="stylesheet" href="style.css?v=20261012d">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -107,6 +107,18 @@
           <span class="mode-text-short">Sürekli</span>
         </button>
       </div>
+
+      <div class="header-divider"></div>
+
+      <!-- Kulaklık ile Sesli Tercüme (Simultane TTS Dinleme) -->
+      <button id="headphoneTtsBtn" class="headphone-btn" title="Kulaklıkla Sesli Simultane Tercümanı Aç/Kapat (Çevirileri Seslendir)" aria-label="Sesli Simultane Tercüme" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="headphone-icon">
+          <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+          <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+        </svg>
+        <span class="headphone-text-full">Kulaklık</span>
+        <span class="headphone-status-dot"></span>
+      </button>
 
       <div class="header-divider"></div>
 
@@ -434,6 +446,18 @@
         </div>
 
         <div class="field-block">
+          <label for="ttsSpeedSelect">Sesli Tercüman Okuma Hızı (Kulaklık)</label>
+          <select id="ttsSpeedSelect" class="field-input">
+            <option value="0.9">0.9x — Sakin & Net</option>
+            <option value="1.05" selected>1.05x — Standart Kongre Akışı (Önerilen)</option>
+            <option value="1.2">1.2x — Hızlı Eşzamanlı Takip</option>
+          </select>
+          <p class="field-description">
+            Kulaklık modu açıkken, simultane çeviriler seçtiğiniz ana dilde bu hızla seslendirilir.
+          </p>
+        </div>
+
+        <div class="field-block">
           <label>Oturum Tutanağı ve Döküm</label>
           <div class="modal-session-actions">
             <button type="button" id="modalCopyBtn" class="session-tool-btn" title="Panoya Kopyala">
@@ -680,6 +704,6 @@
       });
     }
   </script>
-  <script src="app.js?v=20261012c"></script>
+  <script src="app.js?v=20261012d"></script>
 </body>
 </html>

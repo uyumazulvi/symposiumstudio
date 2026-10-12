@@ -378,10 +378,76 @@ input:focus-visible {
   color: var(--text-primary);
 }
 
-.mode-pill.active {
+/* Kulaklıkla Sesli Simultane Tercüman Butonu */
+.headphone-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.headphone-btn:hover {
   background-color: var(--bg-surface-elevated);
   color: var(--text-primary);
+  border-color: var(--border-focus);
+}
+
+.headphone-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+  transition: color var(--transition-fast);
+}
+
+.headphone-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--border-focus);
+  transition: all var(--transition-fast);
+}
+
+/* Aktif Durum (Kulaklık Açık) */
+.headphone-btn.active {
+  background-color: rgba(101, 199, 176, 0.12);
+  border-color: rgba(101, 199, 176, 0.4);
+  color: var(--accent-cyan);
   font-weight: 600;
+}
+
+.headphone-btn.active .headphone-icon {
+  color: var(--accent-cyan);
+}
+
+.headphone-btn.active .headphone-status-dot {
+  background-color: var(--accent-cyan);
+  box-shadow: 0 0 6px var(--accent-cyan);
+}
+
+/* Konuşurken Hafif Animasyon (Ses Çıkışı Aktif) */
+.headphone-btn.active.speaking .headphone-status-dot {
+  animation: headphoneWave 1s infinite alternate ease-in-out;
+}
+
+@keyframes headphoneWave {
+  from {
+    transform: scale(0.9);
+    box-shadow: 0 0 4px var(--accent-cyan);
+  }
+  to {
+    transform: scale(1.4);
+    box-shadow: 0 0 10px var(--accent-cyan);
+  }
 }
 
 /* Araç Butonları */
@@ -1934,6 +2000,21 @@ input:focus-visible {
     font-size: 9.5px !important;
     min-height: 24px !important;
     border-radius: var(--radius-xs) !important;
+  }
+
+  .headphone-btn {
+    padding: 3px 6px !important;
+    min-height: 24px !important;
+    gap: 4px !important;
+  }
+
+  .headphone-text-full {
+    display: none !important;
+  }
+
+  .headphone-icon {
+    width: 13px !important;
+    height: 13px !important;
   }
 
   /* 4 araç butonundan sadece Ayarlar kalır, diğerleri Ayarlar modalında! */

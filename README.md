@@ -38,11 +38,17 @@ Uluslararası konferanslar, akademik sempozyumlar, paneller ve çok dilli oturum
 * Orijinal konuşma akışı referans olarak üstte; yüksek kontrastlı, akıcı ve büyük simultane çeviri altyazısı sahnede odak noktasında görüntülenir.
 * Compact, Standart ve Sinema font boyut seçenekleri mevcuttur.
 
-### 7. 🤖 Çift Çeviri Motoru Pipeline'ı
+### 7. 🎧 Kulaklıkla Sesli Simultane Tercüman (Sıfır Maliyetli TTS Motoru)
+* **Sesli Tercüman Modu:** Üst kontrol çubuğundaki **Kulaklık** butonuna tıklanarak aktif edilir.
+* **Akıllı Dil Yönlendirmesi:** Yabancı dilde konuşan konuşmacıların sözleri anında çevrilip dinleyicinin kulaklığına fısıldanır. Konuşmacı dinleyicinin ana dilinde konuşuyorsa yankı yapmaması için seslendirme otomatik olarak devre dışı kalır.
+* **Kongre Temposu & Hız Ayarı:** Ayarlar penceresinden `0.9x` (Sakin), `1.05x` (Standart Akış) veya `1.2x` (Hızlı Takip) okuma hızları seçilebilir; cümle yığılmasını önleyen akıllı kuyruk yönetimi bulunur.
+* **Sıfır Maliyet & Ekstra API Gerekmez:** Tarayıcının yerel `window.speechSynthesis` API'si üzerinden çalışır; ek ücret veya sunucu maliyeti gerektirmez.
+
+### 8. 🤖 Çift Çeviri Motoru Pipeline'ı
 1. **Google Gemini 1.5 Flash (Opsiyonel):** Ayarlardan ücretsiz Gemini API anahtarı girildiğinde akademik, tıp ve teknik terminolojiye tam uyumlu editoryal çeviri motoru devreye girer.
 2. **Akıllı Web Çevirisi & MyMemory Fallback:** API anahtarı olmasa dahi kesintisiz çalışan yüksek hızlı web çeviri ağı.
 
-### 8. 📝 Canlı Oturum Tutanağı & Dışa Aktarma
+### 9. 📝 Canlı Oturum Tutanağı & Dışa Aktarma
 * Tüm konuşmalar konuşmacı adı, dili, zaman damgası ve çift dilli/yalnızca çeviri filtreleriyle kronolojik olarak kaydedilir.
 * Tek tıkla panoya kopyalama veya `.txt` formatında resmi tutanak dökümü indirme.
 
@@ -81,7 +87,7 @@ Tarayıcınızda `http://localhost:3000` adresini açın. Windows kullanıyorsan
 
 ## 🛠️ Teknolojiler
 * **HTML5 / CSS3 (Modern Broadcast & Dark Glassmorphism Studio)**
-* **Web Speech API (SpeechRecognition)**
+* **Web Speech API (SpeechRecognition & SpeechSynthesis TTS)**
 * **Web Audio API (AudioContext & AnalyserNode VU Metre)**
 * **Google Gemini API (Opsiyonel LLM Entegrasyonu)**
 * **PWA (Progressive Web App - Web App Manifest & Standalone Display)**
