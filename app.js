@@ -3,7 +3,7 @@
 // ==========================================================================
 
 // Uygulama Çekirdek Durumu (State)
-let currentMode = 'ptt'; // 'ptt' (Bas-Konuş) | 'tap' (Sürekli Akış)
+let currentMode = 'tap'; // 'tap' (Sürekli Akış) | 'ptt' (Bas-Konuş)
 let isRecording = false;
 let isRecognitionActive = false;
 let isRecognitionStopping = false;
@@ -121,10 +121,11 @@ const STUDIO_ACCENTS = [
   '#A09F96'  // Nötr Taş
 ];
 
-// Varsayılan Konuşmacı Havuzu (Örnek: Konuşmacı 1 İngilizce, Konuşmacı 2 Almanca)
+// Varsayılan Konuşmacı Havuzu (Konuşmacı 1 İngilizce, Konuşmacı 2 Almanca, Konuşmacı 3 Türkçe)
 let speakers = [
-  { id: 'spk_1', name: 'Konuşmacı 1', accent: 'en-US', color: '#65C7B0' },
-  { id: 'spk_2', name: 'Konuşmacı 2', accent: 'de-DE', color: '#D6A66B' }
+  { id: 'spk_1', name: 'Konuşmacı 1 (İngilizce)', accent: 'en-US', color: '#65C7B0' },
+  { id: 'spk_2', name: 'Konuşmacı 2 (Almanca)', accent: 'de-DE', color: '#D6A66B' },
+  { id: 'spk_3', name: 'Konuşmacı 3 (Türkçe)', accent: 'tr-TR', color: '#8EAA90' }
 ];
 
 // Oturum Tutanak Arşivi
@@ -258,17 +259,21 @@ window.addEventListener('pointerdown', () => {
 
 function loadWorkspaceData() {
   try {
-    const s = localStorage.getItem('sym_speakers_v5');
+    const s = localStorage.getItem('sym_speakers_v6');
     if (s) {
       const parsed = JSON.parse(s);
       if (Array.isArray(parsed) && parsed.length > 0) {
         speakers = parsed;
       }
     } else {
-      const sOld = localStorage.getItem('sym_speakers_v4');
+      const sOld = localStorage.getItem('sym_speakers_v5') || localStorage.getItem('sym_speakers_v4');
       if (sOld) {
         const parsedOld = JSON.parse(sOld);
-        if (Array.isArray(parsedOld) && parsedOld.length >= 2) {
+        if (Array.isArray(parsedOld) && parsedOld.length >= 1) {
+          const hasTr = parsedOld.some(sp => (sp.accent || '').startsWith('tr'));
+          if (!hasTr) {
+            parsedOld.push({ id: 'spk_3', name: 'Konuşmacı 3 (Türkçe)', accent: 'tr-TR', color: '#8EAA90' });
+          }
           speakers = parsedOld;
         }
       }
@@ -298,7 +303,11 @@ function loadWorkspaceData() {
       geminiApiKeyInput.value = k;
     }
     const m = localStorage.getItem('sym_mode_pref');
-    if (m === 'tap' || m === 'ptt') setOperationMode(m);
+    if (m === 'tap' || m === 'ptt') {
+      setOperationMode(m);
+    } else {
+      setOperationMode('tap');
+    }
     const f = localStorage.getItem('sym_font_pref');
     if (f) {
       currentFontSize = f;
@@ -338,7 +347,7 @@ function loadWorkspaceData() {
 
 function saveWorkspaceData() {
   try {
-    localStorage.setItem('sym_speakers_v5', JSON.stringify(speakers));
+    localStorage.setItem('sym_speakers_v6', JSON.stringify(speakers));
     localStorage.setItem('sym_history_v3', JSON.stringify(transcriptHistory));
     localStorage.setItem('sym_gemini_key', geminiApiKey);
     localStorage.setItem('sym_mode_pref', currentMode);
@@ -603,8 +612,8 @@ function initRecognitionEngine() {
   };
 
   recognition.onresult = (event) => {
-    // Bas-Konuş modunda tuşa basılı değilken ve tolerans süresi dışındayken konuşmaları yok say
-    if (currentMode === 'ptt' && !isPttActive) {
+    // Bas-Konuş modunda tuşa basılı değilken ve oturum açık değilken konuşmaları yok say
+    if (currentMode === 'ptt' && !isPttActive && !isRecording) {
       return;
     }
 
@@ -668,6 +677,8 @@ function initRecognitionEngine() {
       isPttActive = false;
       isSessionWarm = false;
       setRecordingState(false);
+    } else if (event.error === 'no-speech') {
+      // Sessizlik zaman aşımı hatası normaldir, onend güvenli şekilde yeniden bağlayacaktır
     } else if (event.error === 'aborted') {
       // Bilinçli durdurmalarda yoksay
     }
@@ -677,52 +688,55 @@ function initRecognitionEngine() {
     isRecognitionActive = false;
     isRecognitionStopping = false;
 
-    // 1. Bekleyen dil geçişi varsa yeni dille başlat
-    if (pendingLangSwitch) {
-      const targetLang = pendingLangSwitch;
-      pendingLangSwitch = null;
-      recognition.lang = targetLang;
+    // Chrome/Edge motorunun önceki oturumu tamamen sonlandırması için 120ms tolerans ile async başlat
+    setTimeout(() => {
+      // 1. Bekleyen dil geçişi varsa yeni dille başlat
+      if (pendingLangSwitch) {
+        const targetLang = pendingLangSwitch;
+        pendingLangSwitch = null;
+        recognition.lang = targetLang;
+        if (isSessionWarm || isRecording) {
+          try {
+            recognition.start();
+            isRecognitionActive = true;
+          } catch (e) {
+            console.warn('Dil geçişinde başlatma hatası:', e);
+          }
+        }
+        return;
+      }
+
+      // 2. Bekleyen konuşmacı başlatması varsa
+      if (pendingStartSpeakerId) {
+        const spkId = pendingStartSpeakerId;
+        pendingStartSpeakerId = null;
+        if (isSessionWarm || isRecording) {
+          const spk = speakers.find(s => s.id === spkId) || getActiveSpeaker();
+          recognition.lang = getSpeakerLang(spk);
+          try {
+            recognition.start();
+            isRecognitionActive = true;
+          } catch (e) {
+            console.warn('Bekleyen konuşmacı başlatma hatası:', e);
+          }
+        }
+        return;
+      }
+
+      // 3. Oturum aktifse (Sürekli akış veya Bas-Konuş): sessizlik zaman aşımında motoru sıcak tut
       if (isSessionWarm || isRecording) {
         try {
+          const cur = getActiveSpeaker();
+          recognition.lang = getSpeakerLang(cur);
           recognition.start();
           isRecognitionActive = true;
         } catch (e) {
-          console.warn('Dil geçişinde başlatma hatası:', e);
+          console.warn('Otomatik devam başlatma:', e);
         }
+      } else {
+        setRecordingState(false);
       }
-      return;
-    }
-
-    // 2. Bekleyen konuşmacı başlatması varsa
-    if (pendingStartSpeakerId) {
-      const spkId = pendingStartSpeakerId;
-      pendingStartSpeakerId = null;
-      if (isSessionWarm || isRecording) {
-        const spk = speakers.find(s => s.id === spkId) || getActiveSpeaker();
-        recognition.lang = getSpeakerLang(spk);
-        try {
-          recognition.start();
-          isRecognitionActive = true;
-        } catch (e) {
-          console.warn('Bekleyen konuşmacı başlatma hatası:', e);
-        }
-      }
-      return;
-    }
-
-    // 3. Oturum aktifse (Sürekli akış veya Bas-Konuş arka planı): sessizlik zaman aşımında motoru sıcak tut
-    if (isSessionWarm || isRecording) {
-      try {
-        const cur = getActiveSpeaker();
-        recognition.lang = getSpeakerLang(cur);
-        recognition.start();
-        isRecognitionActive = true;
-      } catch (e) {
-        console.warn('Otomatik devam başlatma:', e);
-      }
-    } else {
-      setRecordingState(false);
-    }
+    }, 120);
   };
 }
 
@@ -737,7 +751,22 @@ const liveTranslationCache = new Map();
 async function fetchWebTranslation(cleanText, srcCode, tgtCode) {
   if (!cleanText || srcCode === tgtCode) return cleanText;
 
-  // 1. Google GTX (Özel Kaynak ve Hedef Dil Parametreleri ile)
+  // 1. Google Clients5 API (Ultra Hızlı, Açık CORS, CAPTCHA engeli yok)
+  try {
+    const url = `https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=${encodeURIComponent(srcCode)}&tl=${encodeURIComponent(tgtCode)}&q=${encodeURIComponent(cleanText)}`;
+    const res = await fetch(url);
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data[0]) {
+        const result = Array.isArray(data[0]) ? data[0].join(' ').trim() : String(data[0]).trim();
+        if (result) return result;
+      }
+    }
+  } catch (err) {
+    console.warn('Google Clients5 çeviri hatası, alternatif servise geçiliyor:', err);
+  }
+
+  // 2. Google GTX (Alternatif)
   try {
     const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${srcCode}&tl=${tgtCode}&dt=t&q=${encodeURIComponent(cleanText)}`;
     const res = await fetch(url);
@@ -752,7 +781,7 @@ async function fetchWebTranslation(cleanText, srcCode, tgtCode) {
     console.warn('Google GTX çeviri hatası, yedek servise geçiliyor:', err);
   }
 
-  // 2. Yedek Servis: MyMemory API (Ağ engeli veya kota aşımlarında devreye girer)
+  // 3. Yedek Servis: MyMemory API (Ağ engeli veya kota aşımlarında devreye girer)
   try {
     const fallbackUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(cleanText)}&langpair=${srcCode}|${tgtCode}`;
     const fbRes = await fetch(fallbackUrl);
@@ -1292,7 +1321,12 @@ function selectSpeakerByIndex(index) {
     showToast(`Konuşmacı: [${index + 1}] ${targetSpeaker.name}`);
   } else {
     setActiveSpeaker(targetSpeaker.id, false);
-    showToast(`Konuşmacı seçildi: [${index + 1}] ${targetSpeaker.name}`);
+    if (currentMode === 'tap') {
+      startSpeechCapture(targetSpeaker.id);
+      showToast(`Konuşmacı Canlı: [${index + 1}] ${targetSpeaker.name}`);
+    } else {
+      showToast(`Konuşmacı seçildi: [${index + 1}] ${targetSpeaker.name}`);
+    }
   }
 
   // Tuşa hafif basılma efekti ver
@@ -1426,6 +1460,7 @@ function startSpeechCapture(speakerId) {
     return;
   }
 
+  isSessionWarm = true;
   recognition.lang = targetLang;
   turnSpeechBuffer = '';
   lastTranslatedSourceText = '';
