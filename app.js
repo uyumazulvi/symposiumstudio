@@ -1190,11 +1190,10 @@ function stopSpeechCapture() {
 
 function setRecordingState(active) {
   isRecording = active;
-  if (active) {
-    recordingPill.className = 'session-pill live';
-    statusLabel.textContent = 'CANLI YAYIN';
-  } else {
-    recordingPill.className = 'session-pill idle';
+  if (recordingPill) {
+    recordingPill.className = active ? 'session-pill live' : 'session-pill idle';
+  }
+  if (statusLabel) {
     statusLabel.textContent = '';
   }
   updateStopButtonState(active);

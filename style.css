@@ -178,14 +178,7 @@ input:focus-visible {
 
 /* Oturum Durumu */
 .session-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 8px;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-hairline);
-  border-radius: var(--radius-xs);
-  transition: all var(--transition-fast);
+  display: none !important;
 }
 
 .session-dot {
