@@ -853,7 +853,7 @@ async function archiveSpeechTurnForSpeaker(speaker, textToArchive) {
 function renderSoundboardPads() {
   soundboardGrid.innerHTML = '';
 
-  speakers.forEach(speaker => {
+  speakers.forEach((speaker, index) => {
     const isSelected = speaker.id === activeSpeakerId;
     const pad = document.createElement('div');
     pad.className = `switcher-pad ${isSelected ? 'active' : ''}`;
@@ -861,10 +861,14 @@ function renderSoundboardPads() {
 
     const acc = ACCENT_REGISTRY[speaker.accent] || { flag: '🌐', name: speaker.accent };
     const monogram = speaker.name.substring(0, 2).toUpperCase();
+    const keyNumber = index < 9 ? (index + 1) : null;
 
     pad.innerHTML = `
       <div class="pad-head">
-        <span class="pad-monogram">${monogram}</span>
+        <div class="pad-identity-tag">
+          <span class="pad-monogram">${monogram}</span>
+          ${keyNumber ? `<span class="pad-key-badge" title="Klavye Kısayolu: [${keyNumber}]">${keyNumber}</span>` : ''}
+        </div>
         <div class="pad-tools">
           <button type="button" class="pad-edit-btn" title="Düzenle veya Sil">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -947,6 +951,31 @@ function renderSoundboardPads() {
 
     soundboardGrid.appendChild(pad);
   });
+}
+
+function selectSpeakerByIndex(index) {
+  if (index < 0 || index >= speakers.length) return;
+  const targetSpeaker = speakers[index];
+  if (!targetSpeaker) return;
+
+  if (targetSpeaker.id === activeSpeakerId && isRecording) {
+    return;
+  }
+
+  if (isRecording) {
+    switchSpeakerLive(targetSpeaker);
+    showToast(`Konuşmacı: [${index + 1}] ${targetSpeaker.name}`);
+  } else {
+    setActiveSpeaker(targetSpeaker.id, false);
+    showToast(`Konuşmacı seçildi: [${index + 1}] ${targetSpeaker.name}`);
+  }
+
+  // Tuşa hafif basılma efekti ver
+  const pads = soundboardGrid.querySelectorAll('.switcher-pad');
+  if (pads[index]) {
+    pads[index].classList.add('pressed');
+    setTimeout(() => pads[index].classList.remove('pressed'), 200);
+  }
 }
 
 function switchSpeakerLive(newSpeaker) {
@@ -1436,13 +1465,41 @@ function setupEventListeners() {
     }
   });
 
-  // ESC Tuşuna Basınca Modalları Kapat
+  // Klavye Kısayolları (Masaüstü): ESC ile Kapatma ve 1-9 Rakamları ile Konuşmacı Değiştirme
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeModal(addSpeakerModal);
       closeModal(editSpeakerModal);
       closeModal(settingsModal);
       closeModal(iosGuideModal);
+      return;
+    }
+
+    // Input veya textarea üzerinde yazı yazılıyorsa kısayolları engelle
+    const activeEl = document.activeElement;
+    if (activeEl && (
+      activeEl.tagName === 'INPUT' ||
+      activeEl.tagName === 'TEXTAREA' ||
+      activeEl.tagName === 'SELECT' ||
+      activeEl.isContentEditable
+    )) {
+      return;
+    }
+
+    // Modallardan biri açıkken kısayolları tetikleme
+    const isModalOpen = !addSpeakerModal.classList.contains('hidden') ||
+                        !editSpeakerModal.classList.contains('hidden') ||
+                        !settingsModal.classList.contains('hidden') ||
+                        (iosGuideModal && !iosGuideModal.classList.contains('hidden'));
+    if (isModalOpen) return;
+
+    // 1-9 Rakam Tuşları ile Konuşmacılar Arasında Geçiş Yap (Ali = 1, Mehmet = 2, ...)
+    if (e.key >= '1' && e.key <= '9' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      const speakerIdx = parseInt(e.key, 10) - 1;
+      if (speakerIdx >= 0 && speakerIdx < speakers.length) {
+        e.preventDefault();
+        selectSpeakerByIndex(speakerIdx);
+      }
     }
   });
 

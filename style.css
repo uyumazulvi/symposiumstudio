@@ -956,6 +956,30 @@ input:focus-visible {
   color: var(--text-primary);
 }
 
+.pad-identity-tag {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pad-key-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-hairline);
+  color: var(--accent-cyan);
+  line-height: 1.2;
+}
+
+.switcher-pad.active .pad-key-badge {
+  background-color: var(--accent-cyan);
+  color: #0E1A17;
+  border-color: var(--accent-cyan);
+}
+
 .pad-tools {
   display: flex;
   align-items: center;
@@ -2205,6 +2229,10 @@ input:focus-visible {
     font-size: 9.5px !important;
     padding: 2px 5px !important;
     border-radius: 4px !important;
+  }
+
+  .pad-key-badge {
+    display: none !important;
   }
 
   .pad-status-dot {
