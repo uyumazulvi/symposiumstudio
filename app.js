@@ -460,15 +460,15 @@ function swapLanguages() {
 
 function switchTab(tabName) {
   if (tabName === 'live') {
-    tabLiveBtn.classList.add('active');
-    tabLangBtn.classList.remove('active');
-    viewLiveSection.classList.remove('hidden');
-    viewLanguageSection.classList.add('hidden');
+    if (tabLiveBtn) tabLiveBtn.classList.add('active');
+    if (tabLangBtn) tabLangBtn.classList.remove('active');
+    if (viewLiveSection) viewLiveSection.classList.remove('hidden');
+    if (viewLanguageSection) viewLanguageSection.classList.add('hidden');
   } else {
-    tabLangBtn.classList.add('active');
-    tabLiveBtn.classList.remove('active');
-    viewLanguageSection.classList.remove('hidden');
-    viewLiveSection.classList.add('hidden');
+    if (tabLangBtn) tabLangBtn.classList.add('active');
+    if (tabLiveBtn) tabLiveBtn.classList.remove('active');
+    if (viewLanguageSection) viewLanguageSection.classList.remove('hidden');
+    if (viewLiveSection) viewLiveSection.classList.add('hidden');
   }
 }
 

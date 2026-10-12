@@ -222,43 +222,14 @@ input:focus-visible {
   color: var(--accent-cyan);
 }
 
-/* Swiss Ana Navigasyon Sekmeleri */
+/* Ana Dil Navigasyon Alanı */
 .studio-nav {
   display: flex;
   align-items: center;
-  gap: 2px;
-  background-color: var(--bg-surface);
-  padding: 3px;
-  border-radius: var(--radius-xs);
-  border: 1px solid var(--border-hairline);
-}
-
-.nav-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 14px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  border-radius: var(--radius-xs);
-  transition: all var(--transition-fast);
-}
-
-.nav-btn-icon svg {
-  width: 13px;
-  height: 13px;
-  display: block;
-}
-
-.nav-btn:hover {
-  color: var(--text-primary);
-}
-
-.nav-btn.active {
-  color: var(--text-primary);
-  background-color: var(--bg-surface-elevated);
-  font-weight: 600;
+  gap: 0;
+  background-color: transparent;
+  padding: 0;
+  border: none;
 }
 
 /* Header Ana Dil Seçici */
@@ -266,11 +237,17 @@ input:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 8px 3px 10px;
-  background-color: var(--bg-surface-elevated);
+  padding: 4px 10px;
+  background-color: var(--bg-surface);
   border: 1px solid var(--border-hairline);
   border-radius: var(--radius-xs);
-  margin-left: 4px;
+  margin-left: 0;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.native-lang-control:hover {
+  background-color: var(--bg-surface-elevated);
+  border-color: var(--border-focus);
 }
 
 .native-lang-globe {
