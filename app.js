@@ -1497,7 +1497,9 @@ function initPwaInstallationFlow() {
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredInstallPrompt = e;
-    showPwaBanner();
+    if (isMobile) {
+      showPwaBanner();
+    }
   });
 
   // Ekle Butonuna Basıldığında
