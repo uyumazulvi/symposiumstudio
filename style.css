@@ -445,6 +445,13 @@ input:focus-visible {
   display: flex;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity var(--transition-fast);
+}
+
+.speaker-identity:hover {
+  opacity: 0.85;
 }
 
 .status-indicator-dot {
@@ -1098,6 +1105,14 @@ input:focus-visible {
 
 .console-stop-btn.start-mode:hover {
   background-color: rgba(101, 199, 176, 0.22);
+}
+
+.stop-btn-text-full {
+  display: inline;
+}
+
+.stop-btn-text-short {
+  display: none;
 }
 
 /* ==========================================================================
@@ -2108,7 +2123,7 @@ input:focus-visible {
   }
 
   /* ==========================================================================
-     5. SABİT ALT DOCK (TEK SATIRLI ERGONOMİK 54px AKSİYON DOCK'I)
+     5. SABİT ALT DOCK (TEK SATIRLI ERGONOMİK 48px AKSİYON DOCK'I)
      Her daim ekranın en altında sabit, tek satır, ferah, başparmak ergonomisinde.
      ========================================================================== */
   .switcher-console {
@@ -2123,15 +2138,15 @@ input:focus-visible {
     -webkit-backdrop-filter: blur(20px) !important;
     border-top: 1px solid var(--border-hairline) !important;
     box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.7) !important;
-    padding: 7px 10px calc(7px + env(safe-area-inset-bottom, 0px)) 10px !important;
-    gap: 8px !important;
+    padding: 6px 10px calc(6px + env(safe-area-inset-bottom, 0px)) 10px !important;
+    gap: 6px !important;
     box-sizing: border-box !important;
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
     justify-content: space-between !important;
     height: auto !important;
-    min-height: 52px !important;
+    min-height: 48px !important;
   }
 
   .console-action-bar {
@@ -2145,10 +2160,10 @@ input:focus-visible {
   /* Konuşmacı Ekle: Tek Satırlı Şık Dairesel [+] Butonu */
   .console-add-speaker-btn {
     flex-shrink: 0 !important;
-    width: 36px !important;
-    min-width: 36px !important;
-    height: 36px !important;
-    min-height: 36px !important;
+    width: 34px !important;
+    min-width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
     padding: 0 !important;
     border-radius: 50% !important;
     display: inline-flex !important;
@@ -2158,6 +2173,11 @@ input:focus-visible {
     border: 1px solid var(--border-hairline) !important;
     color: var(--text-primary) !important;
     cursor: pointer !important;
+    transition: transform 0.12s ease !important;
+  }
+
+  .console-add-speaker-btn:active {
+    transform: scale(0.92) !important;
   }
 
   .console-add-speaker-btn svg {
@@ -2170,7 +2190,7 @@ input:focus-visible {
     display: none !important;
   }
 
-  /* Konuşmacı Tuşları: Yatay Kapsül Şerit */
+  /* Konuşmacı Tuşları: Yatay Kapsül Şerit (Momentum Scroll & Proximity Snap) */
   .switcher-strip {
     flex: 1 1 auto !important;
     min-width: 0 !important;
@@ -2180,15 +2200,17 @@ input:focus-visible {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch !important;
     scrollbar-width: none !important;
+    scroll-snap-type: x proximity !important;
+    scroll-padding: 0 4px !important;
     gap: 6px !important;
-    padding: 2px 0 !important;
+    padding: 2px 2px !important;
   }
 
   .switcher-strip::-webkit-scrollbar {
     display: none !important;
   }
 
-  /* Kapsül Hap Buton (Ergonomik, Minimalist) */
+  /* Kapsül Hap Buton (Modern, Minimalist ve Ferah Yayın Tasarımı) */
   .switcher-pad,
   .studio-pad {
     display: inline-flex !important;
@@ -2197,95 +2219,103 @@ input:focus-visible {
     gap: 6px !important;
     width: auto !important;
     min-width: auto !important;
-    max-width: 145px !important;
-    padding: 4px 10px 4px 6px !important;
-    min-height: 36px !important;
-    height: 36px !important;
+    max-width: 130px !important;
+    padding: 0 11px 0 9px !important;
+    min-height: 34px !important;
+    height: 34px !important;
     border-radius: 999px !important;
     flex-shrink: 0 !important;
+    scroll-snap-align: start !important;
     touch-action: manipulation;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
     border: 1px solid var(--border-hairline) !important;
     background-color: var(--bg-surface) !important;
+    transition: transform 0.12s ease, background-color 0.15s ease, border-color 0.15s ease !important;
+  }
+
+  .switcher-pad:active,
+  .switcher-pad.pressed {
+    transform: scale(0.96) !important;
+    background-color: var(--bg-surface-hover) !important;
   }
 
   .switcher-pad.active,
   .studio-pad.active {
     background-color: var(--bg-surface-elevated) !important;
-    border-color: var(--accent-cyan) !important;
-    box-shadow: 0 0 12px rgba(101, 199, 176, 0.25) !important;
+    border-color: var(--speaker-tint, var(--accent-cyan)) !important;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.45), inset 0 0 0 1px var(--speaker-tint, var(--accent-cyan)) !important;
   }
 
   .pad-head {
     display: flex !important;
     align-items: center !important;
-    gap: 5px !important;
+    gap: 0 !important;
     flex-shrink: 0 !important;
   }
 
-  .pad-monogram {
-    font-size: 9.5px !important;
-    padding: 2px 5px !important;
-    border-radius: 4px !important;
-  }
-
-  .pad-key-badge {
+  .pad-identity-tag {
     display: none !important;
   }
 
-  .pad-status-dot {
-    width: 6px !important;
-    height: 6px !important;
-    flex-shrink: 0 !important;
-  }
-
-  .pad-name {
-    font-size: 11.5px !important;
-    font-weight: 600 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 65px !important;
-    color: var(--text-primary) !important;
-  }
-
+  .pad-monogram,
+  .pad-key-badge,
+  .pad-edit-btn,
   .pad-accent,
   .pad-trigger-text {
     display: none !important;
   }
 
-  .pad-edit-btn {
-    width: 18px !important;
-    height: 18px !important;
-    padding: 0 !important;
-    display: inline-flex !important;
+  .pad-tools {
+    display: flex !important;
     align-items: center !important;
-    justify-content: center !important;
-    opacity: 0.6 !important;
   }
 
-  .pad-edit-btn svg {
-    width: 10px !important;
-    height: 10px !important;
+  .pad-status-dot {
+    width: 7px !important;
+    height: 7px !important;
+    border-radius: 50% !important;
+    background-color: var(--speaker-tint, var(--accent-cyan)) !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 0 5px var(--speaker-tint, var(--accent-cyan)) !important;
   }
 
-  /* Sürekli Akış Modunda Dinlemeyi Başlat / Durdur Butonu (Inline Kapsül) */
+  .switcher-pad.active .pad-status-dot {
+    box-shadow: 0 0 8px var(--speaker-tint, var(--accent-cyan)) !important;
+  }
+
+  .pad-body {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .pad-name {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 85px !important;
+    color: var(--text-primary) !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  /* Sürekli Akış Modunda Dinlemeyi Başlat / Durdur Butonu (Inline Kompakt Kapsül) */
   .console-stop-btn {
     flex-shrink: 0 !important;
     width: auto !important;
     min-width: auto !important;
-    height: 36px !important;
-    min-height: 36px !important;
-    padding: 0 12px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 10px !important;
     font-size: 11.5px !important;
     font-weight: 600 !important;
     border-radius: 999px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 5px !important;
+    gap: 4px !important;
     box-sizing: border-box !important;
     white-space: nowrap !important;
   }
@@ -2295,8 +2325,16 @@ input:focus-visible {
   }
 
   .console-stop-btn svg {
-    width: 12px !important;
-    height: 12px !important;
+    width: 11px !important;
+    height: 11px !important;
+  }
+
+  .stop-btn-text-full {
+    display: none !important;
+  }
+
+  .stop-btn-text-short {
+    display: inline !important;
   }
 
   /* ==========================================================================
@@ -2473,11 +2511,17 @@ input:focus-visible {
   }
   .switcher-pad,
   .studio-pad {
-    max-width: 115px !important;
-    padding: 3px 8px 3px 5px !important;
+    max-width: 105px !important;
+    padding: 0 9px 0 7px !important;
+    gap: 5px !important;
   }
   .pad-name {
-    max-width: 45px !important;
+    max-width: 65px !important;
+    font-size: 11px !important;
+  }
+  .console-stop-btn {
+    padding: 0 8px !important;
+    font-size: 11px !important;
   }
 }
 

@@ -888,7 +888,7 @@ function renderSoundboardPads() {
       </div>
     `;
 
-    // Düzenleme Butonu Dinleyicisi
+    // Düzenleme Butonu Dinleyicisi (Masaüstü ve Tıklamalar)
     const editBtn = pad.querySelector('.pad-edit-btn');
     if (editBtn) {
       editBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
@@ -900,6 +900,34 @@ function renderSoundboardPads() {
         openEditSpeakerModal(speaker.id);
       });
     }
+
+    // Mobilde Uzun Basma (Long-Press ~450ms) ile Konuşmacı Düzenleme Modalı Açma
+    let touchTimer = null;
+    let didLongPress = false;
+
+    pad.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches.length === 1 && currentMode === 'tap') {
+        didLongPress = false;
+        touchTimer = setTimeout(() => {
+          didLongPress = true;
+          if (navigator.vibrate) {
+            try { navigator.vibrate(40); } catch (_) {}
+          }
+          openEditSpeakerModal(speaker.id);
+        }, 450);
+      }
+    }, { passive: true });
+
+    const cancelLongPress = () => {
+      if (touchTimer) {
+        clearTimeout(touchTimer);
+        touchTimer = null;
+      }
+    };
+
+    pad.addEventListener('touchmove', cancelLongPress, { passive: true });
+    pad.addEventListener('touchend', cancelLongPress, { passive: true });
+    pad.addEventListener('touchcancel', cancelLongPress, { passive: true });
 
     // SIFIR GECİKMELİ POINTER EVENTS
     if (currentMode === 'ptt') {
@@ -936,7 +964,11 @@ function renderSoundboardPads() {
 
     } else {
       // SÜREKLİ AKIŞ (TEK TIKLA GEÇİŞ)
-      pad.addEventListener('click', async () => {
+      pad.addEventListener('click', async (e) => {
+        if (didLongPress) {
+          didLongPress = false;
+          return;
+        }
         await ensureMicrophoneAccess();
         if (isRecording && activeSpeakerId === speaker.id) return;
 
@@ -1157,7 +1189,8 @@ function updateStopButtonState(active) {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="6" y="6" width="12" height="12" rx="2"/>
       </svg>
-      <span>Dinlemeyi Durdur</span>
+      <span class="stop-btn-text-full">Dinlemeyi Durdur</span>
+      <span class="stop-btn-text-short">Durdur</span>
     `;
     stopSessionBtn.setAttribute('title', 'Dinlemeyi Durdur');
   } else {
@@ -1166,7 +1199,8 @@ function updateStopButtonState(active) {
       <svg viewBox="0 0 24 24" fill="currentColor">
         <polygon points="6 4 20 12 6 20 6 4"/>
       </svg>
-      <span>Dinlemeyi Başlat</span>
+      <span class="stop-btn-text-full">Dinlemeyi Başlat</span>
+      <span class="stop-btn-text-short">Başlat</span>
     `;
     stopSessionBtn.setAttribute('title', 'Dinlemeyi Başlat');
   }
@@ -1453,6 +1487,16 @@ function setupEventListeners() {
       showToast(`"${spk.name}" silindi.`);
     }
   });
+
+  // Sahne Başlığındaki Konuşmacı Bilgisine Dokunulduğunda Düzenleme Modalı Açma (Özellikle Mobilde Çok Rahat)
+  const speakerIdentityEl = document.querySelector('.speaker-identity');
+  if (speakerIdentityEl) {
+    speakerIdentityEl.addEventListener('click', () => {
+      if (activeSpeakerId) {
+        openEditSpeakerModal(activeSpeakerId);
+      }
+    });
+  }
 
   // Modalların Dışındaki Karanlık Alana Tıklayınca Kapat
   [addSpeakerModal, editSpeakerModal, settingsModal, iosGuideModal].forEach(modal => {
