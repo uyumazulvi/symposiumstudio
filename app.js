@@ -146,6 +146,17 @@ const dockInstructionText = document.getElementById('dockInstructionText');
 const soundboardGrid = document.getElementById('soundboardGrid');
 const stopSessionBtn = document.getElementById('stopSessionBtn');
 
+// Mobil Çekmece (Expandable Drawer) Elemanları
+const switcherConsole = document.getElementById('switcherConsole') || document.querySelector('.switcher-console');
+const mobileDrawerHeader = document.getElementById('mobileDrawerHeader');
+const mobileDrawerBackdrop = document.getElementById('mobileDrawerBackdrop');
+const mobileDrawerExpandBtn = document.getElementById('mobileDrawerExpandBtn');
+const mobileDrawerCloseBtn = document.getElementById('mobileDrawerCloseBtn');
+const mobileDrawerHandleBtn = document.getElementById('mobileDrawerHandleBtn');
+const drawerAddSpeakerBtn = document.getElementById('drawerAddSpeakerBtn');
+const drawerSpeakerCountBadge = document.getElementById('drawerSpeakerCountBadge');
+const mobileDrawerExpandCount = document.getElementById('mobileDrawerExpandCount');
+
 // Modallar ve Ayarlar
 const settingsBtn = document.getElementById('settingsBtn');
 const settingsModal = document.getElementById('settingsModal');
@@ -181,6 +192,7 @@ const viewTrBtn = document.getElementById('viewTrBtn');
 // Global Modal Kontrolleri
 function openModal(modal) {
   if (!modal) return;
+  closeMobileDrawer();
   modal.classList.remove('hidden');
   modal.style.display = 'flex';
 }
@@ -970,7 +982,12 @@ function renderSoundboardPads() {
           return;
         }
         await ensureMicrophoneAccess();
-        if (isRecording && activeSpeakerId === speaker.id) return;
+        if (isRecording && activeSpeakerId === speaker.id) {
+          if (window.innerWidth <= 768 && speakers.length >= 2) {
+            toggleMobileDrawer();
+          }
+          return;
+        }
 
         if (isRecording) {
           switchSpeakerLive(speaker);
@@ -983,6 +1000,8 @@ function renderSoundboardPads() {
 
     soundboardGrid.appendChild(pad);
   });
+
+  updateDrawerCounts();
 }
 
 function selectSpeakerByIndex(index) {
@@ -1203,6 +1222,44 @@ function updateStopButtonState(active) {
       <span class="stop-btn-text-short">Başlat</span>
     `;
     stopSessionBtn.setAttribute('title', 'Dinlemeyi Başlat');
+  }
+}
+
+// ==========================================================================
+// 8. MOBİL YUKARI AÇILIR ÇEKMECE (EXPANDABLE BROADCAST DECK)
+// ==========================================================================
+function openMobileDrawer() {
+  if (!switcherConsole) return;
+  switcherConsole.classList.add('drawer-open');
+  if (mobileDrawerBackdrop) mobileDrawerBackdrop.classList.remove('hidden');
+  updateDrawerCounts();
+}
+
+function closeMobileDrawer() {
+  if (!switcherConsole) return;
+  switcherConsole.classList.remove('drawer-open');
+  if (mobileDrawerBackdrop) mobileDrawerBackdrop.classList.add('hidden');
+}
+
+function toggleMobileDrawer() {
+  if (!switcherConsole) return;
+  if (switcherConsole.classList.contains('drawer-open')) {
+    closeMobileDrawer();
+  } else {
+    openMobileDrawer();
+  }
+}
+
+function updateDrawerCounts() {
+  const count = speakers ? speakers.length : 0;
+  if (drawerSpeakerCountBadge) drawerSpeakerCountBadge.textContent = count;
+  if (mobileDrawerExpandCount) mobileDrawerExpandCount.textContent = count;
+  if (mobileDrawerExpandBtn) {
+    if (count >= 2) {
+      mobileDrawerExpandBtn.classList.remove('hidden');
+    } else {
+      mobileDrawerExpandBtn.classList.add('hidden');
+    }
   }
 }
 
@@ -1483,6 +1540,10 @@ function setupEventListeners() {
       }
       saveWorkspaceData();
       renderSoundboardPads();
+      updateDrawerCounts();
+      if (speakers.length < 2) {
+        closeMobileDrawer();
+      }
       closeModal(editSpeakerModal);
       showToast(`"${spk.name}" silindi.`);
     }
@@ -1496,6 +1557,46 @@ function setupEventListeners() {
         openEditSpeakerModal(activeSpeakerId);
       }
     });
+  }
+
+  // Mobil Çekmece Olayları
+  if (mobileDrawerExpandBtn) {
+    mobileDrawerExpandBtn.addEventListener('click', toggleMobileDrawer);
+  }
+  if (mobileDrawerCloseBtn) {
+    mobileDrawerCloseBtn.addEventListener('click', closeMobileDrawer);
+  }
+  if (mobileDrawerHandleBtn) {
+    mobileDrawerHandleBtn.addEventListener('click', closeMobileDrawer);
+  }
+  if (mobileDrawerBackdrop) {
+    mobileDrawerBackdrop.addEventListener('click', closeMobileDrawer);
+  }
+  if (drawerAddSpeakerBtn) {
+    drawerAddSpeakerBtn.addEventListener('click', () => {
+      speakerNameInput.value = '';
+      openModal(addSpeakerModal);
+      speakerNameInput.focus();
+    });
+  }
+
+  // Mobilde Çekmece Tutamağından Aşağı Kaydırarak Kapatma (Swipe Down)
+  if (mobileDrawerHeader) {
+    let touchStartY = 0;
+    mobileDrawerHeader.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches[0]) {
+        touchStartY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    mobileDrawerHeader.addEventListener('touchend', (e) => {
+      if (e.changedTouches && e.changedTouches[0]) {
+        const touchEndY = e.changedTouches[0].clientY;
+        if (touchEndY - touchStartY > 35) {
+          closeMobileDrawer();
+        }
+      }
+    }, { passive: true });
   }
 
   // Modalların Dışındaki Karanlık Alana Tıklayınca Kapat
@@ -1512,6 +1613,7 @@ function setupEventListeners() {
   // Klavye Kısayolları (Masaüstü): ESC ile Kapatma ve 1-9 Rakamları ile Konuşmacı Değiştirme
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
+      closeMobileDrawer();
       closeModal(addSpeakerModal);
       closeModal(editSpeakerModal);
       closeModal(settingsModal);
@@ -1565,6 +1667,10 @@ function setupEventListeners() {
     saveWorkspaceData();
     renderSoundboardPads();
     setActiveSpeaker(newSpk.id, false);
+    updateDrawerCounts();
+    if (window.innerWidth <= 768 && speakers.length >= 2) {
+      openMobileDrawer();
+    }
     closeModal(addSpeakerModal);
     showToast(`"${name}" eklendi.`);
   });

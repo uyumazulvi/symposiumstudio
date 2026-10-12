@@ -1115,6 +1115,12 @@ input:focus-visible {
   display: none;
 }
 
+.mobile-drawer-backdrop,
+.mobile-drawer-header,
+.mobile-drawer-expand-btn {
+  display: none;
+}
+
 /* ==========================================================================
    6. TOPLANTI VE ÇEVİRİ DİLİ YAPILANDIRMASI — KARTSIZ EDİTORYAL DÜZEN
    ========================================================================== */
@@ -2123,9 +2129,136 @@ input:focus-visible {
   }
 
   /* ==========================================================================
-     5. SABİT ALT DOCK (TEK SATIRLI ERGONOMİK 48px AKSİYON DOCK'I)
-     Her daim ekranın en altında sabit, tek satır, ferah, başparmak ergonomisinde.
+     5. MOBİL YUKARI AÇILIR ÇEKMECE & SABİT ALT DOCK (EXPANDABLE BROADCAST DECK)
+     Hızlı sempozyum akışında yukarı doğru 2 kolonlu ergonomik panel olarak açılır.
      ========================================================================== */
+  .mobile-drawer-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    background-color: rgba(0, 0, 0, 0.65) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    z-index: 995 !important;
+    transition: opacity 0.2s ease !important;
+  }
+
+  .mobile-drawer-backdrop.hidden {
+    display: none !important;
+  }
+
+  /* Çekmece Başlığı (Yalnızca Çekmece Açıkken Görünür) */
+  .mobile-drawer-header {
+    display: none !important;
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding-bottom: 6px !important;
+    border-bottom: 1px solid var(--border-hairline) !important;
+    flex-shrink: 0 !important;
+  }
+
+  .drawer-handle-bar {
+    width: 38px !important;
+    height: 4px !important;
+    border-radius: 999px !important;
+    background-color: rgba(255, 255, 255, 0.28) !important;
+    border: none !important;
+    cursor: pointer !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    transition: background-color 0.15s ease !important;
+  }
+
+  .drawer-handle-bar:active {
+    background-color: var(--accent-cyan) !important;
+  }
+
+  .drawer-title-row {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 2px 2px 0 2px !important;
+  }
+
+  .drawer-title-group {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .drawer-indicator-dot {
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background-color: var(--accent-cyan) !important;
+    box-shadow: 0 0 6px var(--accent-cyan) !important;
+  }
+
+  .drawer-title-text {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--text-primary) !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .drawer-count-badge {
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    font-family: var(--font-mono) !important;
+    color: var(--accent-cyan) !important;
+    background-color: rgba(101, 199, 176, 0.12) !important;
+    border: 1px solid rgba(101, 199, 176, 0.25) !important;
+    padding: 1px 6px !important;
+    border-radius: 999px !important;
+  }
+
+  .drawer-header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .drawer-add-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 3px 9px !important;
+    border-radius: 999px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--border-hairline) !important;
+    color: var(--text-primary) !important;
+    cursor: pointer !important;
+  }
+
+  .drawer-add-btn svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .drawer-close-btn {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--border-hairline) !important;
+    color: var(--text-secondary) !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+  }
+
+  .drawer-close-btn svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  /* Alt Konsol (Kapalıyken 48px Ergonomik Bar) */
   .switcher-console {
     position: fixed !important;
     bottom: 0 !important;
@@ -2147,6 +2280,7 @@ input:focus-visible {
     justify-content: space-between !important;
     height: auto !important;
     min-height: 48px !important;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.2s ease, max-height 0.22s ease !important;
   }
 
   .console-action-bar {
@@ -2188,6 +2322,51 @@ input:focus-visible {
 
   .console-add-speaker-btn span {
     display: none !important;
+  }
+
+  /* Mobilde Paneli Yukarı Açma Butonu (Kapalıyken Görünür) */
+  .mobile-drawer-expand-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 9px !important;
+    border-radius: 999px !important;
+    background-color: var(--bg-surface-elevated) !important;
+    border: 1px solid var(--border-hairline) !important;
+    color: var(--text-primary) !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    transition: transform 0.12s ease, border-color 0.15s ease !important;
+  }
+
+  .mobile-drawer-expand-btn:active {
+    transform: scale(0.94) !important;
+  }
+
+  .mobile-drawer-expand-btn.hidden {
+    display: none !important;
+  }
+
+  .drawer-expand-chevron {
+    width: 12px !important;
+    height: 12px !important;
+    color: var(--accent-cyan) !important;
+  }
+
+  .drawer-expand-badge {
+    font-family: var(--font-mono) !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    color: var(--accent-cyan) !important;
+    background-color: rgba(101, 199, 176, 0.15) !important;
+    padding: 1px 5px !important;
+    border-radius: 999px !important;
   }
 
   /* Konuşmacı Tuşları: Yatay Kapsül Şerit (Momentum Scroll & Proximity Snap) */
@@ -2335,6 +2514,168 @@ input:focus-visible {
 
   .stop-btn-text-short {
     display: inline !important;
+  }
+
+  /* ==========================================================================
+     AÇILMIŞ ÇEKMECE DURUMU (DRAWER OPEN - YUKARI AÇILAN 2 KOLONLU GRID)
+     ========================================================================== */
+  .switcher-console.drawer-open {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    height: auto !important;
+    max-height: 60vh !important;
+    min-height: 220px !important;
+    border-radius: 18px 18px 0 0 !important;
+    border-top: 1px solid rgba(101, 199, 176, 0.35) !important;
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.85) !important;
+    padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px)) 12px !important;
+    gap: 8px !important;
+    animation: drawerSlideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  }
+
+  @keyframes drawerSlideUp {
+    from {
+      transform: translateY(24px);
+      opacity: 0.9;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .switcher-console.drawer-open .mobile-drawer-header {
+    display: flex !important;
+  }
+
+  .switcher-console.drawer-open .mobile-drawer-expand-btn,
+  .switcher-console.drawer-open .console-action-bar {
+    display: none !important;
+  }
+
+  /* Çekmece Açıkken: 2 Kolonlu Hızlı Erişim Soundboard Izgarası */
+  .switcher-console.drawer-open .switcher-strip {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-height: calc(58vh - 110px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 4px 1px !important;
+    flex: initial !important;
+    scroll-snap-type: none !important;
+  }
+
+  .switcher-console.drawer-open .switcher-pad,
+  .switcher-console.drawer-open .studio-pad {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 46px !important;
+    height: auto !important;
+    padding: 7px 10px !important;
+    border-radius: 10px !important;
+    background-color: var(--bg-surface-elevated) !important;
+    border: 1px solid var(--border-hairline) !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+  }
+
+  .switcher-console.drawer-open .switcher-pad:active,
+  .switcher-console.drawer-open .switcher-pad.pressed {
+    transform: scale(0.97) !important;
+    background-color: var(--bg-surface-active) !important;
+  }
+
+  .switcher-console.drawer-open .switcher-pad.active,
+  .switcher-console.drawer-open .studio-pad.active {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--speaker-tint, var(--accent-cyan)) !important;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.5), inset 0 0 0 1px var(--speaker-tint, var(--accent-cyan)) !important;
+  }
+
+  .switcher-console.drawer-open .pad-head {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .switcher-console.drawer-open .pad-tools {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .switcher-console.drawer-open .pad-status-dot {
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    background-color: var(--speaker-tint, var(--accent-cyan)) !important;
+    box-shadow: 0 0 6px var(--speaker-tint, var(--accent-cyan)) !important;
+    flex-shrink: 0 !important;
+  }
+
+  .switcher-console.drawer-open .switcher-pad.active .pad-status-dot {
+    box-shadow: 0 0 9px var(--speaker-tint, var(--accent-cyan)) !important;
+    animation: statusPulse 1.8s infinite ease-in-out;
+  }
+
+  .switcher-console.drawer-open .pad-body {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 1px !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  .switcher-console.drawer-open .pad-name {
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    color: var(--text-primary) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+
+  .switcher-console.drawer-open .pad-accent {
+    display: block !important;
+    font-size: 9.5px !important;
+    color: var(--text-dim) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+
+  .switcher-console.drawer-open .pad-edit-btn {
+    display: inline-flex !important;
+    width: 20px !important;
+    height: 20px !important;
+    padding: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 0.55 !important;
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+  }
+
+  .switcher-console.drawer-open .console-stop-btn {
+    width: 100% !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    border-radius: 10px !important;
+    font-size: 12.5px !important;
+    margin-top: 3px !important;
+    justify-content: center !important;
   }
 
   /* ==========================================================================

@@ -215,7 +215,33 @@
     </section>
 
     <!-- 4. RAFİNE KONUŞMACI KONTROL ŞERİDİ (BROADCAST SWITCHER) -->
-    <footer class="switcher-console">
+    <footer class="switcher-console" id="switcherConsole">
+      <!-- MOBİL: YUKARI AÇILIR ÇEKMECE BAŞLIĞI & TUTAMAĞI -->
+      <div id="mobileDrawerHeader" class="mobile-drawer-header">
+        <button type="button" id="mobileDrawerHandleBtn" class="drawer-handle-bar" aria-label="Paneli Daralt"></button>
+        <div class="drawer-title-row">
+          <div class="drawer-title-group">
+            <span class="drawer-indicator-dot"></span>
+            <span class="drawer-title-text">Konuşmacı Paneli</span>
+            <span id="drawerSpeakerCountBadge" class="drawer-count-badge">0</span>
+          </div>
+          <div class="drawer-header-actions">
+            <button type="button" id="drawerAddSpeakerBtn" class="drawer-add-btn" title="Yeni Konuşmacı Ekle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              <span>Ekle</span>
+            </button>
+            <button type="button" id="mobileDrawerCloseBtn" class="drawer-close-btn" aria-label="Paneli Kapat" title="Paneli Daralt">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="console-action-bar">
         <div class="console-hint">
           <span class="hint-accent-bar"></span>
@@ -233,10 +259,19 @@
         </button>
       </div>
 
-      <!-- RAFİNE KONUŞMACI ŞERİDİ -->
+      <!-- RAFİNE KONUŞMACI ŞERİDİ (MOBİLDE ÇEKMECE İÇİNDE 2 KOLONLU GRID'E DÖNÜŞÜR) -->
       <div id="soundboardGrid" class="switcher-strip">
         <!-- JS Dinamik Olarak Rafine Butonlar Üretecek -->
       </div>
+
+      <!-- MOBİL: KAPALIYKEN GÖRÜNEN HIZLI AÇMA BUTONU -->
+      <button type="button" id="mobileDrawerExpandBtn" class="mobile-drawer-expand-btn hidden" aria-label="Konuşmacı Panelini Aç" title="Tüm Konuşmacıları Göster">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="drawer-expand-chevron">
+          <polyline points="18 15 12 9 6 15"/>
+        </svg>
+        <span class="drawer-expand-text">Panel</span>
+        <span id="mobileDrawerExpandCount" class="drawer-expand-badge">0</span>
+      </button>
 
       <!-- Sürekli Akış Modunda Dinlemeyi Başlat / Durdur Butonu -->
       <button id="stopSessionBtn" class="console-stop-btn start-mode hidden" title="Dinlemeyi Başlat">
@@ -247,6 +282,9 @@
         <span class="stop-btn-text-short">Başlat</span>
       </button>
     </footer>
+
+    <!-- MOBİL ÇEKMECE KARARTMA KATMANI -->
+    <div id="mobileDrawerBackdrop" class="mobile-drawer-backdrop hidden"></div>
 
   </main>
 
