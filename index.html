@@ -48,7 +48,7 @@
       </div>
     </div>
 
-    <!-- Ana Navigasyon Sekmeleri (Swiss Tabs) -->
+    <!-- Ana Navigasyon Sekmeleri (Swiss Tabs) & Ana Dil Seçici -->
     <nav class="studio-nav" aria-label="Ana Navigasyon">
       <button id="tabLiveBtn" class="nav-btn active" role="tab" aria-selected="true">
         <span class="nav-btn-icon">
@@ -60,18 +60,29 @@
         <span class="tab-label-short">Canlı</span>
       </button>
 
-      <button id="tabLangBtn" class="nav-btn" role="tab" aria-selected="false">
-        <span class="nav-btn-icon">
+      <!-- Ana Dil Seçici (Kullanıcının Dinleme ve Hedef Çeviri Dili) -->
+      <div class="native-lang-control" title="Dinleyici Ana Dili: Konuşmacıların dilleri otomatik olarak bu ana dile çevrilir">
+        <span class="native-lang-globe">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"/>
             <line x1="2" y1="12" x2="22" y2="12"/>
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
           </svg>
         </span>
-        <span class="tab-label-full">Toplantı ve Çeviri</span>
-        <span class="tab-label-short">Çeviri</span>
-        <span id="activeLangBadgePill" class="lang-tag-indicator">EN → TR</span>
-      </button>
+        <span class="native-lang-title-text">Ana Dil:</span>
+        <select id="headerNativeLangSelect" class="native-lang-select" aria-label="Dinleyici Ana Dili">
+          <option value="tr" selected>Türkçe (TR)</option>
+          <option value="en">İngilizce (EN)</option>
+          <option value="de">Almanca (DE)</option>
+          <option value="fr">Fransızca (FR)</option>
+          <option value="es">İspanyolca (ES)</option>
+          <option value="it">İtalyanca (IT)</option>
+          <option value="ru">Rusça (RU)</option>
+          <option value="ar">Arapça (AR)</option>
+          <option value="zh">Çince (ZH)</option>
+          <option value="ja">Japonca (JA)</option>
+        </select>
+      </div>
     </nav>
 
     <!-- Sağ: Kontroller, VU Metre ve Araçlar -->
@@ -155,13 +166,13 @@
         </div>
 
         <div class="stage-language-bridge">
-          <button id="quickLangBadgeBtn" class="language-bridge-btn" title="Dilleri Karşılıklı Değiştir (Hızlı Swap)">
+          <div id="stageLangRouteBadge" class="language-route-badge" title="Aktif Konuşmacı Çeviri Rotası">
             <span id="badgeSourceText">İngilizce</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="bridge-arrow">
-              <path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"/>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="bridge-arrow">
+              <path d="M5 12h14m-6-6l6 6-6 6"/>
             </svg>
             <span id="badgeTargetText">Türkçe</span>
-          </button>
+          </div>
           
           <span id="liveEngineBadge" class="engine-indicator hidden"></span>
         </div>
@@ -496,7 +507,7 @@
         </div>
 
         <div class="field-block">
-          <label for="speakerAccentInput">Telaffuz & Lehçe Uyarlaması</label>
+          <label for="speakerAccentInput">Konuşmacının Konuşacağı Dil & Lehçe</label>
           <select id="speakerAccentInput" class="field-input">
             <option value="en-US">Amerikan İngilizcesi (en-US)</option>
             <option value="en-GB">İngiliz İngilizcesi (en-GB)</option>
@@ -513,7 +524,7 @@
             <option value="tr-TR">Türkçe (tr-TR)</option>
           </select>
           <p class="field-description">
-            Doğru lehçe seçimi, ses motorunun konuşmacının fonetik yapısını doğru kavramasını sağlar.
+            Konuşmacının seçilen dilde yaptığı konuşma, dinleyicinin belirlediği Ana Dil'e anlık olarak simultane çevrilir.
           </p>
         </div>
 
@@ -555,7 +566,7 @@
         </div>
 
         <div class="field-block">
-          <label for="editSpeakerAccentInput">Telaffuz & Lehçe Uyarlaması</label>
+          <label for="editSpeakerAccentInput">Konuşmacının Konuşacağı Dil & Lehçe</label>
           <select id="editSpeakerAccentInput" class="field-input">
             <option value="en-US">Amerikan İngilizcesi (en-US)</option>
             <option value="en-GB">İngiliz İngilizcesi (en-GB)</option>

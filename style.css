@@ -261,6 +261,53 @@ input:focus-visible {
   font-weight: 600;
 }
 
+/* Header Ana Dil Seçici */
+.native-lang-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px 3px 10px;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-xs);
+  margin-left: 4px;
+}
+
+.native-lang-globe {
+  display: flex;
+  align-items: center;
+  color: var(--accent-cyan);
+}
+
+.native-lang-globe svg {
+  width: 13px;
+  height: 13px;
+}
+
+.native-lang-title-text {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.native-lang-select {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 2px 2px;
+  outline: none;
+}
+
+.native-lang-select option {
+  background-color: #16181D;
+  color: #FFFFFF;
+}
+
 .lang-tag-indicator {
   font-family: var(--font-mono);
   font-size: 10px;
@@ -481,6 +528,7 @@ input:focus-visible {
   gap: 12px;
 }
 
+.language-route-badge,
 .language-bridge-btn {
   display: inline-flex;
   align-items: center;
@@ -490,8 +538,9 @@ input:focus-visible {
   border: 1px solid var(--border-hairline);
   border-radius: var(--radius-xs);
   font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
   transition: all var(--transition-fast);
 }
 
@@ -1044,10 +1093,34 @@ input:focus-visible {
   text-overflow: ellipsis;
 }
 
+.pad-route-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
+  background-color: rgba(101, 199, 176, 0.12);
+  border: 1px solid rgba(101, 199, 176, 0.25);
+  color: var(--accent-cyan);
+  white-space: nowrap;
+}
+
+.pad-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.pad-mobile-lang {
+  display: none;
+}
+
 .pad-foot {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 
 .pad-trigger-text {
@@ -1811,7 +1884,7 @@ input:focus-visible {
     border-radius: 999px !important;
   }
 
-  /* Orta: Dil Değiştirme Sekmesi (Swiss Nav - Tek ve Zarif Rozet) */
+  /* Orta: Dinleyici Ana Dili Seçici */
   .studio-nav {
     display: flex !important;
     align-items: center !important;
@@ -1828,38 +1901,33 @@ input:focus-visible {
     display: none !important;
   }
 
-  /* Çeviri butonu doğrudan tek bir şık dil köprüsüne dönüşür */
-  #tabLangBtn {
+  .native-lang-control {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 4px !important;
-    padding: 4px 10px !important;
+    padding: 3px 8px !important;
     min-height: 28px !important;
     background-color: var(--bg-surface) !important;
     border: 1px solid var(--border-hairline) !important;
     border-radius: var(--radius-xs) !important;
+    margin-left: 0 !important;
+  }
+
+  .native-lang-title-text {
+    display: none !important;
+  }
+
+  .native-lang-globe svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .native-lang-select {
     font-size: 11.5px !important;
     font-weight: 600 !important;
     color: var(--text-primary) !important;
-    white-space: nowrap !important;
-  }
-
-  #tabLangBtn .nav-btn-icon {
-    display: none !important;
-  }
-
-  #tabLangBtn .tab-label-full,
-  #tabLangBtn .tab-label-short {
-    display: none !important;
-  }
-
-  #activeLangBadgePill {
-    font-size: 11px !important;
-    font-weight: 600 !important;
-    color: var(--accent-turquoise, #65C7B0) !important;
-    background: transparent !important;
-    padding: 0 !important;
+    padding: 1px 0 !important;
   }
 
   /* Sağ: Mod Toggle ve Tek Ayarlar Butonu */
@@ -2647,6 +2715,13 @@ input:focus-visible {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     max-width: 100% !important;
+  }
+
+  .switcher-console.drawer-open .pad-route-tag {
+    display: inline-flex !important;
+    font-size: 8.5px !important;
+    padding: 1px 4px !important;
+    margin-top: 1px !important;
   }
 
   .switcher-console.drawer-open .pad-edit-btn {

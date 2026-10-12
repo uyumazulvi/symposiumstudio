@@ -58,21 +58,35 @@ const SOURCE_LANG_NAMES = {
   'tr-TR': 'Türkçe'
 };
 
+// Dil Kısa Kodları (Soundboard Pad Rozetleri İçin)
+const LANGUAGE_SHORT_CODES = {
+  'tr': 'TR',
+  'en': 'EN',
+  'de': 'DE',
+  'fr': 'FR',
+  'es': 'ES',
+  'it': 'IT',
+  'ru': 'RU',
+  'ar': 'AR',
+  'zh': 'ZH',
+  'ja': 'JA'
+};
+
 // Aksan & Bölge Veri Tabanı
 const ACCENT_REGISTRY = {
-  'en-US': { name: 'Amerikan İngilizcesi', flag: 'US', code: 'en-US' },
-  'en-GB': { name: 'İngiliz İngilizcesi', flag: 'UK', code: 'en-GB' },
-  'en-IN': { name: 'Hint / Güney Asya', flag: 'IN', code: 'en-IN' },
-  'en-AU': { name: 'Avustralya İngilizcesi', flag: 'AU', code: 'en-AU' },
-  'de-DE': { name: 'Almanca', flag: 'DE', code: 'de-DE' },
-  'fr-FR': { name: 'Fransızca', flag: 'FR', code: 'fr-FR' },
-  'es-ES': { name: 'İspanyolca', flag: 'ES', code: 'es-ES' },
-  'it-IT': { name: 'İtalyanca', flag: 'IT', code: 'it-IT' },
-  'ru-RU': { name: 'Rusça', flag: 'RU', code: 'ru-RU' },
-  'ar-SA': { name: 'Arapça', flag: 'SA', code: 'ar-SA' },
-  'zh-CN': { name: 'Çince (Mandarin)', flag: 'CN', code: 'zh-CN' },
-  'ja-JP': { name: 'Japonca', flag: 'JP', code: 'ja-JP' },
-  'tr-TR': { name: 'Türkçe', flag: 'TR', code: 'tr-TR' }
+  'en-US': { name: 'Amerikan İngilizcesi', short: 'EN', flag: 'US', code: 'en-US' },
+  'en-GB': { name: 'İngiliz İngilizcesi', short: 'EN', flag: 'UK', code: 'en-GB' },
+  'en-IN': { name: 'Hint / Güney Asya', short: 'EN', flag: 'IN', code: 'en-IN' },
+  'en-AU': { name: 'Avustralya İngilizcesi', short: 'EN', flag: 'AU', code: 'en-AU' },
+  'de-DE': { name: 'Almanca', short: 'DE', flag: 'DE', code: 'de-DE' },
+  'fr-FR': { name: 'Fransızca', short: 'FR', flag: 'FR', code: 'fr-FR' },
+  'es-ES': { name: 'İspanyolca', short: 'ES', flag: 'ES', code: 'es-ES' },
+  'it-IT': { name: 'İtalyanca', short: 'IT', flag: 'IT', code: 'it-IT' },
+  'ru-RU': { name: 'Rusça', short: 'RU', flag: 'RU', code: 'ru-RU' },
+  'ar-SA': { name: 'Arapça', short: 'AR', flag: 'SA', code: 'ar-SA' },
+  'zh-CN': { name: 'Çince (Mandarin)', short: 'ZH', flag: 'CN', code: 'zh-CN' },
+  'ja-JP': { name: 'Japonca', short: 'JA', flag: 'JP', code: 'ja-JP' },
+  'tr-TR': { name: 'Türkçe', short: 'TR', flag: 'TR', code: 'tr-TR' }
 };
 
 // Hedef Dilden Konuşma Tanıma Koduna Eşleme
@@ -99,9 +113,10 @@ const STUDIO_ACCENTS = [
   '#A09F96'  // Nötr Taş
 ];
 
-// Varsayılan Konuşmacı Havuzu (Varsayılan olarak tek kullanıcı)
+// Varsayılan Konuşmacı Havuzu (Örnek: Konuşmacı 1 İngilizce, Konuşmacı 2 Almanca)
 let speakers = [
-  { id: 'spk_1', name: 'Konuşmacı 1', accent: 'en-US', color: '#65C7B0' }
+  { id: 'spk_1', name: 'Konuşmacı 1', accent: 'en-US', color: '#65C7B0' },
+  { id: 'spk_2', name: 'Konuşmacı 2', accent: 'de-DE', color: '#D6A66B' }
 ];
 
 // Oturum Tutanak Arşivi
@@ -119,8 +134,10 @@ const tabLiveBtn = document.getElementById('tabLiveBtn');
 const tabLangBtn = document.getElementById('tabLangBtn');
 const viewLiveSection = document.getElementById('viewLiveSection');
 const viewLanguageSection = document.getElementById('viewLanguageSection');
+const headerNativeLangSelect = document.getElementById('headerNativeLangSelect');
 const activeLangBadgePill = document.getElementById('activeLangBadgePill');
 const quickLangBadgeBtn = document.getElementById('quickLangBadgeBtn');
+const stageLangRouteBadge = document.getElementById('stageLangRouteBadge');
 const badgeSourceText = document.getElementById('badgeSourceText');
 const badgeTargetText = document.getElementById('badgeTargetText');
 const targetLangLabelBadge = document.getElementById('targetLangLabelBadge');
@@ -216,13 +233,7 @@ window.addEventListener('DOMContentLoaded', () => {
   updateLanguageDisplayBadges();
 
   if (speakers.length > 0) {
-    const curSpk = speakers[0];
-    const srcFamily = (sourceLanguage || 'en').split('-')[0].toLowerCase();
-    const curFamily = (curSpk.accent || '').split('-')[0].toLowerCase();
-    if (srcFamily !== curFamily) {
-      curSpk.accent = sourceLanguage;
-    }
-    setActiveSpeaker(curSpk.id, false);
+    setActiveSpeaker(speakers[0].id, false);
   }
   updateEngineBadge();
   updateStopButtonState(false);
@@ -236,11 +247,19 @@ window.addEventListener('pointerdown', () => {
 
 function loadWorkspaceData() {
   try {
-    const s = localStorage.getItem('sym_speakers_v4');
+    const s = localStorage.getItem('sym_speakers_v5');
     if (s) {
       const parsed = JSON.parse(s);
       if (Array.isArray(parsed) && parsed.length > 0) {
         speakers = parsed;
+      }
+    } else {
+      const sOld = localStorage.getItem('sym_speakers_v4');
+      if (sOld) {
+        const parsedOld = JSON.parse(sOld);
+        if (Array.isArray(parsedOld) && parsedOld.length >= 2) {
+          speakers = parsedOld;
+        }
       }
     }
     const h = localStorage.getItem('sym_history_v3');
@@ -278,12 +297,16 @@ function loadWorkspaceData() {
     const src = localStorage.getItem('sym_source_lang');
     if (src) {
       sourceLanguage = src;
-      meetingSourceLangSelect.value = src;
+      if (meetingSourceLangSelect) meetingSourceLangSelect.value = src;
     }
     const tgt = localStorage.getItem('sym_target_lang');
     if (tgt) {
       targetLanguage = tgt;
-      meetingTargetLangSelect.value = tgt;
+      if (meetingTargetLangSelect) meetingTargetLangSelect.value = tgt;
+      if (headerNativeLangSelect) headerNativeLangSelect.value = tgt;
+    } else {
+      targetLanguage = 'tr';
+      if (headerNativeLangSelect) headerNativeLangSelect.value = 'tr';
     }
   } catch (err) {
     console.warn('Veri yükleme hatası:', err);
@@ -292,7 +315,7 @@ function loadWorkspaceData() {
 
 function saveWorkspaceData() {
   try {
-    localStorage.setItem('sym_speakers_v4', JSON.stringify(speakers));
+    localStorage.setItem('sym_speakers_v5', JSON.stringify(speakers));
     localStorage.setItem('sym_history_v3', JSON.stringify(transcriptHistory));
     localStorage.setItem('sym_gemini_key', geminiApiKey);
     localStorage.setItem('sym_mode_pref', currentMode);
@@ -322,37 +345,51 @@ function updateEngineBadge() {
 // 2. DİL DEĞİŞİKLİKLERİ VE GÖSTERGE GÜNCELLEMELERİ
 // ==========================================================================
 function updateLanguageDisplayBadges() {
-  const srcName = SOURCE_LANG_NAMES[sourceLanguage] || sourceLanguage;
-  const tgtName = LANGUAGE_NAMES[targetLanguage] || targetLanguage.toUpperCase();
+  const activeSpk = getActiveSpeaker();
+  const spkLocale = getSpeakerLang(activeSpk);
+  const srcCode = (spkLocale || 'en').split('-')[0].toLowerCase();
+  const tgtCode = (targetLanguage || 'tr').toLowerCase();
 
-  // Üst Sekme Rozeti
-  activeLangBadgePill.textContent = `${srcName.split(' ')[0]} → ${tgtName}`;
+  const spkAccentObj = ACCENT_REGISTRY[spkLocale] || { name: spkLocale };
+  const spkName = spkAccentObj.name.split(' ')[0] || spkLocale;
+  const tgtName = LANGUAGE_NAMES[tgtCode] || tgtCode.toUpperCase();
 
-  // Canlı Sahne Rozeti
-  badgeSourceText.textContent = srcName.split(' ')[0];
-  badgeTargetText.textContent = tgtName;
+  // Üst Sekme Rozeti (Varsa)
+  if (activeLangBadgePill) {
+    activeLangBadgePill.textContent = `${spkName} → ${tgtName}`;
+  }
 
-  // Altyazı Kartı Başlığı
-  targetLangLabelBadge.textContent = `${tgtName.toUpperCase()} ALTYAZI`;
-}
-
-function applySelectedLanguages() {
-  sourceLanguage = meetingSourceLangSelect.value;
-  targetLanguage = meetingTargetLangSelect.value;
-
-  // Aktif konuşmacının aksanını yeni kaynak dille senkronize et
-  const cur = getActiveSpeaker();
-  if (cur) {
-    const srcFamily = (sourceLanguage || '').split('-')[0].toLowerCase();
-    const curFamily = (cur.accent || '').split('-')[0].toLowerCase();
-    if (srcFamily !== curFamily) {
-      cur.accent = sourceLanguage;
-      renderSoundboardPads();
-      setActiveSpeaker(cur.id, false);
+  // Sahne Dil Köprüsü Rozeti (Aktif Konuşmacı Dili ➔ Dinleyici Ana Dili)
+  if (badgeSourceText && badgeTargetText) {
+    badgeSourceText.textContent = spkName;
+    if (srcCode === tgtCode) {
+      badgeTargetText.textContent = 'Orijinal';
+    } else {
+      badgeTargetText.textContent = tgtName;
     }
   }
 
+  // Altyazı Kartı Başlığı
+  if (targetLangLabelBadge) {
+    targetLangLabelBadge.textContent = `${tgtName.toUpperCase()} ALTYAZI`;
+  }
+
+  // Header Ana Dil Seçici senkronizasyonu
+  if (headerNativeLangSelect && headerNativeLangSelect.value !== targetLanguage) {
+    headerNativeLangSelect.value = targetLanguage;
+  }
+  if (meetingTargetLangSelect && meetingTargetLangSelect.value !== targetLanguage) {
+    meetingTargetLangSelect.value = targetLanguage;
+  }
+}
+
+function applySelectedLanguages() {
+  if (meetingSourceLangSelect) sourceLanguage = meetingSourceLangSelect.value;
+  if (meetingTargetLangSelect) targetLanguage = meetingTargetLangSelect.value;
+  if (headerNativeLangSelect) headerNativeLangSelect.value = targetLanguage;
+
   updateLanguageDisplayBadges();
+  renderSoundboardPads();
   saveWorkspaceData();
 
   // Eğer ses tanıma motoru çalışıyorsa yeni kaynak dile uyarla
@@ -374,35 +411,28 @@ function applySelectedLanguages() {
 
   // Canlı Sahneye Geri Dön
   switchTab('live');
-  showToast(`Toplantı Dili: ${SOURCE_LANG_NAMES[sourceLanguage]} ➔ Çeviri: ${LANGUAGE_NAMES[targetLanguage]}`);
+  showToast(`Ana Dil: ${LANGUAGE_NAMES[targetLanguage] || targetLanguage}`);
 }
 
 function swapLanguages() {
-  const curSource = meetingSourceLangSelect ? meetingSourceLangSelect.value : sourceLanguage;
-  const curTarget = meetingTargetLangSelect ? meetingTargetLangSelect.value : targetLanguage;
+  const curSpk = getActiveSpeaker();
+  const curSpkLocale = getSpeakerLang(curSpk);
+  const curSrcPrefix = (curSpkLocale || 'en').split('-')[0].toLowerCase();
+  const curTgtPrefix = (targetLanguage || 'tr').toLowerCase();
 
-  const srcPrefix = (curSource || 'en').split('-')[0].toLowerCase();
-  const tgtPrefix = (curTarget || 'tr').split('-')[0].toLowerCase();
+  // Hedef dili aktif konuşmacının dili yap
+  const newSourceLocale = DEFAULT_SPEECH_LOCALES[curTgtPrefix] || (curTgtPrefix + '-' + curTgtPrefix.toUpperCase());
+  const newTargetCode = curSrcPrefix;
 
-  // Hedef dili yeni kaynak dil yap (Bölgesel konuşma tanıma yerel kodu ile)
-  const newSourceLocale = DEFAULT_SPEECH_LOCALES[tgtPrefix] || (tgtPrefix + '-' + tgtPrefix.toUpperCase());
-  // Eski kaynak dili yeni hedef dil yap
-  const newTargetCode = srcPrefix;
-
-  sourceLanguage = newSourceLocale;
+  curSpk.accent = newSourceLocale;
   targetLanguage = newTargetCode;
 
-  if (meetingSourceLangSelect) meetingSourceLangSelect.value = sourceLanguage;
+  if (meetingSourceLangSelect) meetingSourceLangSelect.value = newSourceLocale;
   if (meetingTargetLangSelect) meetingTargetLangSelect.value = targetLanguage;
+  if (headerNativeLangSelect) headerNativeLangSelect.value = targetLanguage;
 
-  // Aktif konuşmacı aksanını yeni kaynak dile adapte et
-  const cur = getActiveSpeaker();
-  if (cur) {
-    cur.accent = newSourceLocale;
-    renderSoundboardPads();
-    setActiveSpeaker(cur.id, false);
-  }
-
+  renderSoundboardPads();
+  setActiveSpeaker(curSpk.id, false);
   updateLanguageDisplayBadges();
   saveWorkspaceData();
 
@@ -423,9 +453,9 @@ function swapLanguages() {
   liveOriginalStream.textContent = 'Dinleniyor...';
   liveTranslationStream.textContent = '...';
 
-  const srcName = SOURCE_LANG_NAMES[sourceLanguage] || sourceLanguage;
+  const srcAcc = ACCENT_REGISTRY[curSpk.accent] || { name: curSpk.accent };
   const tgtName = LANGUAGE_NAMES[targetLanguage] || targetLanguage;
-  showToast(`Diller Değiştirildi: ${srcName.split(' ')[0]} ⇄ ${tgtName}`);
+  showToast(`Diller Değiştirildi: ${srcAcc.name.split(' ')[0]} ⇄ ${tgtName}`);
 }
 
 function switchTab(tabName) {
@@ -521,9 +551,8 @@ let turnSpeechBuffer = '';
 let streamAutoCommitTimer = null;
 
 function getSpeakerLang(spk) {
-  if (!spk) return sourceLanguage;
-  const langPrefix = sourceLanguage.split('-')[0];
-  return (spk.accent && spk.accent.startsWith(langPrefix)) ? spk.accent : sourceLanguage;
+  if (spk && spk.accent) return spk.accent;
+  return 'en-US';
 }
 
 function initRecognitionEngine() {
@@ -720,9 +749,12 @@ function triggerLiveTranslation(sourceText) {
   if (clean === lastTranslatedSourceText) return;
   if (clean === 'Dinleniyor...' || clean.startsWith('Sistemi başlatmak')) return;
 
-  const srcCode = (sourceLanguage || 'en').split('-')[0].toLowerCase();
-  const tgtCode = (targetLanguage || 'tr').split('-')[0].toLowerCase();
+  const activeSpk = getActiveSpeaker();
+  const spkLocale = getSpeakerLang(activeSpk);
+  const srcCode = (spkLocale || 'en').split('-')[0].toLowerCase();
+  const tgtCode = (targetLanguage || 'tr').toLowerCase();
 
+  // Konuşmacının dili ile dinleyicinin ana dili aynı ise çeviri yapmadan direkt göster
   if (srcCode === tgtCode) {
     liveTranslationStream.textContent = clean;
     liveTranslationStream.scrollTop = liveTranslationStream.scrollHeight;
@@ -759,12 +791,14 @@ function triggerLiveTranslation(sourceText) {
   }, 100);
 }
 
-async function translateSpeechTurn(sourceText) {
+async function translateSpeechTurn(sourceText, speaker) {
   if (!sourceText || sourceText.trim() === '') return '';
   const cleanText = sourceText.trim();
 
-  const srcCode = (sourceLanguage || 'en').split('-')[0].toLowerCase();
-  const tgtCode = (targetLanguage || 'tr').split('-')[0].toLowerCase();
+  const spk = speaker || getActiveSpeaker();
+  const spkLocale = getSpeakerLang(spk);
+  const srcCode = (spkLocale || 'en').split('-')[0].toLowerCase();
+  const tgtCode = (targetLanguage || 'tr').toLowerCase();
 
   if (srcCode === tgtCode) return cleanText;
 
@@ -836,8 +870,8 @@ async function archiveSpeechTurnForSpeaker(speaker, textToArchive) {
 
   const timeFormatted = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
 
-  // Çeviriyi tamamla
-  const translated = await translateSpeechTurn(textToArchive);
+  // Çeviriyi bu konuşmacının dilinden hedef ana dile yap
+  const translated = await translateSpeechTurn(textToArchive, speaker);
 
   // Canlı Altyazıyı Güncelle
   liveTranslationStream.textContent = translated;
@@ -865,15 +899,22 @@ async function archiveSpeechTurnForSpeaker(speaker, textToArchive) {
 function renderSoundboardPads() {
   soundboardGrid.innerHTML = '';
 
+  const tgtShort = (LANGUAGE_SHORT_CODES[targetLanguage] || targetLanguage.toUpperCase());
+
   speakers.forEach((speaker, index) => {
     const isSelected = speaker.id === activeSpeakerId;
     const pad = document.createElement('div');
     pad.className = `switcher-pad ${isSelected ? 'active' : ''}`;
     pad.style.setProperty('--speaker-tint', speaker.color);
 
-    const acc = ACCENT_REGISTRY[speaker.accent] || { flag: '🌐', name: speaker.accent };
+    const acc = ACCENT_REGISTRY[speaker.accent] || { flag: '🌐', name: speaker.accent, short: 'EN' };
     const monogram = speaker.name.substring(0, 2).toUpperCase();
     const keyNumber = index < 9 ? (index + 1) : null;
+
+    const spkShort = acc.short || (speaker.accent ? speaker.accent.split('-')[0].toUpperCase() : 'EN');
+    const isSameLang = spkShort.toLowerCase() === tgtShort.toLowerCase();
+    const routeLabel = isSameLang ? `${spkShort} (Orijinal)` : `${spkShort} ➔ ${tgtShort}`;
+    const fullRouteHint = isSameLang ? `${acc.name} (Orijinal)` : `${acc.name} ➔ ${LANGUAGE_NAMES[targetLanguage] || targetLanguage}`;
 
     pad.innerHTML = `
       <div class="pad-head">
@@ -882,6 +923,7 @@ function renderSoundboardPads() {
           ${keyNumber ? `<span class="pad-key-badge" title="Klavye Kısayolu: [${keyNumber}]">${keyNumber}</span>` : ''}
         </div>
         <div class="pad-tools">
+          <span class="pad-route-tag" title="Çeviri Rotası: ${fullRouteHint}">${routeLabel}</span>
           <button type="button" class="pad-edit-btn" title="Düzenle veya Sil">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -893,9 +935,12 @@ function renderSoundboardPads() {
       </div>
       <div class="pad-body">
         <span class="pad-name">${escapeHtml(speaker.name)}</span>
-        <span class="pad-accent">${acc.name}</span>
+        <div class="pad-meta-row">
+          <span class="pad-accent">${acc.name}</span>
+        </div>
       </div>
       <div class="pad-foot">
+        <span class="pad-mobile-lang">${routeLabel}</span>
         <span class="pad-trigger-text">${currentMode === 'ptt' ? 'Basılı Tutun' : 'Aktif Et'}</span>
       </div>
     `;
@@ -1093,6 +1138,9 @@ function setActiveSpeaker(speakerId, autoStart = false) {
 
   const acc = ACCENT_REGISTRY[cur.accent] || { name: cur.accent };
   activeSpeakerAccentDisplay.textContent = acc.name;
+
+  // Aktif konuşmacının diliyle sahne çeviri rotası rozetini güncelle
+  updateLanguageDisplayBadges();
 
   // Pad durumlarını güncelle
   const pads = soundboardGrid.querySelectorAll('.switcher-pad, .studio-pad');
@@ -1348,13 +1396,35 @@ function renderTranscriptFeed() {
 // ==========================================================================
 function setupEventListeners() {
   // Ana Sekme Geçişleri
-  tabLiveBtn.addEventListener('click', () => switchTab('live'));
-  tabLangBtn.addEventListener('click', () => switchTab('lang'));
-  quickLangBadgeBtn.addEventListener('click', swapLanguages);
+  if (tabLiveBtn) tabLiveBtn.addEventListener('click', () => switchTab('live'));
+  if (tabLangBtn) tabLangBtn.addEventListener('click', () => switchTab('lang'));
+  if (quickLangBadgeBtn) quickLangBadgeBtn.addEventListener('click', swapLanguages);
+
+  // Header Ana Dil Seçici Olayı (Dinleyici Ana Dili Değişimi)
+  if (headerNativeLangSelect) {
+    headerNativeLangSelect.addEventListener('change', () => {
+      targetLanguage = headerNativeLangSelect.value;
+      if (meetingTargetLangSelect) meetingTargetLangSelect.value = targetLanguage;
+      saveWorkspaceData();
+      updateLanguageDisplayBadges();
+      renderSoundboardPads();
+      const langName = LANGUAGE_NAMES[targetLanguage] || targetLanguage;
+      showToast(`Ana Dil Değiştirildi: ${langName}`);
+    });
+  }
 
   // Dil Paneli Olayları
-  applyLangSettingsBtn.addEventListener('click', applySelectedLanguages);
-  swapLanguagesBtn.addEventListener('click', swapLanguages);
+  if (applyLangSettingsBtn) applyLangSettingsBtn.addEventListener('click', applySelectedLanguages);
+  if (swapLanguagesBtn) swapLanguagesBtn.addEventListener('click', swapLanguages);
+  if (meetingTargetLangSelect) {
+    meetingTargetLangSelect.addEventListener('change', () => {
+      targetLanguage = meetingTargetLangSelect.value;
+      if (headerNativeLangSelect) headerNativeLangSelect.value = targetLanguage;
+      saveWorkspaceData();
+      updateLanguageDisplayBadges();
+      renderSoundboardPads();
+    });
+  }
 
   // Hızlı Dil Şablonları (Presets)
   presetPills.forEach(pill => {
@@ -1413,9 +1483,10 @@ function setupEventListeners() {
       return;
     }
     let text = `SYMPOSIUM KONGRE TUTANAĞI — ${new Date().toLocaleDateString('tr-TR')}\n`;
-    text += `Diller: ${SOURCE_LANG_NAMES[sourceLanguage]} ➔ ${LANGUAGE_NAMES[targetLanguage]}\n\n`;
+    text += `Dinleyici Ana Dili: ${LANGUAGE_NAMES[targetLanguage] || targetLanguage}\n\n`;
     transcriptHistory.forEach(t => {
-      text += `[${t.time}] ${t.speakerName}:\n  Orijinal: ${t.original}\n  Çeviri (${LANGUAGE_NAMES[targetLanguage]}): ${t.translation}\n\n`;
+      const spkAcc = ACCENT_REGISTRY[t.speakerAccent] || { name: t.speakerAccent || '' };
+      text += `[${t.time}] ${t.speakerName} [${spkAcc.name}]:\n  Orijinal: ${t.original}\n  Çeviri (${LANGUAGE_NAMES[targetLanguage]}): ${t.translation}\n\n`;
     });
     navigator.clipboard.writeText(text).then(() => {
       showToast('Tutanak panoya kopyalandı.');
@@ -1428,9 +1499,10 @@ function setupEventListeners() {
       return;
     }
     let text = `SYMPOSIUM KONGRE TUTANAĞI — ${new Date().toLocaleDateString('tr-TR')}\n`;
-    text += `Diller: ${SOURCE_LANG_NAMES[sourceLanguage]} ➔ ${LANGUAGE_NAMES[targetLanguage]}\n\n`;
+    text += `Dinleyici Ana Dili: ${LANGUAGE_NAMES[targetLanguage] || targetLanguage}\n\n`;
     transcriptHistory.forEach(t => {
-      text += `[${t.time}] ${t.speakerName}:\n  Orijinal: ${t.original}\n  Çeviri (${LANGUAGE_NAMES[targetLanguage]}): ${t.translation}\n\n`;
+      const spkAcc = ACCENT_REGISTRY[t.speakerAccent] || { name: t.speakerAccent || '' };
+      text += `[${t.time}] ${t.speakerName} [${spkAcc.name}]:\n  Orijinal: ${t.original}\n  Çeviri (${LANGUAGE_NAMES[targetLanguage]}): ${t.translation}\n\n`;
     });
     const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
     const a = document.createElement('a');
