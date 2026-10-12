@@ -506,6 +506,7 @@ async function initStudioVuMeter() {
 // 4. SES TANIMA VE TAMPON MOTORU (SPEECH ENGINE)
 // ==========================================================================
 let turnSpeechBuffer = '';
+let streamAutoCommitTimer = null;
 
 function getSpeakerLang(spk) {
   if (!spk) return sourceLanguage;
@@ -554,11 +555,38 @@ function initRecognitionEngine() {
     const currentLiveStream = (turnSpeechBuffer + ' ' + finalChunk + ' ' + interimChunk).trim();
     if (currentLiveStream.length > 0) {
       liveOriginalStream.textContent = currentLiveStream;
+      liveOriginalStream.scrollTop = liveOriginalStream.scrollHeight;
       triggerLiveTranslation(currentLiveStream);
     }
 
     if (finalChunk.trim().length > 0) {
       turnSpeechBuffer = (turnSpeechBuffer + ' ' + finalChunk).trim();
+
+      // Sürekli Akış modunda: uzun konuşmaların dev bir paragrafa dönüşüp sahneyi doldurmasını önle
+      if (currentMode === 'tap') {
+        const hasPunctuation = /[.?!;]\s*$/.test(turnSpeechBuffer);
+        const isLongEnough = turnSpeechBuffer.length >= 80;
+
+        if (hasPunctuation || isLongEnough) {
+          if (streamAutoCommitTimer) clearTimeout(streamAutoCommitTimer);
+          streamAutoCommitTimer = null;
+          commitSpeechTurn();
+        } else {
+          if (streamAutoCommitTimer) clearTimeout(streamAutoCommitTimer);
+          streamAutoCommitTimer = setTimeout(() => {
+            if (currentMode === 'tap' && turnSpeechBuffer.trim().length > 0) {
+              commitSpeechTurn();
+            }
+          }, 1400);
+        }
+      }
+    } else if (interimChunk.trim().length > 0 && currentMode === 'tap') {
+      if (streamAutoCommitTimer) clearTimeout(streamAutoCommitTimer);
+      streamAutoCommitTimer = setTimeout(() => {
+        if (currentMode === 'tap' && turnSpeechBuffer.trim().length > 0) {
+          commitSpeechTurn();
+        }
+      }, 1600);
     }
   };
 
@@ -685,6 +713,7 @@ function triggerLiveTranslation(sourceText) {
 
   if (srcCode === tgtCode) {
     liveTranslationStream.textContent = clean;
+    liveTranslationStream.scrollTop = liveTranslationStream.scrollHeight;
     lastTranslatedSourceText = clean;
     return;
   }
@@ -692,6 +721,7 @@ function triggerLiveTranslation(sourceText) {
   const cacheKey = `${srcCode}_${tgtCode}_${clean}`;
   if (liveTranslationCache.has(cacheKey)) {
     liveTranslationStream.textContent = liveTranslationCache.get(cacheKey);
+    liveTranslationStream.scrollTop = liveTranslationStream.scrollHeight;
     lastTranslatedSourceText = clean;
     return;
   }
@@ -703,6 +733,7 @@ function triggerLiveTranslation(sourceText) {
       const translated = await fetchWebTranslation(clean, srcCode, tgtCode);
       if (translated && currentSeq === liveTranslateSeq) {
         liveTranslationStream.textContent = translated;
+        liveTranslationStream.scrollTop = liveTranslationStream.scrollHeight;
         lastTranslatedSourceText = clean;
         liveTranslationCache.set(cacheKey, translated);
         if (liveTranslationCache.size > 200) {
@@ -921,6 +952,11 @@ function renderSoundboardPads() {
 function switchSpeakerLive(newSpeaker) {
   if (activeSpeakerId === newSpeaker.id) return;
 
+  if (streamAutoCommitTimer) {
+    clearTimeout(streamAutoCommitTimer);
+    streamAutoCommitTimer = null;
+  }
+
   const prevSpeaker = getActiveSpeaker();
   const textToArchive = (turnSpeechBuffer || liveOriginalStream.textContent).trim();
   turnSpeechBuffer = '';
@@ -1056,6 +1092,10 @@ function stopSpeechCapture() {
   isPttActive = false;
   isSessionWarm = false;
   clearTimeout(pttReleaseTimer);
+  if (streamAutoCommitTimer) {
+    clearTimeout(streamAutoCommitTimer);
+    streamAutoCommitTimer = null;
+  }
   pendingLangSwitch = null;
   pendingStartSpeakerId = null;
 
