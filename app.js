@@ -426,18 +426,12 @@ function applySelectedLanguages() {
   renderSoundboardPads();
   saveWorkspaceData();
 
-  // Eğer ses tanıma motoru çalışıyorsa yeni kaynak dile uyarla
-  if (recognition) {
-    const targetRecLang = getSpeakerLang(getActiveSpeaker());
-    if (isRecording && isRecognitionActive) {
-      pendingLangSwitch = targetRecLang;
-      isRecognitionStopping = true;
-      try {
-        recognition.stop();
-      } catch (e) {}
-    } else {
-      recognition.lang = targetRecLang;
-    }
+  // Eğer kayıt aktifse taze motorla yeni dile uyarla
+  if (isRecording) {
+    const spk = getActiveSpeaker();
+    startSpeechCapture(spk.id);
+  } else {
+    updateListeningPrompt();
   }
 
   // Akış tamponlarını temizle
@@ -472,21 +466,14 @@ function swapLanguages() {
   saveWorkspaceData();
 
   // Ses tanıma motorunun dilini anında güncelle
-  if (recognition) {
-    const targetRecLang = getSpeakerLang(getActiveSpeaker());
-    if (isRecording && isRecognitionActive) {
-      pendingLangSwitch = targetRecLang;
-      isRecognitionStopping = true;
-      try { recognition.stop(); } catch (e) {}
-    } else {
-      recognition.lang = targetRecLang;
-    }
+  if (isRecording) {
+    startSpeechCapture(curSpk.id);
+  } else {
+    updateListeningPrompt(curSpk);
   }
 
   // Ekran tamponlarını ve referans metinleri temizle
   lastTranslatedSourceText = '';
-  liveOriginalStream.textContent = 'Dinleniyor...';
-  liveTranslationStream.textContent = '...';
   stopTtsSpeaking();
 
   const srcAcc = ACCENT_REGISTRY[curSpk.accent] || { name: curSpk.accent };
@@ -511,6 +498,9 @@ function switchTab(tabName) {
 // ==========================================================================
 // 3. KALICI MİKROFON ERİŞİMİ VE STÜDYO VU METRE
 // ==========================================================================
+let isRecognitionSoundActive = false;
+let speechRestartTimeout = null;
+
 async function ensureMicrophoneAccess() {
   if (microphoneStream && microphoneStream.active) {
     if (audioContext && audioContext.state === 'suspended') {
@@ -529,8 +519,8 @@ async function ensureMicrophoneAccess() {
     if (!audioContext) {
       audioContext = new (window.AudioContext || window.webkitAudioContext)();
       analyser = audioContext.createAnalyser();
-      analyser.fftSize = 64;
-      analyser.smoothingTimeConstant = 0.3;
+      analyser.fftSize = 512;
+      analyser.smoothingTimeConstant = 0.25;
       const source = audioContext.createMediaStreamSource(microphoneStream);
       source.connect(analyser);
       startVuMeterLoop();
@@ -544,26 +534,41 @@ async function ensureMicrophoneAccess() {
   }
 }
 
+function triggerVuActivity(active) {
+  isRecognitionSoundActive = active;
+  const leds = vuLeds ? vuLeds.querySelectorAll('.vu-led') : [];
+  if (active && (!analyser || audioContext?.state !== 'running')) {
+    leds.forEach((led, idx) => {
+      if (idx < 5) led.classList.add('lit');
+      else led.classList.remove('lit');
+    });
+  } else if (!active && (!analyser || audioContext?.state !== 'running')) {
+    leds.forEach(led => led.classList.remove('lit'));
+  }
+}
+
 function startVuMeterLoop() {
   if (isVuMeterRunning || !analyser) return;
   isVuMeterRunning = true;
 
   const leds = vuLeds ? vuLeds.querySelectorAll('.vu-led') : [];
-  const timeData = new Uint8Array(analyser.fftSize || 64);
+  const timeData = new Uint8Array(analyser.fftSize || 512);
 
   function updateLeds() {
-    if (analyser && isRecording) {
+    if (analyser && isRecording && audioContext && audioContext.state === 'running') {
       analyser.getByteTimeDomainData(timeData);
-      let maxDev = 0;
+      let sum = 0;
       for (let i = 0; i < timeData.length; i++) {
-        const dev = Math.abs(timeData[i] - 128);
-        if (dev > maxDev) maxDev = dev;
+        const dev = (timeData[i] - 128) / 128;
+        sum += dev * dev;
       }
+      const rms = Math.sqrt(sum / timeData.length);
 
-      // Konuşma seviyesine göre hassas LED sayısı (0 ile 8 arası)
       let litCount = 0;
-      if (maxDev > 2) {
-        litCount = Math.min(8, Math.max(1, Math.round((maxDev / 32) * 8)));
+      if (rms > 0.012) {
+        litCount = Math.min(8, Math.max(1, Math.round(((rms - 0.012) / 0.16) * 8)));
+      } else if (isRecognitionSoundActive) {
+        litCount = 3;
       }
 
       leds.forEach((led, idx) => {
@@ -572,6 +577,11 @@ function startVuMeterLoop() {
         } else {
           led.classList.remove('lit');
         }
+      });
+    } else if (isRecording && isRecognitionSoundActive) {
+      leds.forEach((led, idx) => {
+        if (idx < 4) led.classList.add('lit');
+        else led.classList.remove('lit');
       });
     } else {
       leds.forEach(led => led.classList.remove('lit'));
@@ -583,7 +593,7 @@ function startVuMeterLoop() {
 
 async function initStudioVuMeter() {
   try {
-    await ensureMicrophoneAccess();
+    ensureMicrophoneAccess().catch(() => {});
   } catch (e) {}
 }
 
@@ -598,29 +608,73 @@ function getSpeakerLang(spk) {
   return 'en-US';
 }
 
-function initRecognitionEngine() {
+function createFreshRecognition(targetLang) {
   const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRec) {
     showToast('Tarayıcınız Web Speech API desteklemiyor (Chrome/Edge önerilir).');
-    return;
+    return null;
   }
 
-  if (recognition) return;
+  // Önceki motor örneğini temizle ve sonlandır
+  if (recognition) {
+    try {
+      recognition.onstart = null;
+      recognition.onaudiostart = null;
+      recognition.onsoundstart = null;
+      recognition.onspeechstart = null;
+      recognition.onspeechend = null;
+      recognition.onsoundend = null;
+      recognition.onaudioend = null;
+      recognition.onresult = null;
+      recognition.onerror = null;
+      recognition.onend = null;
+      recognition.abort();
+    } catch (e) {}
+    recognition = null;
+  }
 
-  recognition = new SpeechRec();
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.maxAlternatives = 1;
+  const rec = new SpeechRec();
+  rec.continuous = true;
+  rec.interimResults = true;
+  rec.maxAlternatives = 1;
+  rec.lang = targetLang;
 
-  recognition.onstart = () => {
+  rec.onstart = () => {
     isRecognitionActive = true;
     isRecognitionStopping = false;
     setRecordingState(true);
     updateListeningPrompt();
   };
 
-  recognition.onresult = (event) => {
-    // Bas-Konuş modunda tuşa basılı değilken ve oturum açık değilken konuşmaları yok say
+  rec.onaudiostart = () => {
+    triggerVuActivity(true);
+  };
+
+  rec.onsoundstart = () => {
+    triggerVuActivity(true);
+  };
+
+  rec.onspeechstart = () => {
+    triggerVuActivity(true);
+    const pulse = document.querySelector('.listening-pulse');
+    if (pulse) {
+      pulse.textContent = '● Ses Algılandı';
+    }
+  };
+
+  rec.onspeechend = () => {
+    triggerVuActivity(false);
+  };
+
+  rec.onsoundend = () => {
+    triggerVuActivity(false);
+  };
+
+  rec.onaudioend = () => {
+    triggerVuActivity(false);
+  };
+
+  rec.onresult = (event) => {
     if (currentMode === 'ptt' && !isPttActive && !isRecording) {
       return;
     }
@@ -647,7 +701,6 @@ function initRecognitionEngine() {
     if (finalChunk.trim().length > 0) {
       turnSpeechBuffer = (turnSpeechBuffer + ' ' + finalChunk).trim();
 
-      // Sürekli Akış modunda: uzun konuşmaların dev bir paragrafa dönüşüp sahneyi doldurmasını önle
       if (currentMode === 'tap') {
         const hasPunctuation = /[.?!;]\s*$/.test(turnSpeechBuffer);
         const isLongEnough = turnSpeechBuffer.length >= 80;
@@ -675,106 +728,158 @@ function initRecognitionEngine() {
     }
   };
 
-  recognition.onerror = (event) => {
+  rec.onerror = (event) => {
     console.warn('Speech recognition error:', event.error);
     if (event.error === 'not-allowed') {
-      showToast('❌ Mikrofon erişim izni engellendi. Tarayıcı adres çubuğundaki kilit simgesinden mikrofon iznini verin.');
+      showToast('❌ Mikrofon izni engellendi. Tarayıcı adres çubuğundaki kilit simgesinden mikrofon iznini verin.');
       isRecording = false;
       isRecognitionActive = false;
       isRecognitionStopping = false;
       isPttActive = false;
       isSessionWarm = false;
       setRecordingState(false);
-      if (liveOriginalStream) liveOriginalStream.innerHTML = '<span style="color:#d95d5d;">❌ Mikrofon izni engellendi (Tarayıcıdan izin verin)</span>';
+      if (liveOriginalStream) {
+        liveOriginalStream.innerHTML = '<span style="color:#d95d5d;">❌ Mikrofon izni engellendi (Adres çubuğundaki kilit simgesinden izin verin)</span>';
+      }
     } else if (event.error === 'audio-capture') {
-      showToast('❌ Mikrofon donanımından ses alınamıyor. Mikrofon bağlantısını kontrol edin.');
+      showToast('❌ Mikrofon donanımından ses alınamıyor. Windows ses ayarlarından giriş aygıtını kontrol edin.');
       isRecording = false;
       isRecognitionActive = false;
       isRecognitionStopping = false;
       setRecordingState(false);
-      if (liveOriginalStream) liveOriginalStream.innerHTML = '<span style="color:#d95d5d;">❌ Mikrofon aygıtı bulunamadı veya meşgul</span>';
+      if (liveOriginalStream) {
+        liveOriginalStream.innerHTML = '<span style="color:#d95d5d;">❌ Mikrofon aygıtı bulunamadı. Windows Ses Ayarları > Giriş Aygıtını kontrol edin.</span>';
+      }
     } else if (event.error === 'network') {
-      showToast('⚠️ Google Konuşma Tanıma sunucusuyla bağlantı kurulamadı (Ağ hatası).');
+      showToast('⚠️ Google Konuşma Tanıma sunucusuna bağlanılamadı. Otomatik yeniden deneniyor...');
     } else if (event.error === 'no-speech') {
-      // Sessizlik zaman aşımı hatası normaldir, onend güvenli şekilde yeniden bağlayacaktır
+      const spk = getActiveSpeaker();
+      if (!turnSpeechBuffer) {
+        updateListeningPrompt(spk);
+      }
     } else if (event.error === 'aborted') {
-      // Bilinçli durdurmalarda yoksay
+      // Bilinçli durdurma
     } else {
       showToast(`Konuşma tanıma bildirimi: ${event.error}`);
     }
   };
 
-  recognition.onend = () => {
+  rec.onend = () => {
     isRecognitionActive = false;
-    isRecognitionStopping = false;
+    triggerVuActivity(false);
 
-    // Chrome/Edge motorunun önceki oturumu tamamen sonlandırması için 120ms tolerans ile async başlat
-    setTimeout(() => {
-      // 1. Bekleyen dil geçişi varsa yeni dille başlat
-      if (pendingLangSwitch) {
-        const targetLang = pendingLangSwitch;
-        pendingLangSwitch = null;
-        recognition.lang = targetLang;
-        if (isSessionWarm || isRecording) {
+    if ((isRecording || isSessionWarm) && !isRecognitionStopping) {
+      clearTimeout(speechRestartTimeout);
+      speechRestartTimeout = setTimeout(() => {
+        if ((isRecording || isSessionWarm) && !isRecognitionStopping) {
+          const spk = getActiveSpeaker();
+          const targetRecLang = getSpeakerLang(spk);
           try {
-            recognition.start();
-            isRecognitionActive = true;
+            createFreshRecognition(targetRecLang);
+            if (recognition) {
+              recognition.start();
+              isRecognitionActive = true;
+            }
           } catch (e) {
-            console.warn('Dil geçişinde başlatma hatası:', e);
+            console.warn('Otomatik devam başlatma:', e);
           }
         }
-        return;
-      }
-
-      // 2. Bekleyen konuşmacı başlatması varsa
-      if (pendingStartSpeakerId) {
-        const spkId = pendingStartSpeakerId;
-        pendingStartSpeakerId = null;
-        if (isSessionWarm || isRecording) {
-          const spk = speakers.find(s => s.id === spkId) || getActiveSpeaker();
-          recognition.lang = getSpeakerLang(spk);
-          try {
-            recognition.start();
-            isRecognitionActive = true;
-          } catch (e) {
-            console.warn('Bekleyen konuşmacı başlatma hatası:', e);
-          }
-        }
-        return;
-      }
-
-      // 3. Oturum aktifse (Sürekli akış veya Bas-Konuş): sessizlik zaman aşımında motoru sıcak tut
-      if (isSessionWarm || isRecording) {
-        try {
-          const cur = getActiveSpeaker();
-          recognition.lang = getSpeakerLang(cur);
-          recognition.start();
-          isRecognitionActive = true;
-        } catch (e) {
-          console.warn('Otomatik devam başlatma:', e);
-        }
-      } else {
-        setRecordingState(false);
-      }
-    }, 120);
+      }, 120);
+    } else {
+      setRecordingState(false);
+    }
   };
+
+  recognition = rec;
+  return rec;
 }
+
+function initRecognitionEngine() {
+  const spk = getActiveSpeaker();
+  createFreshRecognition(getSpeakerLang(spk));
+}
+
+function quickSwitchTestMode(mode) {
+  if (mode === 'tr-en') {
+    let trSpk = speakers.find(s => (s.accent || '').startsWith('tr'));
+    if (!trSpk) {
+      trSpk = { id: 'spk_tr_' + Date.now(), name: 'Konuşmacı (Türkçe)', accent: 'tr-TR', color: '#8EAA90' };
+      speakers.push(trSpk);
+    }
+    targetLanguage = 'en';
+    if (headerNativeLangSelect) headerNativeLangSelect.value = 'en';
+    if (meetingTargetLangSelect) meetingTargetLangSelect.value = 'en';
+
+    setActiveSpeaker(trSpk.id, false);
+    renderSoundboardPads();
+    saveWorkspaceData();
+
+    startSpeechCapture(trSpk.id);
+    showToast('🇹🇷 Türkçe Konuşma ➔ 🇬🇧 İngilizce Çeviri Modu Başlatıldı!');
+  }
+}
+window.quickSwitchTestMode = quickSwitchTestMode;
 
 function updateListeningPrompt(speaker) {
   const spk = speaker || getActiveSpeaker();
-  const acc = ACCENT_REGISTRY[spk.accent] || { name: spk.accent };
-  const tgtName = LANGUAGE_NAMES[targetLanguage] || targetLanguage;
+  const acc = ACCENT_REGISTRY[spk.accent] || { name: spk.accent, short: 'EN' };
+  const srcFamily = (spk.accent || 'en').split('-')[0].toLowerCase();
+  const tgtFamily = (targetLanguage || 'tr').toLowerCase();
+  const tgtName = LANGUAGE_NAMES[tgtFamily] || tgtFamily.toUpperCase();
 
-  if (liveOriginalStream && (!turnSpeechBuffer || liveOriginalStream.textContent.startsWith('Dinleniyor'))) {
+  if (liveOriginalStream && (!turnSpeechBuffer || liveOriginalStream.textContent.startsWith('Dinleniyor') || liveOriginalStream.querySelector('.listening-pulse'))) {
     liveOriginalStream.innerHTML = `<span class="listening-pulse">● Dinleniyor</span> &nbsp;—&nbsp; <span class="listening-hint">Mikrofondan <strong>${acc.name}</strong> konuşması bekleniyor...</span>`;
   }
-  if (liveTranslationStream && (!turnSpeechBuffer || liveTranslationStream.textContent.startsWith('Konuşmacı başladığında') || liveTranslationStream.textContent.includes('konuştuğunuzda') || liveTranslationStream.textContent.includes('dili aynı'))) {
-    const spkShort = (spk.accent || 'en').split('-')[0].toLowerCase();
-    const tgtShort = (targetLanguage || 'tr').toLowerCase();
-    if (spkShort === tgtShort) {
-      liveTranslationStream.innerHTML = `<span class="stream-hint">Konuşmacı ve Dinleyici dili aynı (${acc.name}). Konuşulanlar doğrudan orijinal aktarılır. Farklı bir dile çeviri görmek için üstteki Ana Dili değiştirin.</span>`;
+
+  if (liveTranslationStream && (!turnSpeechBuffer || liveTranslationStream.textContent.startsWith('Konuşmacı') || liveTranslationStream.querySelector('.prompt-container') || liveTranslationStream.textContent.includes('konuştuğunuzda') || liveTranslationStream.textContent.includes('dili aynı'))) {
+    if (srcFamily === tgtFamily) {
+      liveTranslationStream.innerHTML = `
+        <div class="prompt-container">
+          <div class="prompt-line">
+            🎙️ Mikrofondan <strong>${acc.name}</strong> konuşmanız bekleniyor.
+          </div>
+          <div class="prompt-subline">
+            Konuşmacı ve dinleyici dili aynı (${acc.name}). Konuşulanlar doğrudan orijinal aktarılacaktır.
+          </div>
+          <div class="prompt-action-row">
+            <button type="button" class="prompt-action-pill highlight" onclick="quickSwitchTestMode('tr-en')">
+              🔄 Hızlı Test: Türkçe Konuş ➔ İngilizceye Çevir
+            </button>
+          </div>
+        </div>
+      `;
+    } else if (srcFamily === 'en') {
+      liveTranslationStream.innerHTML = `
+        <div class="prompt-container">
+          <div class="prompt-line">
+            🎙️ Mikrofondan <strong>${acc.name}</strong> konuşmanız bekleniyor (Örn: <em>"Hello, welcome to our conference..."</em>).
+          </div>
+          <div class="prompt-subline">
+            Mikrofona İngilizce konuştuğunuzda anında <strong>${tgtName}</strong> simultane çevirisi burada akacaktır.
+          </div>
+          <div class="prompt-action-row">
+            <button type="button" class="prompt-action-pill highlight" onclick="quickSwitchTestMode('tr-en')">
+              🇹🇷 Türkçe Konuşarak Test Et (TR ➔ EN)
+            </button>
+          </div>
+        </div>
+      `;
     } else {
-      liveTranslationStream.innerHTML = `<span class="stream-hint">Mikrofona <strong>${acc.name}</strong> konuştuğunuzda anında <strong>${tgtName}</strong> çevirisi burada akacaktır.</span>`;
+      liveTranslationStream.innerHTML = `
+        <div class="prompt-container">
+          <div class="prompt-line">
+            🎙️ Mikrofondan <strong>${acc.name}</strong> konuşmanız bekleniyor.
+          </div>
+          <div class="prompt-subline">
+            Mikrofona konuştuğunuzda anında <strong>${tgtName}</strong> simultane çevirisi burada akacaktır.
+          </div>
+          <div class="prompt-action-row">
+            <button type="button" class="prompt-action-pill highlight" onclick="quickSwitchTestMode('tr-en')">
+              🇹🇷 Türkçe Konuşarak Test Et (TR ➔ EN)
+            </button>
+          </div>
+        </div>
+      `;
     }
   }
 }
@@ -1377,7 +1482,7 @@ function selectSpeakerByIndex(index) {
 }
 
 function switchSpeakerLive(newSpeaker) {
-  if (activeSpeakerId === newSpeaker.id) return;
+  if (activeSpeakerId === newSpeaker.id && isRecording) return;
 
   if (streamAutoCommitTimer) {
     clearTimeout(streamAutoCommitTimer);
@@ -1388,36 +1493,13 @@ function switchSpeakerLive(newSpeaker) {
   const textToArchive = (turnSpeechBuffer || liveOriginalStream.textContent).trim();
   turnSpeechBuffer = '';
   lastTranslatedSourceText = '';
-  liveOriginalStream.textContent = 'Dinleniyor...';
 
-  // Önceki konuşmacının metnini arka planda kaydet ve çevir
-  if (textToArchive && !textToArchive.startsWith('Sistemi başlatmak') && textToArchive !== 'Dinleniyor...') {
+  if (textToArchive && !textToArchive.startsWith('Sistemi başlatmak') && !textToArchive.startsWith('Dinleniyor') && !textToArchive.includes('● Dinleniyor')) {
     archiveSpeechTurnForSpeaker(prevSpeaker, textToArchive);
   }
 
-  // Yeni konuşmacıyı gecikmesiz olarak aktif yap (Arayüz anında güncellenir)
   setActiveSpeaker(newSpeaker.id, false);
-
-  const currentRecLang = recognition ? recognition.lang : sourceLanguage;
-  const targetRecLang = getSpeakerLang(newSpeaker);
-  const currentFamily = (currentRecLang || '').split('-')[0].toLowerCase();
-  const targetFamily = (targetRecLang || '').split('-')[0].toLowerCase();
-
-  // AYNI DİL AİLESİ: Tanıma motorunu asla kesme! Mikrofon açık kalır, sıfır izin sorusu!
-  if (currentFamily === targetFamily && isRecognitionActive) {
-    return;
-  }
-
-  // FARKLI DİL AİLESİ: Güvenli dil geçişi yap
-  if (isRecognitionActive) {
-    pendingLangSwitch = targetRecLang;
-    isRecognitionStopping = true;
-    try {
-      recognition.stop();
-    } catch (e) {}
-  } else {
-    startSpeechCapture(newSpeaker.id);
-  }
+  startSpeechCapture(newSpeaker.id);
 }
 
 function openEditSpeakerModal(id) {
@@ -1474,66 +1556,62 @@ function getActiveSpeaker() {
 // 8. KAYIT KONTROL DÖNGÜSÜ
 // ==========================================================================
 function startSpeechCapture(speakerId) {
-  if (!recognition) initRecognitionEngine();
-  if (!recognition) return;
-
   const spk = speakers.find(s => s.id === speakerId) || getActiveSpeaker();
   const targetLang = getSpeakerLang(spk);
 
-  // Motor durma aşamasındaysa durunca başlaması için kaydet
-  if (isRecognitionStopping) {
-    pendingStartSpeakerId = spk.id;
-    setRecordingState(true);
-    turnSpeechBuffer = '';
-    lastTranslatedSourceText = '';
-    liveOriginalStream.textContent = 'Dinleniyor...';
-    return;
+  // AudioContext'i kullanıcı etkileşimi akışında hemen uyandır
+  if (audioContext && audioContext.state === 'suspended') {
+    try { audioContext.resume(); } catch (e) {}
   }
-
-  // Zaten çalışıyorsa (motor sıcaksa) ve aynı dilse tekrar start ÇAĞIRMA! (InvalidStateError ve izin penceresini önler)
-  if (isRecognitionActive) {
-    const currentFamily = (recognition.lang || '').split('-')[0].toLowerCase();
-    const targetFamily = (targetLang || '').split('-')[0].toLowerCase();
-    if (currentFamily === targetFamily) {
-      turnSpeechBuffer = '';
-      lastTranslatedSourceText = '';
-      liveOriginalStream.textContent = 'Dinleniyor...';
-      return;
-    }
-    // Farklı dilse durdurup onend içinde yeni dille başlat
-    pendingLangSwitch = targetLang;
-    isRecognitionStopping = true;
-    try { recognition.stop(); } catch (e) {}
-    return;
-  }
+  // Mikrofon akışını arka planda aç (engelleme yapmadan)
+  ensureMicrophoneAccess().catch(() => {});
 
   isSessionWarm = true;
-  recognition.lang = targetLang;
   turnSpeechBuffer = '';
   lastTranslatedSourceText = '';
-  updateListeningPrompt(spk);
   setRecordingState(true);
+  setActiveSpeaker(spk.id, false);
+  updateListeningPrompt(spk);
 
+  // Zaten tanıma aktifse ve aynı dildeyse durdurup yeniden başlatmaya gerek yok
+  if (isRecognitionActive && recognition && recognition.lang === targetLang) {
+    return;
+  }
+
+  isRecognitionStopping = false;
   try {
-    recognition.start();
-    isRecognitionActive = true;
-  } catch (e) {
-    console.warn('startSpeechCapture başlatma:', e);
-    if (e.name !== 'InvalidStateError') {
-      showToast(`Mikrofon uyarısı: ${e.message || e.name}`);
+    createFreshRecognition(targetLang);
+    if (recognition) {
+      recognition.start();
+      isRecognitionActive = true;
     }
-    if (isRecording || isSessionWarm) {
-      pendingStartSpeakerId = spk.id;
+  } catch (e) {
+    console.warn('startSpeechCapture başlatma hatası:', e);
+    if (e.name === 'InvalidStateError') {
+      setTimeout(() => {
+        if (isRecording || isSessionWarm) {
+          try {
+            createFreshRecognition(targetLang);
+            if (recognition) {
+              recognition.start();
+              isRecognitionActive = true;
+            }
+          } catch (err) {}
+        }
+      }, 150);
+    } else {
+      showToast(`Mikrofon uyarısı: ${e.message || e.name}`);
     }
   }
 }
 
 function stopSpeechCapture() {
-  if (!isRecording && !isRecognitionActive) return;
   isRecording = false;
   isPttActive = false;
   isSessionWarm = false;
+  isRecognitionStopping = true;
   clearTimeout(pttReleaseTimer);
+  clearTimeout(speechRestartTimeout);
   if (streamAutoCommitTimer) {
     clearTimeout(streamAutoCommitTimer);
     streamAutoCommitTimer = null;
@@ -1541,13 +1619,18 @@ function stopSpeechCapture() {
   pendingLangSwitch = null;
   pendingStartSpeakerId = null;
 
-  if (isRecognitionActive) {
-    isRecognitionStopping = true;
-    try { recognition.stop(); } catch (e) {}
+  if (recognition) {
+    try {
+      recognition.onend = null;
+      recognition.stop();
+    } catch (e) {}
   }
+  isRecognitionActive = false;
+  isRecognitionStopping = false;
 
   setRecordingState(false);
   commitSpeechTurn();
+  triggerVuActivity(false);
 }
 
 function setRecordingState(active) {
@@ -1559,6 +1642,25 @@ function setRecordingState(active) {
     statusLabel.textContent = '';
   }
   updateStopButtonState(active);
+
+  // Pad durumlarını güncelle (Aktif konuşmacı CANLI rozeti alır)
+  const pads = soundboardGrid.querySelectorAll('.switcher-pad, .studio-pad');
+  speakers.forEach((s, i) => {
+    if (pads[i]) {
+      const isCur = s.id === activeSpeakerId;
+      pads[i].classList.toggle('active', isCur);
+      const trig = pads[i].querySelector('.pad-trigger-text');
+      if (trig) {
+        if (isCur && active) {
+          trig.textContent = '● CANLI';
+        } else if (isCur && !active) {
+          trig.textContent = 'Seçili';
+        } else {
+          trig.textContent = currentMode === 'ptt' ? 'Basılı Tutun' : 'Aktif Et';
+        }
+      }
+    }
+  });
 }
 
 function updateStopButtonState(active) {
@@ -1728,6 +1830,7 @@ function setupEventListeners() {
       saveWorkspaceData();
       updateLanguageDisplayBadges();
       renderSoundboardPads();
+      updateListeningPrompt();
       const langName = LANGUAGE_NAMES[targetLanguage] || targetLanguage;
       showToast(`Ana Dil Değiştirildi: ${langName}`);
     });
@@ -1744,6 +1847,7 @@ function setupEventListeners() {
       saveWorkspaceData();
       updateLanguageDisplayBadges();
       renderSoundboardPads();
+      updateListeningPrompt();
     });
   }
 
@@ -1763,7 +1867,7 @@ function setupEventListeners() {
   modeTapBtn.addEventListener('click', () => setOperationMode('tap'));
 
   // Dinlemeyi Başlat / Durdur Toggle Butonu
-  stopSessionBtn.addEventListener('click', async () => {
+  stopSessionBtn.addEventListener('click', () => {
     if (isRecording) {
       isSessionWarm = false;
       isPttActive = false;
@@ -1771,7 +1875,10 @@ function setupEventListeners() {
       stopSpeechCapture();
       showToast('Dinleme durduruldu');
     } else {
-      await ensureMicrophoneAccess();
+      if (audioContext && audioContext.state === 'suspended') {
+        try { audioContext.resume(); } catch (e) {}
+      }
+      ensureMicrophoneAccess().catch(() => {});
       isSessionWarm = true;
       const spk = getActiveSpeaker();
       startSpeechCapture(spk.id);

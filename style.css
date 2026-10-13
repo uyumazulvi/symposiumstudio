@@ -702,6 +702,77 @@ input:focus-visible {
   line-height: 1.5;
 }
 
+.prompt-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 4px 0;
+}
+
+.prompt-line {
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.prompt-line em {
+  color: var(--accent-amber);
+  font-style: normal;
+}
+
+.prompt-line strong {
+  color: var(--accent-cyan);
+}
+
+.prompt-subline {
+  color: var(--text-tertiary);
+  font-size: 14.5px;
+  line-height: 1.4;
+}
+
+.prompt-action-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.prompt-action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--text-primary);
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  user-select: none;
+}
+
+.prompt-action-pill:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+}
+
+.prompt-action-pill.highlight {
+  background: linear-gradient(135deg, rgba(101, 199, 176, 0.16) 0%, rgba(101, 199, 176, 0.06) 100%);
+  border-color: rgba(101, 199, 176, 0.38);
+  color: #8ce3d0;
+}
+
+.prompt-action-pill.highlight:hover {
+  background: linear-gradient(135deg, rgba(101, 199, 176, 0.26) 0%, rgba(101, 199, 176, 0.12) 100%);
+  border-color: rgba(101, 199, 176, 0.58);
+}
+
 /* ==========================================================================
    4. OTURUM TUTANAĞI — KARTSIZ EDİTORYAL KRONOLOJİ (LEDGER STREAM)
    ========================================================================== */

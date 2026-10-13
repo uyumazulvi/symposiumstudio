@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>SYMPOSIUM STUDIO — Canlı Konferans & Simultane Çeviri</title>
-  <link rel="stylesheet" href="style.css?v=20261012f">
+  <link rel="stylesheet" href="style.css?v=20261013a">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -455,6 +455,17 @@
           <p class="field-description">
             Kulaklık modu açıkken, simultane çeviriler seçtiğiniz ana dilde bu hızla seslendirilir.
           </p>
+        <div class="field-block">
+          <label>🎙️ Mikrofon ve Ses Giriş Rehberi</label>
+          <div class="mic-diag-card" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 14px; font-size: 13px; line-height: 1.5; color: var(--text-secondary);">
+            <div style="margin-bottom: 6px;"><strong style="color: var(--accent-cyan);">● Web Speech API:</strong> Chrome / Edge Destekli (Sıfır Maliyetli Doğal STT)</div>
+            <div style="margin-bottom: 6px;"><strong style="color: var(--text-primary);">💡 Mikrofon Sesinizi Algılamıyorsa:</strong></div>
+            <ul style="margin: 0; padding-left: 18px; color: var(--text-tertiary);">
+              <li style="margin-bottom: 4px;"><strong>Dil Uyumu:</strong> Alttaki konuşmacı panelinden hangi dilde konuşacaksanız o konuşmacıyı seçin (Örn: Türkçe konuşuyorsanız Türkçe konuşmacı aktif olmalı).</li>
+              <li style="margin-bottom: 4px;"><strong>Tarayıcı İzni:</strong> Adres çubuğundaki kilit simgesinden mikrofon iznini kontrol edin.</li>
+              <li><strong>Windows Giriş Cihazı:</strong> Windows Ayarları &gt; Sistem &gt; Ses &gt; <em>Giriş</em> bölümünde doğru mikrofonun (özellikle <em>Realtek Mikrofon Dizisi</em>) varsayılan seçildiğinden emin olun.</li>
+            </ul>
+          </div>
         </div>
 
         <div class="field-block">
@@ -704,6 +715,6 @@
       });
     }
   </script>
-  <script src="app.js?v=20261012f"></script>
+  <script src="app.js?v=20261013a"></script>
 </body>
 </html>
