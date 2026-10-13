@@ -1528,27 +1528,29 @@ function selectSpeakerByIndex(index) {
   if (!targetSpeaker) return;
 
   if (targetSpeaker.id === activeSpeakerId && isRecording) {
+    showToast(`Aktif Konuşmacı: [${index + 1}] ${targetSpeaker.name}`);
     return;
   }
 
   if (isRecording) {
     switchSpeakerLive(targetSpeaker);
-    showToast(`Konuşmacı: [${index + 1}] ${targetSpeaker.name}`);
+    showToast(`Konuşmacı Değiştirildi: [${index + 1}] ${targetSpeaker.name}`);
   } else {
     setActiveSpeaker(targetSpeaker.id, false);
     if (currentMode === 'tap') {
       startSpeechCapture(targetSpeaker.id);
       showToast(`Konuşmacı Canlı: [${index + 1}] ${targetSpeaker.name}`);
     } else {
-      showToast(`Konuşmacı seçildi: [${index + 1}] ${targetSpeaker.name}`);
+      showToast(`Konuşmacı Seçildi: [${index + 1}] ${targetSpeaker.name}`);
     }
   }
 
-  // Tuşa hafif basılma efekti ver
+  // Tuşa hafif basılma efekti ver ve görünüme odakla
   const pads = soundboardGrid.querySelectorAll('.switcher-pad');
   if (pads[index]) {
     pads[index].classList.add('pressed');
-    setTimeout(() => pads[index].classList.remove('pressed'), 200);
+    setTimeout(() => pads[index].classList.remove('pressed'), 220);
+    pads[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
   }
 }
 
@@ -2327,24 +2329,27 @@ function setupEventListeners() {
   }
 
   // Modalların Dışındaki Karanlık Alana Tıklayınca Kapat
-  [addSpeakerModal, editSpeakerModal, settingsModal, iosGuideModal].forEach(modal => {
-    if (modal) {
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-          closeModal(modal);
-        }
-      });
-    }
+  const registeredModals = [
+    addSpeakerModal,
+    editSpeakerModal,
+    settingsModal,
+    document.getElementById('pwaEntryModal'),
+    document.getElementById('pwaStepsGuideModal')
+  ].filter(Boolean);
+
+  registeredModals.forEach(modal => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal(modal);
+      }
+    });
   });
 
   // Klavye Kısayolları (Masaüstü): ESC ile Kapatma ve 1-9 Rakamları ile Konuşmacı Değiştirme
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeMobileDrawer();
-      closeModal(addSpeakerModal);
-      closeModal(editSpeakerModal);
-      closeModal(settingsModal);
-      closeModal(iosGuideModal);
+      registeredModals.forEach(m => closeModal(m));
       return;
     }
 
@@ -2360,18 +2365,26 @@ function setupEventListeners() {
     }
 
     // Modallardan biri açıkken kısayolları tetikleme
-    const isModalOpen = !addSpeakerModal.classList.contains('hidden') ||
-                        !editSpeakerModal.classList.contains('hidden') ||
-                        !settingsModal.classList.contains('hidden') ||
-                        (iosGuideModal && !iosGuideModal.classList.contains('hidden'));
+    const isModalOpen = registeredModals.some(m => !m.classList.contains('hidden'));
     if (isModalOpen) return;
 
-    // 1-9 Rakam Tuşları ile Konuşmacılar Arasında Geçiş Yap (Ali = 1, Mehmet = 2, ...)
-    if (e.key >= '1' && e.key <= '9' && !e.ctrlKey && !e.altKey && !e.metaKey) {
-      const speakerIdx = parseInt(e.key, 10) - 1;
+    // Masaüstünde 1-9 Rakam Tuşları (Üst Sıra veya Numpad) ile Konuşmacı Değiştirme
+    let digit = null;
+    if (e.key >= '1' && e.key <= '9') {
+      digit = parseInt(e.key, 10);
+    } else if (/^Digit([1-9])$/.test(e.code)) {
+      digit = parseInt(e.code.replace('Digit', ''), 10);
+    } else if (/^Numpad([1-9])$/.test(e.code)) {
+      digit = parseInt(e.code.replace('Numpad', ''), 10);
+    }
+
+    if (digit !== null && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      const speakerIdx = digit - 1;
       if (speakerIdx >= 0 && speakerIdx < speakers.length) {
         e.preventDefault();
         selectSpeakerByIndex(speakerIdx);
+      } else {
+        showToast(`Konuşmacı [${digit}] henüz tanımlı değil (${speakers.length} konuşmacı var)`);
       }
     }
 
