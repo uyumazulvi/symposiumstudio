@@ -1644,99 +1644,62 @@ input:focus-visible {
     overflow: visible !important;
   }
 
+  /* Mobil Üst Çubuk (Tek Satır, 50px Yükseklik) */
   .app-header {
-    height: auto !important;
-    min-height: 54px;
-    padding: 10px 16px !important;
+    height: 50px !important;
+    min-height: 50px !important;
+    max-height: 50px !important;
+    padding: 0 12px !important;
     display: flex !important;
-    flex-wrap: wrap !important;
+    flex-wrap: nowrap !important;
     align-items: center !important;
     justify-content: space-between !important;
-    row-gap: 10px !important;
+    gap: 8px !important;
   }
 
   .mobile-brand-row {
     display: flex !important;
-    order: 1;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    flex-shrink: 0;
   }
 
   .mobile-menu-btn {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
   }
 
   .mobile-wordmark {
-    font-size: 14px;
-    gap: 6px;
+    font-size: 13px;
+    gap: 5px;
+    letter-spacing: 0.08em;
   }
 
   .mobile-wordmark .brand-sym-icon {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
   }
 
-  .topbar-right-controls {
-    display: flex !important;
-    order: 2;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .native-lang-control {
-    padding: 5px 8px;
-    gap: 4px;
-    border-radius: 999px;
-  }
-
-  .native-lang-globe svg {
-    width: 13px;
-    height: 13px;
-  }
-
-  .native-lang-select {
-    font-size: 11.5px;
-    max-width: 80px;
-  }
-
-  .headphone-btn {
-    padding: 5px 8px;
-    border-radius: 999px;
-  }
-
-  .headphone-btn .headphone-text-full {
-    display: none !important;
-  }
-
-  .headphone-icon {
-    width: 14px;
-    height: 14px;
-  }
-
-  .theme-icon-btn {
-    width: 32px;
-    height: 32px;
-  }
-
+  /* Mod Seçici Tek Satıra Merkezlenir */
   .mic-mode-toggle {
-    order: 3;
-    width: 100% !important;
-    max-width: 280px;
-    margin: 0 auto;
-    display: flex !important;
-    justify-content: center;
-    padding: 3px;
+    display: inline-flex !important;
+    align-items: center;
+    padding: 2px !important;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--border-glass);
+    flex-shrink: 0;
+    max-width: none !important;
+    width: auto !important;
+    margin: 0 !important;
   }
 
   .mic-mode-toggle .mode-pill {
-    flex: 1;
-    text-align: center;
-    padding: 6px 12px;
-    font-size: 12px;
+    padding: 4px 10px;
+    font-size: 11px;
+    line-height: 1.2;
+    border-radius: 999px;
   }
 
   .mode-text-full {
@@ -1748,6 +1711,47 @@ input:focus-visible {
     white-space: nowrap;
   }
 
+  .topbar-right-controls {
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  /* Mobilde ana dil seçici gizlenir çünkü hemen aşağıdaki kartta zaten mevcuttur */
+  .native-lang-control {
+    display: none !important;
+  }
+
+  .headphone-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0 !important;
+    justify-content: center;
+    border-radius: 50% !important;
+    position: relative;
+  }
+
+  .headphone-btn .headphone-text-full {
+    display: none !important;
+  }
+
+  .headphone-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .headphone-status-dot {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+  }
+
+  .theme-icon-btn {
+    width: 32px;
+    height: 32px;
+  }
+
   .stop-btn-text-full {
     display: none !important;
   }
@@ -1757,47 +1761,205 @@ input:focus-visible {
     white-space: nowrap;
   }
 
+  /* Mobil Çalışma Alanı */
   .workspace-view {
-    padding: 16px 16px 80px 16px;
+    padding: 8px 12px 76px 12px !important;
+    gap: 8px !important;
     height: auto !important;
-    overflow: visible !important;
-    gap: 14px;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
   }
 
+  /* Mobil Canlı Sahne Tipografisi (Kompakt ve Okunaklı) */
+  .teleprompter-stage {
+    padding: 4px 0 2px 0 !important;
+    gap: 4px !important;
+  }
+
+  .hero-welcome-badge {
+    display: none !important;
+  }
+
+  .speaker-identity {
+    font-size: 11.5px !important;
+    gap: 4px !important;
+  }
+
+  .caption-stream-text {
+    font-size: 17px !important;
+    line-height: 1.35 !important;
+    letter-spacing: -0.01em !important;
+    margin: 0 !important;
+  }
+
+  .source-stream-text {
+    font-size: 11.5px !important;
+    line-height: 1.35 !important;
+    color: var(--text-tertiary) !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+  }
+
+  /* Mobil Yüzen Dil Kartı (2 Satırlı Izgara: Diller Yan Yana, Buton Altta) */
   .floating-lang-pill-card {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 12px;
-    gap: 10px;
-    border-radius: 18px;
+    display: grid !important;
+    grid-template-columns: 1fr 32px 1fr !important;
+    grid-template-rows: auto auto !important;
+    gap: 8px !important;
+    padding: 8px 10px !important;
+    border-radius: 16px !important;
+    align-items: center !important;
   }
 
-  .lang-pill-select-group {
-    width: 100%;
-    padding: 10px 14px;
+  .floating-lang-pill-card .lang-pill-select-group {
+    padding: 6px 8px !important;
+    border-radius: 10px !important;
+    gap: 4px !important;
+    min-width: 0 !important;
   }
 
-  .pill-swap-btn {
-    align-self: center;
-    margin: -4px 0;
+  .floating-lang-pill-card .lang-pill-select-group:nth-of-type(1) {
+    grid-column: 1 / 2 !important;
+    grid-row: 1 / 2 !important;
   }
 
-  .pill-action-glow-btn {
+  .floating-lang-pill-card .pill-globe-icon svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  .floating-lang-pill-card .pill-select {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    padding: 0 !important;
+  }
+
+  .floating-lang-pill-card .pill-swap-btn {
+    grid-column: 2 / 3 !important;
+    grid-row: 1 / 2 !important;
+    width: 32px !important;
+    height: 32px !important;
+    justify-self: center !important;
+    align-self: center !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .floating-lang-pill-card .lang-pill-select-group:nth-of-type(2) {
+    grid-column: 3 / 4 !important;
+    grid-row: 1 / 2 !important;
+  }
+
+  .floating-lang-pill-card .pill-action-glow-btn {
+    grid-column: 1 / 4 !important;
+    grid-row: 2 / 3 !important;
     width: 100% !important;
-    height: 44px !important;
-    min-height: 44px !important;
-    max-height: 44px !important;
-    padding: 0 16px !important;
-    font-size: 14px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
     border-radius: 12px !important;
+    font-size: 14px !important;
+    padding: 0 16px !important;
   }
 
+  /* Mobil Tutanak Kartı */
   .transcript-journal-card {
-    max-height: none;
-    min-height: 280px;
+    min-height: 200px !important;
+    max-height: 38vh !important;
+    border-radius: 16px !important;
   }
 
+  .journal-header {
+    padding: 8px 12px !important;
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .journal-title {
+    font-size: 10px !important;
+  }
+
+  .journal-count {
+    font-size: 9.5px !important;
+    padding: 1px 5px !important;
+  }
+
+  .journal-header-right {
+    gap: 6px !important;
+  }
+
+  .journal-filter-switch {
+    padding: 1px !important;
+  }
+
+  .journal-filter-btn {
+    padding: 2px 7px !important;
+    font-size: 10px !important;
+  }
+
+  .journal-action-btn span {
+    display: none !important;
+  }
+
+  .journal-action-btn {
+    padding: 4px 6px !important;
+    border-radius: 6px !important;
+  }
+
+  .journal-action-btn svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .journal-feed {
+    padding: 4px 12px !important;
+  }
+
+  .journal-empty-state {
+    padding: 24px 12px !important;
+    gap: 8px !important;
+  }
+
+  .empty-primary {
+    font-size: 13px !important;
+  }
+
+  .empty-secondary {
+    font-size: 11px !important;
+  }
+
+  /* Mobil Konuşmacı Çubuğu */
   .switcher-console {
-    margin: 0;
+    border-radius: 14px !important;
+    padding: 6px 10px !important;
+    margin: 0 !important;
+  }
+
+  .console-add-speaker-btn {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 8px !important;
+  }
+
+  .switcher-pad {
+    padding: 4px 10px !important;
+    gap: 6px !important;
+  }
+
+  .pad-avatar {
+    width: 18px !important;
+    height: 18px !important;
+    font-size: 9px !important;
+  }
+
+  .pad-name {
+    font-size: 11.5px !important;
+  }
+
+  .pad-lang-tag {
+    font-size: 10px !important;
   }
 }
