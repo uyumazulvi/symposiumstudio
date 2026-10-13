@@ -606,6 +606,10 @@ async function initStudioVuMeter() {
 // ==========================================================================
 let turnSpeechBuffer = '';
 let streamAutoCommitTimer = null;
+let isCommittingTurn = false;
+let lastCommittedOriginal = '';
+let lastCommittedTimestamp = 0;
+let hasUncommittedSpeech = false;
 
 function getSpeakerLang(spk) {
   if (spk && spk.accent) return spk.accent;
@@ -693,6 +697,10 @@ function createFreshRecognition(targetLang) {
       } else {
         interimChunk += text;
       }
+    }
+
+    if (finalChunk.trim().length > 0 || interimChunk.trim().length > 0) {
+      hasUncommittedSpeech = true;
     }
 
     const currentLiveStream = (turnSpeechBuffer + ' ' + finalChunk + ' ' + interimChunk).trim();
@@ -1056,26 +1064,84 @@ async function translateSpeechTurn(sourceText, speaker) {
 // 6. CÜMLEYİ TUTANAĞA ARŞİVLEME
 // ==========================================================================
 async function commitSpeechTurn() {
-  const textToArchive = (turnSpeechBuffer || liveOriginalStream.textContent).trim();
-  turnSpeechBuffer = '';
+  if (isCommittingTurn) return;
 
-  if (!textToArchive || textToArchive.startsWith('Sistemi başlatmak') || textToArchive === 'Dinleniyor...') {
+  const rawText = turnSpeechBuffer || (hasUncommittedSpeech ? liveOriginalStream.textContent : '');
+  const textToArchive = (rawText || '').trim();
+
+  turnSpeechBuffer = '';
+  hasUncommittedSpeech = false;
+
+  if (!textToArchive || 
+      textToArchive.startsWith('Sistemi başlatmak') || 
+      textToArchive.startsWith('Dinleniyor') || 
+      textToArchive.includes('● Dinleniyor') ||
+      textToArchive === '● CANLI DİNLENİYOR...') {
     return;
   }
 
-  const speaker = getActiveSpeaker();
-  await archiveSpeechTurnForSpeaker(speaker, textToArchive);
+  // Çift kayıt engeli: Son 5 saniye içinde aynı metin zaten işlendiyse atla
+  const now = Date.now();
+  if (lastCommittedOriginal && 
+      lastCommittedOriginal.toLowerCase() === textToArchive.toLowerCase() && 
+      (now - lastCommittedTimestamp) < 5000) {
+    return;
+  }
+
+  isCommittingTurn = true;
+  lastCommittedOriginal = textToArchive;
+  lastCommittedTimestamp = now;
+
+  try {
+    const speaker = getActiveSpeaker();
+    await archiveSpeechTurnForSpeaker(speaker, textToArchive);
+  } finally {
+    isCommittingTurn = false;
+  }
 }
 
 async function archiveSpeechTurnForSpeaker(speaker, textToArchive) {
-  if (!textToArchive || textToArchive.startsWith('Sistemi başlatmak') || textToArchive === 'Dinleniyor...') {
+  if (!textToArchive || 
+      textToArchive.startsWith('Sistemi başlatmak') || 
+      textToArchive.startsWith('Dinleniyor') || 
+      textToArchive.includes('● Dinleniyor') ||
+      textToArchive === '● CANLI DİNLENİYOR...') {
     return;
+  }
+
+  const cleanOriginal = textToArchive.trim();
+  const now = Date.now();
+
+  // Katman 1: Orijinal metin üzerinden son tutanak kaydıyla mükerrerlik kontrolü
+  if (transcriptHistory.length > 0) {
+    const lastEntry = transcriptHistory[0];
+    const isRecent = (now - (lastEntry.timestamp || 0)) < 6000;
+    const isSameOriginal = lastEntry.original && 
+      lastEntry.original.trim().toLowerCase() === cleanOriginal.toLowerCase();
+    
+    if (isRecent && isSameOriginal) {
+      return;
+    }
   }
 
   const timeFormatted = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
 
   // Çeviriyi bu konuşmacının dilinden hedef ana dile yap
-  const translated = await translateSpeechTurn(textToArchive, speaker);
+  const translated = await translateSpeechTurn(cleanOriginal, speaker);
+
+  // Katman 2: Çeviri tamamlandıktan sonra mükerrerlik kontrolü
+  if (transcriptHistory.length > 0) {
+    const lastEntry = transcriptHistory[0];
+    const isRecent = (now - (lastEntry.timestamp || 0)) < 6000;
+    const isSameTranslation = translated && lastEntry.translation && 
+      lastEntry.translation.trim().toLowerCase() === translated.trim().toLowerCase();
+    const isSameOriginal = lastEntry.original && 
+      lastEntry.original.trim().toLowerCase() === cleanOriginal.toLowerCase();
+    
+    if (isRecent && (isSameTranslation || isSameOriginal)) {
+      return;
+    }
+  }
 
   // Canlı Altyazıyı Güncelle
   liveTranslationStream.textContent = translated;
@@ -1099,7 +1165,7 @@ async function archiveSpeechTurnForSpeaker(speaker, textToArchive) {
     speakerColor: speaker.color,
     speakerAccent: speaker.accent,
     time: timeFormatted,
-    original: textToArchive,
+    original: cleanOriginal,
     translation: translated
   };
 
@@ -1412,8 +1478,6 @@ function renderSoundboardPads() {
           clearTimeout(pttReleaseTimer);
           pttReleaseTimer = setTimeout(() => {
             isPttActive = false;
-            setRecordingState(false);
-            commitSpeechTurn();
             stopSpeechCapture();
           }, 300);
         }
@@ -1492,8 +1556,9 @@ function switchSpeakerLive(newSpeaker) {
   }
 
   const prevSpeaker = getActiveSpeaker();
-  const textToArchive = (turnSpeechBuffer || liveOriginalStream.textContent).trim();
+  const textToArchive = (turnSpeechBuffer || (hasUncommittedSpeech ? liveOriginalStream.textContent : '')).trim();
   turnSpeechBuffer = '';
+  hasUncommittedSpeech = false;
   lastTranslatedSourceText = '';
 
   if (textToArchive && !textToArchive.startsWith('Sistemi başlatmak') && !textToArchive.startsWith('Dinleniyor') && !textToArchive.includes('● Dinleniyor')) {
@@ -1570,6 +1635,7 @@ function startSpeechCapture(speakerId) {
 
   isSessionWarm = true;
   turnSpeechBuffer = '';
+  hasUncommittedSpeech = false;
   lastTranslatedSourceText = '';
   setRecordingState(true);
   setActiveSpeaker(spk.id, false);
@@ -1735,8 +1801,7 @@ function setOperationMode(mode, showNotification = true) {
   isPttActive = false;
   clearTimeout(pttReleaseTimer);
   if (isRecording) {
-    commitSpeechTurn();
-    setRecordingState(false);
+    stopSpeechCapture();
   }
 
   currentMode = mode;
@@ -1899,8 +1964,6 @@ function setupEventListeners() {
         clearTimeout(pttReleaseTimer);
         pttReleaseTimer = setTimeout(() => {
           isPttActive = false;
-          setRecordingState(false);
-          commitSpeechTurn();
           stopSpeechCapture();
         }, 300);
       }
@@ -2232,8 +2295,6 @@ function setupEventListeners() {
       clearTimeout(pttReleaseTimer);
       pttReleaseTimer = setTimeout(() => {
         isPttActive = false;
-        setRecordingState(false);
-        commitSpeechTurn();
         stopSpeechCapture();
       }, 300);
     }
