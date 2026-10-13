@@ -816,6 +816,25 @@ input:focus-visible {
   pointer-events: none;
 }
 
+@keyframes pulseHighlight {
+  0% {
+    box-shadow: 0 0 0 0 rgba(78, 203, 147, 0.7);
+    border-color: rgba(78, 203, 147, 0.85);
+  }
+  50% {
+    box-shadow: 0 0 24px 6px rgba(78, 203, 147, 0.35);
+    border-color: rgba(78, 203, 147, 1);
+  }
+  100% {
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
+    border-color: var(--border-glass);
+  }
+}
+
+.transcript-journal-card.pulse-highlight {
+  animation: pulseHighlight 1.6s ease-out !important;
+}
+
 .journal-header {
   padding: 12px 20px;
   border-bottom: 1px solid var(--border-glass-subtle);

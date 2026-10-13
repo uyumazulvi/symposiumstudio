@@ -141,6 +141,7 @@ const modeTapBtn = document.getElementById('modeTapBtn');
 // Sekmeler & Görünümler
 const tabLiveBtn = document.getElementById('tabLiveBtn');
 const tabLangBtn = document.getElementById('tabLangBtn');
+const tabResourcesBtn = document.getElementById('tabResourcesBtn');
 const viewLiveSection = document.getElementById('viewLiveSection');
 const viewLanguageSection = document.getElementById('viewLanguageSection');
 const headerNativeLangSelect = document.getElementById('headerNativeLangSelect');
@@ -489,18 +490,69 @@ function swapLanguages() {
   showToast(`Diller Değiştirildi: ${srcAcc.name.split(' ')[0]} ⇄ ${tgtName}`);
 }
 
+function closeMobileSidebar() {
+  const appSidebar = document.getElementById('appSidebar');
+  const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+  if (appSidebar) appSidebar.classList.remove('open');
+  if (sidebarBackdrop) sidebarBackdrop.classList.add('hidden');
+}
+
 function switchTab(tabName) {
-  if (tabName === 'live') {
+  if (tabName === 'lang') {
+    if (tabLiveBtn) tabLiveBtn.classList.remove('active');
+    if (tabLangBtn) tabLangBtn.classList.add('active');
+    if (tabResourcesBtn) tabResourcesBtn.classList.remove('active');
+
+    if (viewLiveSection) {
+      viewLiveSection.classList.remove('active');
+      viewLiveSection.classList.add('hidden');
+    }
+    if (viewLanguageSection) {
+      viewLanguageSection.classList.add('active');
+      viewLanguageSection.classList.remove('hidden');
+      viewLanguageSection.scrollTop = 0;
+    }
+  } else if (tabName === 'resources') {
+    if (tabLiveBtn) tabLiveBtn.classList.remove('active');
+    if (tabLangBtn) tabLangBtn.classList.remove('active');
+    if (tabResourcesBtn) tabResourcesBtn.classList.add('active');
+
+    if (viewLanguageSection) {
+      viewLanguageSection.classList.remove('active');
+      viewLanguageSection.classList.add('hidden');
+    }
+    if (viewLiveSection) {
+      viewLiveSection.classList.add('active');
+      viewLiveSection.classList.remove('hidden');
+    }
+
+    const card = document.querySelector('.transcript-journal-card') || document.getElementById('transcriptFeed');
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      card.classList.remove('pulse-highlight');
+      void card.offsetWidth;
+      card.classList.add('pulse-highlight');
+      setTimeout(() => card.classList.remove('pulse-highlight'), 1800);
+    }
+  } else {
+    // 'live' (Sohbet / Canlı Çeviri)
     if (tabLiveBtn) tabLiveBtn.classList.add('active');
     if (tabLangBtn) tabLangBtn.classList.remove('active');
-    if (viewLiveSection) viewLiveSection.classList.remove('hidden');
-    if (viewLanguageSection) viewLanguageSection.classList.add('hidden');
-  } else {
-    if (tabLangBtn) tabLangBtn.classList.add('active');
-    if (tabLiveBtn) tabLiveBtn.classList.remove('active');
-    if (viewLanguageSection) viewLanguageSection.classList.remove('hidden');
-    if (viewLiveSection) viewLiveSection.classList.add('hidden');
+    if (tabResourcesBtn) tabResourcesBtn.classList.remove('active');
+
+    if (viewLanguageSection) {
+      viewLanguageSection.classList.remove('active');
+      viewLanguageSection.classList.add('hidden');
+    }
+    if (viewLiveSection) {
+      viewLiveSection.classList.add('active');
+      viewLiveSection.classList.remove('hidden');
+      viewLiveSection.scrollTop = 0;
+    }
   }
+
+  // Mobilde hamburger menü açıksa otomatik kapat
+  closeMobileSidebar();
 }
 
 // ==========================================================================
@@ -1845,18 +1897,25 @@ function renderTranscriptFeed() {
 // 11. OLAY DİNLEYİCİLERİ VE BAĞLANTILAR
 // ==========================================================================
 function setupEventListeners() {
-  // Ana Sekme Geçişleri
-  if (tabLiveBtn) tabLiveBtn.addEventListener('click', () => switchTab('live'));
-  if (tabLangBtn) tabLangBtn.addEventListener('click', () => switchTab('lang'));
+  // Ana Sekme Geçişleri (Sohbet, Keşfet, Kaynaklar)
+  if (tabLiveBtn) {
+    tabLiveBtn.addEventListener('click', () => {
+      switchTab('live');
+      showToast('Sohbet & Canlı Çeviri');
+    });
+  }
+  if (tabLangBtn) {
+    tabLangBtn.addEventListener('click', () => {
+      switchTab('lang');
+      showToast('Keşfet: Diller & Konuşmacılar');
+    });
+  }
   if (quickLangBadgeBtn) quickLangBadgeBtn.addEventListener('click', swapLanguages);
 
-  const tabResourcesBtn = document.getElementById('tabResourcesBtn');
   if (tabResourcesBtn) {
     tabResourcesBtn.addEventListener('click', () => {
-      switchTab('live');
-      const card = document.querySelector('.transcript-journal-card') || document.getElementById('transcriptFeed');
-      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      showToast('Oturum Tutanağı');
+      switchTab('resources');
+      showToast('Kaynaklar & Oturum Tutanağı');
     });
   }
 
@@ -2124,12 +2183,15 @@ function setupEventListeners() {
   if (modalClearBtn) modalClearBtn.addEventListener('click', clearTranscriptAction);
 
   // Ayarlar Modalı
-  settingsBtn.addEventListener('click', () => {
-    geminiApiKeyInput.value = geminiApiKey;
-    fontSizeSelect.value = currentFontSize;
-    if (ttsSpeedSelect) ttsSpeedSelect.value = ttsSpeed.toString();
-    openModal(settingsModal);
-  });
+  if (settingsBtn) {
+    settingsBtn.addEventListener('click', () => {
+      closeMobileSidebar();
+      geminiApiKeyInput.value = geminiApiKey;
+      fontSizeSelect.value = currentFontSize;
+      if (ttsSpeedSelect) ttsSpeedSelect.value = ttsSpeed.toString();
+      openModal(settingsModal);
+    });
+  }
 
   if (closeSettingsBtn) closeSettingsBtn.addEventListener('click', () => closeModal(settingsModal));
   if (cancelSettingsBtn) cancelSettingsBtn.addEventListener('click', () => closeModal(settingsModal));
