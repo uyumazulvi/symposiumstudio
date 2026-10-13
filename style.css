@@ -1669,7 +1669,19 @@ input:focus-visible {
   gap: 10px;
 }
 
-.primary-btn {
+.modal-footer.split {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.footer-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.primary-btn,
+.btn-solid {
   padding: 8px 18px;
   background: var(--accent-mint);
   border: 1px solid transparent;
@@ -1681,11 +1693,13 @@ input:focus-visible {
   transition: all var(--transition-fast);
 }
 
-.primary-btn:hover {
+.primary-btn:hover,
+.btn-solid:hover {
   box-shadow: 0 0 16px var(--accent-mint-glow);
 }
 
-.secondary-btn {
+.secondary-btn,
+.btn-ghost {
   padding: 8px 16px;
   background-color: transparent;
   border: 1px solid var(--border-glass);
@@ -1697,24 +1711,45 @@ input:focus-visible {
   transition: all var(--transition-fast);
 }
 
-.secondary-btn:hover {
+.secondary-btn:hover,
+.btn-ghost:hover {
   color: #FFFFFF;
   background-color: rgba(255, 255, 255, 0.05);
 }
 
-.danger-btn {
-  padding: 8px 16px;
-  background-color: rgba(224, 108, 117, 0.12);
-  border: 1px solid rgba(224, 108, 117, 0.3);
+.danger-btn,
+.btn-danger {
+  padding: 8px 14px;
+  background-color: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
   border-radius: 10px;
-  color: var(--accent-crimson);
+  color: #EF4444 !important;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
 }
 
-.danger-btn:hover {
-  background-color: rgba(224, 108, 117, 0.22);
+.danger-btn svg,
+.btn-danger svg {
+  width: 14px;
+  height: 14px;
+  stroke: #EF4444;
+}
+
+.danger-btn:hover,
+.btn-danger:hover {
+  background-color: rgba(239, 68, 68, 0.22);
+  border-color: rgba(239, 68, 68, 0.55);
+  color: #F87171 !important;
+}
+
+.danger-btn:hover svg,
+.btn-danger:hover svg {
+  stroke: #F87171;
 }
 
 /* ==========================================================================
@@ -3104,13 +3139,26 @@ body.theme-light .primary-btn:hover {
 
 body.theme-light .btn-danger,
 body.theme-light .danger-btn {
-  background: #EF4444 !important;
-  color: #FFFFFF !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  color: #DC2626 !important;
+}
+
+body.theme-light .btn-danger svg,
+body.theme-light .danger-btn svg {
+  stroke: #DC2626 !important;
 }
 
 body.theme-light .btn-danger:hover,
 body.theme-light .danger-btn:hover {
-  background: #DC2626 !important;
+  background: rgba(239, 68, 68, 0.16) !important;
+  border-color: rgba(239, 68, 68, 0.5) !important;
+  color: #B91C1C !important;
+}
+
+body.theme-light .btn-danger:hover svg,
+body.theme-light .danger-btn:hover svg {
+  stroke: #B91C1C !important;
 }
 
 /* Dil & Keşfet Sayfası (Language Workspace) */
