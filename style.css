@@ -2023,11 +2023,11 @@ input:focus-visible {
   }
 
   /* ==========================================================================
-     2. MOBİL ÜST ÇUBUK (TEK SATIRLI, MİNİMALİST VE FERAH STÜDYO BAR)
+     2. MOBİL ÜST ÇUBUK (SAFE-AREA UYUMLU, ASLA TAŞMAYAN MİKRO STÜDYO BAR)
      ========================================================================== */
   .app-header {
-    height: 48px !important;
-    min-height: 48px !important;
+    height: auto !important;
+    min-height: calc(48px + env(safe-area-inset-top, 0px)) !important;
     position: sticky !important;
     top: 0 !important;
     z-index: 100 !important;
@@ -2035,18 +2035,24 @@ input:focus-visible {
     flex-direction: row !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 8px !important;
-    padding: calc(6px + env(safe-area-inset-top, 0px)) 12px 6px 12px !important;
+    gap: 5px !important;
+    padding-top: max(8px, env(safe-area-inset-top, 8px)) !important;
+    padding-bottom: 8px !important;
+    padding-left: max(10px, env(safe-area-inset-left, 10px)) !important;
+    padding-right: max(10px, env(safe-area-inset-right, 10px)) !important;
     border-bottom: 1px solid var(--border-hairline) !important;
-    background-color: rgba(18, 20, 24, 0.98) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
+    background-color: rgba(14, 17, 22, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    overflow: hidden !important;
   }
 
   .header-left {
     display: flex !important;
     align-items: center !important;
-    gap: 6px !important;
+    gap: 4px !important;
     flex-shrink: 0 !important;
     cursor: pointer !important;
   }
@@ -2054,34 +2060,27 @@ input:focus-visible {
   .brand-group {
     display: flex !important;
     align-items: center !important;
-    gap: 6px !important;
+    gap: 0 !important;
   }
 
   .wordmark-wrap {
     display: flex !important;
     align-items: baseline !important;
-    gap: 2px !important;
+    gap: 0 !important;
   }
 
   .brand-wordmark {
-    font-size: 13.5px !important;
+    font-size: 13px !important;
     font-weight: 700 !important;
-    letter-spacing: 0.04em !important;
+    letter-spacing: 0.03em !important;
     color: var(--text-primary) !important;
+    white-space: nowrap !important;
   }
 
-  .brand-sub {
-    display: none !important;
-  }
-
-  .header-divider {
-    display: none !important;
-  }
-
+  .brand-sub,
+  .header-divider,
   .session-pill {
-    padding: 2px 5px !important;
-    font-size: 9px !important;
-    border-radius: 999px !important;
+    display: none !important;
   }
 
   /* Orta: Dinleyici Ana Dili Seçici */
@@ -2093,10 +2092,9 @@ input:focus-visible {
     border: none !important;
     padding: 0 !important;
     min-width: 0 !important;
-    flex: 1 1 auto !important;
+    flex-shrink: 0 !important;
   }
 
-  /* Canlı sekmesi mobilde gizlenir (kullanıcı zaten sahnede) */
   #tabLiveBtn {
     display: none !important;
   }
@@ -2105,13 +2103,15 @@ input:focus-visible {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 4px !important;
-    padding: 3px 8px !important;
-    min-height: 28px !important;
+    gap: 3px !important;
+    padding: 3px 6px !important;
+    height: 30px !important;
+    min-height: 30px !important;
     background-color: var(--bg-surface) !important;
     border: 1px solid var(--border-hairline) !important;
     border-radius: var(--radius-xs) !important;
     margin-left: 0 !important;
+    box-sizing: border-box !important;
   }
 
   .native-lang-title-text {
@@ -2121,21 +2121,30 @@ input:focus-visible {
   .native-lang-globe svg {
     width: 12px !important;
     height: 12px !important;
+    color: var(--accent-cyan) !important;
   }
 
   .native-lang-select {
-    font-size: 11.5px !important;
-    font-weight: 600 !important;
+    width: auto !important;
+    max-width: 48px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
     color: var(--text-primary) !important;
-    padding: 1px 0 !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    outline: none !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
   }
 
-  /* Sağ: Mod Toggle ve Tek Ayarlar Butonu */
+  /* Sağ: Mod Toggle, Kulaklık ve Tek Ayarlar Butonu */
   .header-right {
     display: flex !important;
     align-items: center !important;
     justify-content: flex-end !important;
-    gap: 6px !important;
+    gap: 4px !important;
     flex-shrink: 0 !important;
   }
 
@@ -2150,19 +2159,35 @@ input:focus-visible {
     background-color: var(--bg-surface) !important;
     border: 1px solid var(--border-hairline) !important;
     border-radius: var(--radius-xs) !important;
+    height: 30px !important;
+    box-sizing: border-box !important;
   }
 
   .mode-pill {
-    padding: 3px 6px !important;
-    font-size: 9.5px !important;
+    padding: 0 7px !important;
+    height: 24px !important;
     min-height: 24px !important;
-    border-radius: var(--radius-xs) !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    border-radius: 4px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
   }
 
   .headphone-btn {
-    padding: 3px 6px !important;
-    min-height: 24px !important;
-    gap: 4px !important;
+    padding: 0 !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: var(--radius-xs) !important;
+    box-sizing: border-box !important;
+    position: relative !important;
   }
 
   .headphone-text-full {
@@ -2170,11 +2195,18 @@ input:focus-visible {
   }
 
   .headphone-icon {
-    width: 13px !important;
-    height: 13px !important;
+    width: 14px !important;
+    height: 14px !important;
   }
 
-  /* 4 araç butonundan sadece Ayarlar kalır, diğerleri Ayarlar modalında! */
+  .headphone-status-dot {
+    position: absolute !important;
+    top: 4px !important;
+    right: 4px !important;
+    width: 5px !important;
+    height: 5px !important;
+  }
+
   .utility-actions {
     display: flex !important;
     align-items: center !important;
@@ -2188,14 +2220,23 @@ input:focus-visible {
   }
 
   #settingsBtn {
-    width: 28px !important;
-    height: 28px !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     background-color: var(--bg-surface) !important;
     border: 1px solid var(--border-hairline) !important;
     border-radius: var(--radius-xs) !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+  }
+
+  #settingsBtn svg {
+    width: 15px !important;
+    height: 15px !important;
   }
 
   /* ==========================================================================
@@ -2257,6 +2298,23 @@ input:focus-visible {
     max-width: 110px;
   }
 
+  .stage-controls-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .stage-ptt-hint {
+    display: none !important;
+  }
+
+  .stage-ptt-btn {
+    padding: 3px 8px !important;
+    font-size: 11px !important;
+    gap: 4px !important;
+  }
+
   /* Duplicate Dil Rozeti mobilde gizlenir - tek rozet üst barda yer alıyor */
   .stage-language-bridge {
     display: none !important;
@@ -2282,7 +2340,7 @@ input:focus-visible {
   }
 
   .caption-badge {
-    display: none !important; /* Mobilde sahte AI hissi veren ekstra rozet gizlenir */
+    display: none !important;
   }
 
   .caption-stream-text {
@@ -2309,17 +2367,15 @@ input:focus-visible {
   }
 
   .journal-header {
-    position: sticky;
-    top: 48px !important; /* Yeni 48px tek satırlı üst çubuk ile tam hizalı */
-    z-index: 70;
-    background-color: rgba(18, 20, 24, 0.96) !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 6px 12px;
-    border-bottom: 1px solid var(--border-hairline);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    position: relative !important;
+    top: auto !important;
+    z-index: 10 !important;
+    background-color: var(--bg-root) !important;
+    padding: 8px 12px !important;
+    border-bottom: 1px solid var(--border-hairline) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
   }
 
   .journal-title-wrap {
@@ -3114,22 +3170,44 @@ input:focus-visible {
    ========================================================================== */
 @media (max-width: 380px) {
   .app-header {
-    padding: calc(5px + env(safe-area-inset-top, 0px)) 8px 5px 8px !important;
-    gap: 4px !important;
+    padding-top: max(6px, env(safe-area-inset-top, 6px)) !important;
+    padding-bottom: 6px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    gap: 3px !important;
   }
   .brand-wordmark {
-    font-size: 12px !important;
+    font-size: 11.5px !important;
   }
   .session-pill {
     display: none !important;
   }
-  #tabLangBtn {
-    padding: 3px 6px !important;
-    font-size: 10.5px !important;
+  .native-lang-control {
+    padding: 2px 4px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+  }
+  .native-lang-select {
+    max-width: 36px !important;
+    font-size: 10px !important;
+  }
+  .mic-mode-toggle {
+    height: 28px !important;
+    gap: 1px !important;
+    padding: 1px !important;
   }
   .mode-pill {
-    padding: 2px 4px !important;
-    font-size: 8.5px !important;
+    padding: 0 5px !important;
+    height: 24px !important;
+    min-height: 24px !important;
+    font-size: 9.5px !important;
+  }
+  .headphone-btn,
+  #settingsBtn {
+    width: 28px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    min-height: 28px !important;
   }
   .speaker-name-hero {
     max-width: 85px !important;
@@ -3140,12 +3218,11 @@ input:focus-visible {
     font-size: 10px !important;
   }
   .caption-stream-text {
-    font-size: 18px !important;
+    font-size: 19px !important;
   }
   .switcher-pad,
   .studio-pad {
-    max-width: 105px !important;
-    padding: 0 9px 0 7px !important;
+    padding: 0 8px 0 6px !important;
     gap: 5px !important;
   }
   .pad-name {

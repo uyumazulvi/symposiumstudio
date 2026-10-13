@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>SYMPOSIUM STUDIO — Canlı Konferans & Simultane Çeviri</title>
-  <link rel="stylesheet" href="style.css?v=20261013e">
+  <link rel="stylesheet" href="style.css?v=20261013f">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -64,16 +64,16 @@
         </span>
         <span class="native-lang-title-text">Ana Dil:</span>
         <select id="headerNativeLangSelect" class="native-lang-select" aria-label="Dinleyici Ana Dili">
-          <option value="tr" selected>Türkçe (TR)</option>
-          <option value="en">İngilizce (EN)</option>
-          <option value="de">Almanca (DE)</option>
-          <option value="fr">Fransızca (FR)</option>
-          <option value="es">İspanyolca (ES)</option>
-          <option value="it">İtalyanca (IT)</option>
-          <option value="ru">Rusça (RU)</option>
-          <option value="ar">Arapça (AR)</option>
-          <option value="zh">Çince (ZH)</option>
-          <option value="ja">Japonca (JA)</option>
+          <option value="tr" selected>TR • Türkçe</option>
+          <option value="en">EN • İngilizce</option>
+          <option value="de">DE • Almanca</option>
+          <option value="fr">FR • Fransızca</option>
+          <option value="es">ES • İspanyolca</option>
+          <option value="it">IT • İtalyanca</option>
+          <option value="ru">RU • Rusça</option>
+          <option value="ar">AR • Arapça</option>
+          <option value="zh">ZH • Çince</option>
+          <option value="ja">JA • Japonca</option>
         </select>
       </div>
     </nav>
@@ -84,10 +84,11 @@
       <div class="mic-mode-toggle" role="tablist" aria-label="Mikrofon Çalışma Modu">
         <button id="modeTapBtn" class="mode-pill" role="tab" aria-selected="false" title="Tek tıkla konuşmacı geçişi">
           <span class="mode-text-full">Sürekli Akış</span>
-          <span class="mode-text-short">Sürekli</span>
+          <span class="mode-text-short">Akış</span>
         </button>
         <button id="modePttBtn" class="mode-pill active" role="tab" aria-selected="true" title="Basılı tutarak konuşma">
-          Bas-Konuş
+          <span class="mode-text-full">Bas-Konuş</span>
+          <span class="mode-text-short">Bas-Konuş</span>
         </button>
       </div>
 
@@ -702,6 +703,6 @@
       });
     }
   </script>
-  <script src="app.js?v=20261013e"></script>
+  <script src="app.js?v=20261013f"></script>
 </body>
 </html>
