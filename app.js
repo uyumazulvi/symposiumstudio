@@ -163,6 +163,7 @@ const activeSpeakerNameDisplay = document.getElementById('activeSpeakerNameDispl
 const activeSpeakerAccentDisplay = document.getElementById('activeSpeakerAccentDisplay');
 const speakerAvatarDot = document.getElementById('speakerAvatarDot');
 const liveEngineBadge = document.getElementById('liveEngineBadge');
+const stagePttBtn = document.getElementById('stagePttBtn');
 const liveOriginalStream = document.getElementById('liveOriginalStream');
 const liveTranslationStream = document.getElementById('liveTranslationStream');
 const transcriptFeed = document.getElementById('transcriptFeed');
@@ -1406,6 +1407,7 @@ function renderSoundboardPads() {
         isPttActive = true;
         setActiveSpeaker(speaker.id, false);
         pad.classList.add('pressed');
+        if (stagePttBtn) stagePttBtn.classList.add('pressed');
         setRecordingState(true);
         startSpeechCapture(speaker.id);
       });
@@ -1413,6 +1415,7 @@ function renderSoundboardPads() {
       const releasePad = () => {
         if (pad.classList.contains('pressed')) {
           pad.classList.remove('pressed');
+          if (stagePttBtn) stagePttBtn.classList.remove('pressed');
           // Son hecelerin şebekeden tam ulaşması için 300ms tolerans
           clearTimeout(pttReleaseTimer);
           pttReleaseTimer = setTimeout(() => {
@@ -1752,6 +1755,7 @@ function setOperationMode(mode, showNotification = true) {
     modeTapBtn.setAttribute('aria-selected', 'false');
     dockInstructionText.innerHTML = '<strong>Bas-Konuş:</strong> Tuşa basılı tutun (veya Boşluk tuşu).';
     stopSessionBtn.classList.add('hidden');
+    if (stagePttBtn) stagePttBtn.classList.remove('hidden');
   } else {
     modeTapBtn.classList.add('active');
     modeTapBtn.setAttribute('aria-selected', 'true');
@@ -1759,6 +1763,7 @@ function setOperationMode(mode, showNotification = true) {
     modePttBtn.setAttribute('aria-selected', 'false');
     dockInstructionText.innerHTML = '<strong>Sürekli Akış:</strong> Konuşmacıya dokunun.';
     stopSessionBtn.classList.remove('hidden');
+    if (stagePttBtn) stagePttBtn.classList.add('hidden');
     updateStopButtonState(isRecording);
   }
 
@@ -1874,6 +1879,45 @@ function setupEventListeners() {
   // Mod Değiştirme
   modePttBtn.addEventListener('click', () => setOperationMode('ptt'));
   modeTapBtn.addEventListener('click', () => setOperationMode('tap'));
+
+  // Sahnede Hızlı Bas-Konuş Butonu (Doğrudan Sahne Üzerinden Konuşma)
+  if (stagePttBtn) {
+    stagePttBtn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      clearTimeout(pttReleaseTimer);
+      lastTranslatedSourceText = '';
+      if (audioContext && audioContext.state === 'suspended') {
+        try { audioContext.resume(); } catch (_) {}
+      }
+      ensureMicrophoneAccess().catch(() => {});
+      isSessionWarm = true;
+      isPttActive = true;
+      stagePttBtn.classList.add('pressed');
+      const activePad = soundboardGrid.querySelector('.switcher-pad.active');
+      if (activePad) activePad.classList.add('pressed');
+      setRecordingState(true);
+      startSpeechCapture(activeSpeakerId);
+    });
+
+    const releaseStagePtt = () => {
+      if (stagePttBtn.classList.contains('pressed')) {
+        stagePttBtn.classList.remove('pressed');
+        const activePad = soundboardGrid.querySelector('.switcher-pad.pressed');
+        if (activePad) activePad.classList.remove('pressed');
+        clearTimeout(pttReleaseTimer);
+        pttReleaseTimer = setTimeout(() => {
+          isPttActive = false;
+          setRecordingState(false);
+          commitSpeechTurn();
+          stopSpeechCapture();
+        }, 300);
+      }
+    };
+
+    stagePttBtn.addEventListener('pointerup', releaseStagePtt);
+    stagePttBtn.addEventListener('pointercancel', releaseStagePtt);
+    stagePttBtn.addEventListener('pointerleave', releaseStagePtt);
+  }
 
   // Dinlemeyi Başlat / Durdur Toggle Butonu
   stopSessionBtn.addEventListener('click', () => {
@@ -2177,6 +2221,7 @@ function setupEventListeners() {
         isSessionWarm = true;
         isPttActive = true;
         activePad.classList.add('pressed');
+        if (stagePttBtn) stagePttBtn.classList.add('pressed');
         setRecordingState(true);
         startSpeechCapture(activeSpeakerId);
       }
@@ -2188,14 +2233,17 @@ function setupEventListeners() {
       const activePad = soundboardGrid.querySelector('.switcher-pad.pressed');
       if (activePad) {
         activePad.classList.remove('pressed');
-        clearTimeout(pttReleaseTimer);
-        pttReleaseTimer = setTimeout(() => {
-          isPttActive = false;
-          setRecordingState(false);
-          commitSpeechTurn();
-          stopSpeechCapture();
-        }, 300);
       }
+      if (stagePttBtn) {
+        stagePttBtn.classList.remove('pressed');
+      }
+      clearTimeout(pttReleaseTimer);
+      pttReleaseTimer = setTimeout(() => {
+        isPttActive = false;
+        setRecordingState(false);
+        commitSpeechTurn();
+        stopSpeechCapture();
+      }, 300);
     }
   });
 

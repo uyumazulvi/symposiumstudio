@@ -490,12 +490,13 @@ input:focus-visible {
    2. ÇALIŞMA ALANI DÜZENİ
    ========================================================================== */
 .workspace-view {
-  flex: 1 0 auto;
-  min-height: calc(100vh - var(--header-height));
+  flex: 1 1 auto;
+  height: calc(100vh - var(--header-height));
   display: flex;
   flex-direction: column;
-  overflow: visible;
+  overflow: hidden;
   background-color: var(--bg-root);
+  position: relative;
 }
 
 /* ==========================================================================
@@ -777,11 +778,13 @@ input:focus-visible {
    4. OTURUM TUTANAĞI — KARTSIZ EDİTORYAL KRONOLOJİ (LEDGER STREAM)
    ========================================================================== */
 .transcript-journal {
-  flex: 1 0 auto;
-  min-height: 220px;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background-color: var(--bg-root);
+  overflow: hidden;
+  padding-bottom: 120px; /* Sabit alt konsol için güvenli mesafe */
 }
 
 .journal-header {
@@ -854,9 +857,10 @@ input:focus-visible {
 
 /* Tutanak Akış Listesi */
 .journal-feed {
-  flex: 1 0 auto;
-  overflow: visible;
-  padding: 0 36px 28px 36px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 0 36px 20px 36px;
   display: flex;
   flex-direction: column;
 }
@@ -1010,23 +1014,71 @@ input:focus-visible {
   word-break: break-word;
 }
 
+.stage-ptt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(101, 199, 176, 0.08);
+  border: 1px solid rgba(101, 199, 176, 0.3);
+  color: var(--accent-cyan);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.16s ease;
+  flex-shrink: 0;
+}
+
+.stage-ptt-btn:hover {
+  background: rgba(101, 199, 176, 0.16);
+  border-color: rgba(101, 199, 176, 0.55);
+}
+
+.stage-ptt-btn.pressed {
+  background: var(--accent-cyan) !important;
+  color: #0E1116 !important;
+  border-color: var(--accent-cyan) !important;
+  box-shadow: 0 0 16px rgba(101, 199, 176, 0.5) !important;
+  transform: scale(0.97);
+}
+
+.stage-ptt-hint {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--text-tertiary);
+}
+
+.stage-ptt-btn.pressed .stage-ptt-hint {
+  background: rgba(0, 0, 0, 0.25);
+  color: #0E1116;
+}
+
 /* ==========================================================================
    5. RAFİNE KONUŞMACI KONTROL ŞERİDİ (HARDWARE SWITCHER STRIP)
    ========================================================================== */
 .switcher-console {
-  background-color: rgba(22, 24, 20, 0.97);
+  background-color: rgba(22, 24, 20, 0.98);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--border-hairline);
-  box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.65);
   padding: 10px 36px 12px 36px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   flex-shrink: 0;
-  position: sticky;
+  position: fixed;
   bottom: 0;
-  z-index: 40;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 50;
 }
 
 .console-action-bar {
