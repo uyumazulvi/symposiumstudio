@@ -1837,15 +1837,25 @@ function setOperationMode(mode, showNotification = true) {
 function renderTranscriptFeed() {
   historyCounter.textContent = `${transcriptHistory.length} Kayıt`;
 
+  const actionsWrap = document.querySelector('.journal-actions');
+  const filterWrap = document.querySelector('.journal-filter-switch');
+  const countBadge = document.getElementById('historyCounter');
+
   if (transcriptHistory.length === 0) {
-    emptyNotice.classList.remove('hidden');
+    if (emptyNotice) emptyNotice.classList.remove('hidden');
+    if (actionsWrap) actionsWrap.classList.add('hidden');
+    if (filterWrap) filterWrap.classList.add('hidden');
+    if (countBadge) countBadge.classList.add('hidden');
     Array.from(transcriptFeed.children).forEach(c => {
       if (c.id !== 'emptyNotice') c.remove();
     });
     return;
   }
 
-  emptyNotice.classList.add('hidden');
+  if (emptyNotice) emptyNotice.classList.add('hidden');
+  if (actionsWrap) actionsWrap.classList.remove('hidden');
+  if (filterWrap) filterWrap.classList.remove('hidden');
+  if (countBadge) countBadge.classList.remove('hidden');
   transcriptFeed.innerHTML = '';
 
   const showBoth = currentFilter === 'all';
