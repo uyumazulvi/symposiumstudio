@@ -1887,6 +1887,43 @@ function setupEventListeners() {
   if (tabLangBtn) tabLangBtn.addEventListener('click', () => switchTab('lang'));
   if (quickLangBadgeBtn) quickLangBadgeBtn.addEventListener('click', swapLanguages);
 
+  const tabResourcesBtn = document.getElementById('tabResourcesBtn');
+  if (tabResourcesBtn) {
+    tabResourcesBtn.addEventListener('click', () => {
+      switchTab('live');
+      const card = document.querySelector('.transcript-journal-card') || document.getElementById('transcriptFeed');
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      showToast('Oturum Tutanağı');
+    });
+  }
+
+  // Mobil Kenar Çubuğu (Drawer) Geçişleri
+  const mobileMenuToggleBtn = document.getElementById('mobileMenuToggleBtn');
+  const appSidebar = document.getElementById('appSidebar');
+  const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+  if (mobileMenuToggleBtn && appSidebar) {
+    mobileMenuToggleBtn.addEventListener('click', () => {
+      appSidebar.classList.toggle('open');
+      if (sidebarBackdrop) sidebarBackdrop.classList.toggle('hidden');
+    });
+  }
+
+  if (sidebarBackdrop && appSidebar) {
+    sidebarBackdrop.addEventListener('click', () => {
+      appSidebar.classList.remove('open');
+      sidebarBackdrop.classList.add('hidden');
+    });
+  }
+
+  // Tema Butonu
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      showToast('Karanlık Stüdyo Teması Aktif');
+    });
+  }
+
   // Kulaklıkla Sesli Simultane Tercüman Butonu
   if (headphoneTtsBtn) {
     headphoneTtsBtn.addEventListener('click', toggleTtsInterpretation);
