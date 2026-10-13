@@ -17,6 +17,7 @@ let activeSpeakerId = null;
 let geminiApiKey = '';
 let currentFilter = 'all'; // 'all' | 'tr'
 let currentFontSize = 'standard';
+let currentTheme = 'dark'; // 'dark' | 'light'
 
 // Sesli Tercüman (TTS / Kulaklıkla Dinleme) Durumu
 let isTtsActive = false;
@@ -359,6 +360,13 @@ function loadWorkspaceData() {
         if (ttsSpeedSelect) ttsSpeedSelect.value = sp;
       }
     }
+    const th = localStorage.getItem('sym_theme_pref');
+    if (th === 'light' || th === 'dark') {
+      currentTheme = th;
+    } else {
+      currentTheme = 'dark';
+    }
+    applyTheme(currentTheme, false);
   } catch (err) {
     console.warn('Veri yükleme hatası:', err);
   }
@@ -372,6 +380,7 @@ function saveWorkspaceData() {
     localStorage.setItem('sym_mode_pref_v2', currentMode);
     localStorage.setItem('sym_mode_pref', currentMode);
     localStorage.setItem('sym_font_pref', currentFontSize);
+    localStorage.setItem('sym_theme_pref', currentTheme);
     localStorage.setItem('sym_source_lang', sourceLanguage);
     localStorage.setItem('sym_target_lang_v2', targetLanguage);
     localStorage.setItem('sym_target_lang', targetLanguage);
@@ -380,6 +389,62 @@ function saveWorkspaceData() {
   } catch (err) {
     console.warn('Veri kayıt hatası:', err);
   }
+}
+
+// ==========================================================================
+// TEMA YÖNETİMİ (AÇIK / KOYU MOD)
+// ==========================================================================
+function applyTheme(theme, showNotice = false) {
+  currentTheme = theme === 'light' ? 'light' : 'dark';
+  const isLight = currentTheme === 'light';
+
+  if (isLight) {
+    document.body.classList.add('theme-light');
+    document.documentElement.setAttribute('data-theme', 'light');
+  } else {
+    document.body.classList.remove('theme-light');
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+
+  // Mobil adres çubuğu ve PWA tema rengi
+  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+  if (metaThemeColor) {
+    metaThemeColor.setAttribute('content', isLight ? '#F4F6F9' : '#0E1116');
+  }
+
+  // Buton ikonları ve başlıkları
+  const sunIcon = document.querySelector('#themeToggleBtn .theme-sun-icon');
+  const moonIcon = document.querySelector('#themeToggleBtn .theme-moon-icon');
+  const themeBtn = document.getElementById('themeToggleBtn');
+
+  if (sunIcon && moonIcon) {
+    if (isLight) {
+      sunIcon.classList.add('hidden');
+      moonIcon.classList.remove('hidden');
+    } else {
+      sunIcon.classList.remove('hidden');
+      moonIcon.classList.add('hidden');
+    }
+  }
+
+  if (themeBtn) {
+    const titleText = isLight ? 'Koyu Temaya Geç' : 'Açık Temaya Geç';
+    themeBtn.setAttribute('title', titleText);
+    themeBtn.setAttribute('aria-label', titleText);
+  }
+
+  try {
+    localStorage.setItem('sym_theme_pref', currentTheme);
+  } catch (_) {}
+
+  if (showNotice) {
+    showToast(isLight ? 'Açık Stüdyo Teması Aktif' : 'Karanlık Stüdyo Teması Aktif');
+  }
+}
+
+function toggleTheme() {
+  const next = currentTheme === 'light' ? 'dark' : 'light';
+  applyTheme(next, true);
 }
 
 function updateEngineBadge() {
@@ -2038,12 +2103,10 @@ function setupEventListeners() {
     }
   });
 
-  // Tema Butonu
+  // Tema Değiştirme Butonu (Açık / Koyu Tema)
   const themeToggleBtn = document.getElementById('themeToggleBtn');
   if (themeToggleBtn) {
-    themeToggleBtn.addEventListener('click', () => {
-      showToast('Karanlık Stüdyo Teması Aktif');
-    });
+    themeToggleBtn.addEventListener('click', toggleTheme);
   }
 
   // Kulaklıkla Sesli Simultane Tercüman Butonu
