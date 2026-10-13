@@ -261,9 +261,12 @@ window.addEventListener('DOMContentLoaded', () => {
   initPwaInstallationFlow();
 });
 
-// İlk kullanıcı etkileşiminde mikrofon akışını bağla ve kalıcı tut
+// İlk kullanıcı etkileşiminde mikrofon akışını bağla ve ses motorunu hazırla
 window.addEventListener('pointerdown', () => {
   ensureMicrophoneAccess();
+  if (isTtsActive) {
+    unlockSpeechEngine();
+  }
 }, { once: true });
 
 function loadWorkspaceData() {
@@ -1297,6 +1300,62 @@ function updateHeadphoneButtonState() {
   }
 }
 
+let ttsKeepAliveTimer = null;
+
+function startTtsKeepAlive() {
+  stopTtsKeepAlive();
+  ttsKeepAliveTimer = setInterval(() => {
+    if (!('speechSynthesis' in window)) return;
+    if (window.speechSynthesis.speaking) {
+      try {
+        window.speechSynthesis.pause();
+        window.speechSynthesis.resume();
+      } catch (_) {}
+    } else {
+      stopTtsKeepAlive();
+    }
+  }, 10000);
+}
+
+function stopTtsKeepAlive() {
+  if (ttsKeepAliveTimer) {
+    clearInterval(ttsKeepAliveTimer);
+    ttsKeepAliveTimer = null;
+  }
+}
+
+// iOS Safari ve modern mobil tarayıcılar için Ses Motoru İzin Kilidini Açma (Unlock)
+function unlockSpeechEngine() {
+  if (!('speechSynthesis' in window)) return;
+
+  try {
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.resume();
+  } catch (e) {}
+
+  // iOS Safari'nin user-activation yetkisini açması için hızlı, minik bir tetikleyici
+  try {
+    const primer = new SpeechSynthesisUtterance('a');
+    primer.volume = 0.01;
+    primer.rate = 10;
+    primer.onend = () => {
+      window._speechUnlockUtterance = null;
+      try { window.speechSynthesis.cancel(); } catch (_) {}
+    };
+    primer.onerror = () => {
+      window._speechUnlockUtterance = null;
+      try { window.speechSynthesis.cancel(); } catch (_) {}
+    };
+    window._speechUnlockUtterance = primer;
+    window.speechSynthesis.speak(primer);
+  } catch (e) {}
+
+  // AudioContext varsa uyandır
+  if (audioContext && audioContext.state === 'suspended') {
+    try { audioContext.resume(); } catch (_) {}
+  }
+}
+
 function toggleTtsInterpretation() {
   if (!('speechSynthesis' in window)) {
     showToast('Tarayıcınız ses sentezi (TTS) desteklemiyor.');
@@ -1310,12 +1369,8 @@ function toggleTtsInterpretation() {
   if (isTtsActive) {
     const langName = LANGUAGE_NAMES[targetLanguage] || targetLanguage.toUpperCase();
     showToast(`Kulaklık Modu Açık: ${langName} sesli tercüme aktif`);
-    // Tarayıcı audio/autoplay kısıtını açmak için kullanıcı jestiyle sessiz mikro utterance tetikle
-    try {
-      const primer = new SpeechSynthesisUtterance(' ');
-      primer.volume = 0;
-      window.speechSynthesis.speak(primer);
-    } catch (e) {}
+    // Kullanıcı tıklaması akışında motoru iOS için hemen uyandır
+    unlockSpeechEngine();
   } else {
     stopTtsSpeaking();
     showToast('Sesli tercüman kapatıldı.');
@@ -1326,9 +1381,13 @@ function stopTtsSpeaking() {
   ttsSpeechQueue = [];
   isTtsSpeaking = false;
   currentTtsUtterance = null;
+  window._activeTtsUtterance = null;
+  stopTtsKeepAlive();
+
   if ('speechSynthesis' in window) {
     try {
       window.speechSynthesis.cancel();
+      window.speechSynthesis.resume();
     } catch (e) {}
   }
   if (headphoneTtsBtn) {
@@ -1344,14 +1403,14 @@ function getVoiceForLanguage(langCode) {
 
   const codeLower = (langCode || 'tr').toLowerCase();
   const defaultLocale = (DEFAULT_SPEECH_LOCALES[codeLower] || `${codeLower}-${codeLower.toUpperCase()}`).toLowerCase();
+  const langPrefix = codeLower.split('-')[0];
 
-  // 1. Varsayılan tam yerel kod eşleşmesi (örn: 'tr-tr', 'en-us')
+  // 1. Tam dil ve bölge eşleşmesi (örn: 'tr-tr', 'en-us')
   let matched = availableVoices.find(v => v.lang && v.lang.toLowerCase().replace('_', '-') === defaultLocale);
   if (matched) return matched;
 
   // 2. Dil ailesi eşleşmesi (örn: 'tr', 'en')
-  const langPrefix = codeLower.split('-')[0];
-  matched = availableVoices.find(v => v.lang && v.lang.toLowerCase().startsWith(langPrefix));
+  matched = availableVoices.find(v => v.lang && v.lang.toLowerCase().replace('_', '-').startsWith(langPrefix));
   if (matched) return matched;
 
   return null;
@@ -1377,7 +1436,9 @@ function speakTranslatedText(text, langCode) {
   const targetLang = langCode || targetLanguage || 'tr';
   ttsSpeechQueue.push({ text: clean, lang: targetLang });
 
-  if (!isTtsSpeaking) {
+  // Eğer motor takılı kaldıysa veya durmuşsa senkronizasyonu tazele
+  if (!isTtsSpeaking || (!window.speechSynthesis.speaking && !window.speechSynthesis.pending)) {
+    isTtsSpeaking = false;
     processTtsQueue();
   }
 }
@@ -1386,6 +1447,8 @@ function processTtsQueue() {
   if (!isTtsActive || ttsSpeechQueue.length === 0) {
     isTtsSpeaking = false;
     currentTtsUtterance = null;
+    window._activeTtsUtterance = null;
+    stopTtsKeepAlive();
     if (headphoneTtsBtn) {
       headphoneTtsBtn.classList.remove('speaking');
     }
@@ -1400,24 +1463,36 @@ function processTtsQueue() {
   const nextItem = ttsSpeechQueue.shift();
   const utterance = new SpeechSynthesisUtterance(nextItem.text);
   currentTtsUtterance = utterance;
+  window._activeTtsUtterance = utterance; // iOS Safari Garbage Collection koruması
 
   const langPrefix = (nextItem.lang || 'tr').toLowerCase();
   const defaultLocale = DEFAULT_SPEECH_LOCALES[langPrefix] || `${langPrefix}-${langPrefix.toUpperCase()}`;
   utterance.lang = defaultLocale;
 
+  // iOS Safari'de bulut Siri sesleri çökmeye sebep olabildiğinden yerel/sistem sesleri tercih edilir
+  const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const voice = getVoiceForLanguage(langPrefix);
   if (voice) {
-    utterance.voice = voice;
+    if (!isIos || voice.localService || voice.default) {
+      utterance.voice = voice;
+    }
   }
 
+  utterance.volume = 1.0;
   utterance.rate = ttsSpeed || 1.05;
   utterance.pitch = 1.0;
 
+  utterance.onstart = () => {
+    startTtsKeepAlive();
+  };
+
   utterance.onend = () => {
-    isTtsSpeaking = false;
+    stopTtsKeepAlive();
+    window._activeTtsUtterance = null;
     currentTtsUtterance = null;
+    isTtsSpeaking = false;
     if (ttsSpeechQueue.length > 0) {
-      processTtsQueue();
+      setTimeout(processTtsQueue, 30);
     } else {
       if (headphoneTtsBtn) {
         headphoneTtsBtn.classList.remove('speaking');
@@ -1426,10 +1501,13 @@ function processTtsQueue() {
   };
 
   utterance.onerror = (e) => {
-    isTtsSpeaking = false;
+    console.warn('TTS utterance hatası:', e);
+    stopTtsKeepAlive();
+    window._activeTtsUtterance = null;
     currentTtsUtterance = null;
+    isTtsSpeaking = false;
     if (ttsSpeechQueue.length > 0) {
-      setTimeout(processTtsQueue, 50);
+      setTimeout(processTtsQueue, 60);
     } else {
       if (headphoneTtsBtn) {
         headphoneTtsBtn.classList.remove('speaking');
@@ -1438,9 +1516,19 @@ function processTtsQueue() {
   };
 
   try {
+    // iOS Safari kuyruk donmasını engellemek için önce resume
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+    }
     window.speechSynthesis.speak(utterance);
+    // Safari 15+ için hemen arkasından ekstra resume
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+    }
   } catch (err) {
     console.warn('speechSynthesis.speak hatası:', err);
+    stopTtsKeepAlive();
+    window._activeTtsUtterance = null;
     isTtsSpeaking = false;
     currentTtsUtterance = null;
     if (headphoneTtsBtn) headphoneTtsBtn.classList.remove('speaking');
@@ -1736,6 +1824,14 @@ function startSpeechCapture(speakerId) {
   }
   // Mikrofon akışını arka planda aç (engelleme yapmadan)
   ensureMicrophoneAccess().catch(() => {});
+
+  if (isTtsActive && 'speechSynthesis' in window) {
+    try {
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+    } catch (_) {}
+  }
 
   isSessionWarm = true;
   turnSpeechBuffer = '';
