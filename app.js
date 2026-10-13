@@ -1950,6 +1950,10 @@ function setupEventListeners() {
     if (desktopSidebarToggleBtn) {
       desktopSidebarToggleBtn.classList.toggle('collapsed-state', isCollapsed);
       desktopSidebarToggleBtn.setAttribute('title', isCollapsed ? 'Kenar Çubuğunu Aç (Ctrl+B)' : 'Kenar Çubuğunu Daralt (Ctrl+B)');
+      const label = desktopSidebarToggleBtn.querySelector('.desktop-toggle-text');
+      if (label) {
+        label.textContent = isCollapsed ? 'Menüyü Aç' : 'Menü';
+      }
     }
   }
 
@@ -1965,11 +1969,21 @@ function setupEventListeners() {
     } catch (e) {}
   }
 
+  // Bir kerelik temiz başlangıç: Kullanıcının ekranında takılı kalmış eski '1' durumunu sıfırla
+  try {
+    if (localStorage.getItem('sym_desktop_sidebar_reset_v2') !== 'done') {
+      localStorage.removeItem('sym_desktop_sidebar_collapsed');
+      localStorage.setItem('sym_desktop_sidebar_reset_v2', 'done');
+    }
+  } catch (e) {}
+
   // Başlangıçta kayıtlı tercihi yükle (Sadece masaüstü)
   if (window.innerWidth > 768) {
     try {
       if (localStorage.getItem('sym_desktop_sidebar_collapsed') === '1') {
         updateDesktopSidebarUi(true);
+      } else {
+        updateDesktopSidebarUi(false);
       }
     } catch (e) {}
   }

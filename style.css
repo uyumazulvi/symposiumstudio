@@ -321,13 +321,16 @@ input:focus-visible {
 .desktop-header-left {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
+  margin-right: 14px;
 }
 
 .desktop-sidebar-toggle-btn {
-  width: 36px;
   height: 36px;
+  padding: 0 12px;
+  gap: 7px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-glass);
   display: inline-flex;
   align-items: center;
@@ -339,21 +342,29 @@ input:focus-visible {
 }
 
 .desktop-sidebar-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
   border-color: var(--border-glass-strong);
 }
 
 .desktop-sidebar-toggle-btn.collapsed-state {
-  background: rgba(78, 203, 147, 0.12);
-  color: var(--accent-emerald);
-  border-color: rgba(78, 203, 147, 0.35);
-  box-shadow: 0 0 12px rgba(78, 203, 147, 0.2);
+  background: rgba(78, 203, 147, 0.18) !important;
+  color: #FFFFFF !important;
+  border-color: rgba(78, 203, 147, 0.55) !important;
+  box-shadow: 0 0 16px rgba(78, 203, 147, 0.3) !important;
 }
 
 .desktop-sidebar-toggle-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+.desktop-toggle-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: inherit;
+  letter-spacing: 0.02em;
 }
 
 /* Mod Seçimi (Segmented Controller) */
@@ -1893,33 +1904,40 @@ input:focus-visible {
    ========================================================================== */
 @media (min-width: 769px) {
   .app-sidebar {
-    transition: margin-left 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-                width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
                 padding 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-                opacity 0.22s ease,
+                opacity 0.2s ease,
                 border-color 0.2s ease !important;
-    will-change: margin-left, width;
-    overflow-x: hidden;
+    will-change: width, padding;
+    overflow: hidden;
   }
 
   .app-sidebar.desktop-collapsed {
-    margin-left: calc(-1 * var(--sidebar-width)) !important;
     width: 0 !important;
     min-width: 0 !important;
     max-width: 0 !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-right-width: 0 !important;
     border-right-color: transparent !important;
     opacity: 0 !important;
     pointer-events: none !important;
     overflow: hidden !important;
     white-space: nowrap !important;
-    visibility: hidden;
+    visibility: hidden !important;
+  }
+
+  .desktop-header-left {
+    display: flex;
+    align-items: center;
+    margin-right: 14px;
+    flex-shrink: 0;
   }
 
   .mic-mode-toggle {
     margin-right: auto;
-    margin-left: 14px;
   }
 }
 
