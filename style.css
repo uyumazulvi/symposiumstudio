@@ -1553,6 +1553,208 @@ input:focus-visible {
 }
 
 /* ==========================================================================
+   9.1 PWA ANA EKRANA EKLE POP-UP & REHBER MODALI
+   ========================================================================== */
+.pwa-entry-card {
+  max-width: 380px !important;
+  text-align: center;
+  padding: 28px 22px 20px 22px !important;
+  align-items: center;
+  gap: 14px;
+  background: #0E121B !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85) !important;
+}
+
+.pwa-entry-icon-wrap {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  background: rgba(78, 203, 147, 0.08);
+  border: 1px solid rgba(78, 203, 147, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 24px rgba(78, 203, 147, 0.2);
+}
+
+.pwa-entry-icon-wrap img {
+  width: 36px;
+  height: 36px;
+}
+
+.pwa-entry-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+.pwa-entry-desc {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.pwa-entry-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.pwa-entry-btn {
+  width: 100%;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  background: #4ECB93;
+  color: #071013;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 0 20px rgba(78, 203, 147, 0.35);
+  transition: all 0.2s ease;
+}
+
+.pwa-entry-btn:active {
+  transform: scale(0.98);
+}
+
+.pwa-dismiss-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.pwa-dismiss-btn:hover {
+  color: #FFFFFF;
+}
+
+/* Rehber Modalı (Adım Adım Listeleme) */
+.pwa-guide-card {
+  max-width: 440px !important;
+  background: #0E121B !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+}
+
+.pwa-os-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  margin-bottom: 6px;
+}
+
+.pwa-os-tab {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.pwa-os-tab.active {
+  background: rgba(78, 203, 147, 0.15);
+  color: #4ECB93;
+  border: 1px solid rgba(78, 203, 147, 0.3);
+}
+
+.pwa-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pwa-step-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 14px;
+}
+
+.pwa-step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(78, 203, 147, 0.15);
+  color: #4ECB93;
+  font-size: 12.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.pwa-step-text {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #FFFFFF;
+}
+
+.pwa-step-text strong {
+  color: #4ECB93;
+}
+
+.pwa-step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0 4px;
+}
+
+.pwa-step-badge svg {
+  width: 14px;
+  height: 14px;
+  color: #4ECB93;
+}
+
+.pwa-guide-note {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+  margin: 4px 0 0 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 3px solid #4ECB93;
+}
+
+/* ==========================================================================
    10. SİSTEM BİLDİRİMİ (TOAST)
    ========================================================================== */
 .system-toast {

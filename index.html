@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>SYMPOSIUM STUDIO — Canlı Konferans & Simultane Çeviri</title>
-  <link rel="stylesheet" href="style.css?v=20261013q">
+  <link rel="stylesheet" href="style.css?v=20261013r">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -74,6 +74,13 @@
       </div>
 
       <div class="sidebar-bottom">
+        <button type="button" id="sidebarInstallBtn" class="sidebar-nav-item" title="Ana Ekrana Ekle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+            <line x1="12" y1="18" x2="12.01" y2="18"/>
+          </svg>
+          <span>Uygulamayı Ekle</span>
+        </button>
         <button type="button" id="settingsBtn" class="sidebar-nav-item settings-item" title="Ayarlar & Yapılandırma">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"/>
@@ -674,57 +681,128 @@
 
 
 
-  <!-- iOS Safari İçin 2 Adımlı Hızlı Rehber Modalı -->
-  <div id="iosGuideModal" class="modal-backdrop hidden">
-    <div class="modal-card ios-guide-card">
+  <!-- =========================================================================
+       1. WEBE GİRİNCE AÇILAN "ANA EKRANA EKLE" POP-UP MODALI
+       ========================================================================= -->
+  <div id="pwaEntryModal" class="modal-backdrop hidden">
+    <div class="modal-card pwa-entry-card">
+      <div class="pwa-entry-icon-wrap">
+        <img src="icon.svg" alt="Symposium Icon" width="36" height="36">
+      </div>
+      <h3 class="pwa-entry-title">Ana Ekrana Ekle</h3>
+      <p class="pwa-entry-desc">
+        Tam ekran kongre deneyimi ve adres çubuğu olmadan hızlı erişim için uygulamayı ana ekranınıza ekleyin.
+      </p>
+      <div class="pwa-entry-actions">
+        <button type="button" id="pwaEntryInstallBtn" class="pwa-entry-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width: 17px; height: 17px;">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+            <line x1="12" y1="18" x2="12.01" y2="18"/>
+          </svg>
+          <span>Ana Ekrana Ekle</span>
+        </button>
+        <button type="button" id="pwaEntryDismissBtn" class="pwa-dismiss-btn">Daha Sonra</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       2. ADIM ADIM "NASIL EKLENİR?" REHBER MODALI (IPHONE & ANDROID)
+       ========================================================================= -->
+  <div id="pwaStepsGuideModal" class="modal-backdrop hidden">
+    <div class="modal-card pwa-guide-card">
       <div class="modal-header">
         <div class="modal-title-group">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modal-title-icon">
             <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
             <line x1="12" y1="18" x2="12.01" y2="18"/>
           </svg>
-          <h3 class="modal-heading">iPhone'da Ana Ekrana Ekle</h3>
+          <h3 class="modal-heading">Ana Ekrana Nasıl Eklenir?</h3>
         </div>
-        <button type="button" id="closeIosGuideBtn" class="modal-close-btn" title="Kapat">
+        <button type="button" id="closePwaGuideBtn" class="modal-close-btn" title="Kapat">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"/>
             <line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </button>
       </div>
-      <div class="modal-body ios-guide-body">
-        <div class="ios-step-item">
-          <div class="ios-step-num">1</div>
-          <div class="ios-step-text">
-            Safari'nin altındaki <strong>Paylaş</strong> 
-            <span class="ios-share-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ios-share-svg">
-                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                <polyline points="16 6 12 2 8 6"/>
-                <line x1="12" y1="2" x2="12" y2="15"/>
-              </svg>
-            </span>
-            butonuna dokunun.
-          </div>
+
+      <div class="modal-body">
+        <!-- Cihaz Seçim Sekmeleri -->
+        <div class="pwa-os-tabs">
+          <button type="button" id="pwaTabIosBtn" class="pwa-os-tab active">
+            <span>🍏 iPhone (Safari)</span>
+          </button>
+          <button type="button" id="pwaTabAndroidBtn" class="pwa-os-tab">
+            <span>🤖 Android (Chrome)</span>
+          </button>
         </div>
-        <div class="ios-step-item">
-          <div class="ios-step-num">2</div>
-          <div class="ios-step-text">
-            Açılan menüden aşağı kaydırıp <strong>"Ana Ekrana Ekle"</strong> 
-            <span class="ios-plus-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ios-plus-svg">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                <line x1="12" y1="8" x2="12" y2="16"/>
-                <line x1="8" y1="12" x2="16" y2="12"/>
-              </svg>
-            </span>
-            seçeneğine basın.
+
+        <!-- iPhone Adımları -->
+        <div id="pwaGuideIosContent" class="pwa-steps-list">
+          <div class="pwa-step-card">
+            <div class="pwa-step-num">1</div>
+            <div class="pwa-step-text">
+              Safari'nin altındaki <strong>Paylaş</strong> 
+              <span class="pwa-step-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                  <polyline points="16 6 12 2 8 6"/>
+                  <line x1="12" y1="2" x2="12" y2="15"/>
+                </svg>
+              </span>
+              simgesine dokunun.
+            </div>
           </div>
+          <div class="pwa-step-card">
+            <div class="pwa-step-num">2</div>
+            <div class="pwa-step-text">
+              Açılan menüyü aşağı kaydırıp <strong>"Ana Ekrana Ekle"</strong> 
+              <span class="pwa-step-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="12" y1="8" x2="12" y2="16"/>
+                  <line x1="8" y1="12" x2="16" y2="12"/>
+                </svg>
+              </span>
+              seçeneğine basın.
+            </div>
+          </div>
+          <div class="pwa-step-card">
+            <div class="pwa-step-num">3</div>
+            <div class="pwa-step-text">
+              Sağ üst köşedeki <strong>"Ekle"</strong> butonuna dokunarak işlemi tamamlayın.
+            </div>
+          </div>
+          <p class="pwa-guide-note">Artık uygulama doğrudan ana ekranınızdan adres çubuğu olmadan tam ekran açılacaktır.</p>
         </div>
-        <p class="ios-guide-footer-note">Artık uygulama doğrudan ana ekranınızdan tıpkı bir mobil uygulama gibi açılacaktır.</p>
+
+        <!-- Android Adımları -->
+        <div id="pwaGuideAndroidContent" class="pwa-steps-list hidden">
+          <div class="pwa-step-card">
+            <div class="pwa-step-num">1</div>
+            <div class="pwa-step-text">
+              Chrome tarayıcısının sağ üstündeki <strong>üç nokta (⋮)</strong> menüsüne dokunun.
+            </div>
+          </div>
+          <div class="pwa-step-card">
+            <div class="pwa-step-num">2</div>
+            <div class="pwa-step-text">
+              Menüdeki <strong>"Uygulamayı yükle"</strong> veya <strong>"Ana ekrana ekle"</strong> seçeneğine dokunun.
+            </div>
+          </div>
+          <div class="pwa-step-card">
+            <div class="pwa-step-num">3</div>
+            <div class="pwa-step-text">
+              Açılan onay penceresinde <strong>"Yükle"</strong> butonuna basın.
+            </div>
+          </div>
+          <p class="pwa-guide-note">Uygulama telefonunuza yüklenecek ve simgesi ana ekranınıza yerleşecektir.</p>
+        </div>
       </div>
+
       <div class="modal-footer">
-        <button type="button" id="dismissIosGuideBtn" class="btn-solid" style="width: 100%;">Anladım</button>
+        <button type="button" id="pwaGuideDoneBtn" class="btn-solid" style="width: 100%;">Anladım</button>
       </div>
     </div>
   </div>
@@ -739,6 +817,6 @@
       });
     }
   </script>
-  <script src="app.js?v=20261013q"></script>
+  <script src="app.js?v=20261013r"></script>
 </body>
 </html>

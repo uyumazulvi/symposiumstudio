@@ -2352,44 +2352,123 @@ function escapeHtml(str) {
 }
 
 // ==========================================================================
-// 12. PWA AKILLI YÜKLEME ŞERİDİ (SMART INSTALL BANNER & IOS REHBERİ)
+// 12. PWA "ANA EKRANA EKLE" POP-UP VE ADIM ADIM REHBER MOTORU
 // ==========================================================================
 let deferredInstallPrompt = null;
-const pwaSmartBanner = document.getElementById('pwaSmartBanner');
-const pwaInstallActionBtn = document.getElementById('pwaInstallActionBtn');
-const pwaDismissBannerBtn = document.getElementById('pwaDismissBannerBtn');
-const iosGuideModal = document.getElementById('iosGuideModal');
-const closeIosGuideBtn = document.getElementById('closeIosGuideBtn');
-const dismissIosGuideBtn = document.getElementById('dismissIosGuideBtn');
+
+const pwaEntryModal = document.getElementById('pwaEntryModal');
+const pwaEntryInstallBtn = document.getElementById('pwaEntryInstallBtn');
+const pwaEntryDismissBtn = document.getElementById('pwaEntryDismissBtn');
+
+const pwaStepsGuideModal = document.getElementById('pwaStepsGuideModal');
+const closePwaGuideBtn = document.getElementById('closePwaGuideBtn');
+const pwaGuideDoneBtn = document.getElementById('pwaGuideDoneBtn');
+
+const pwaTabIosBtn = document.getElementById('pwaTabIosBtn');
+const pwaTabAndroidBtn = document.getElementById('pwaTabAndroidBtn');
+const pwaGuideIosContent = document.getElementById('pwaGuideIosContent');
+const pwaGuideAndroidContent = document.getElementById('pwaGuideAndroidContent');
+
+const sidebarInstallBtn = document.getElementById('sidebarInstallBtn');
+
+function selectPwaGuideTab(platform) {
+  if (platform === 'ios') {
+    if (pwaTabIosBtn) pwaTabIosBtn.classList.add('active');
+    if (pwaTabAndroidBtn) pwaTabAndroidBtn.classList.remove('active');
+    if (pwaGuideIosContent) pwaGuideIosContent.classList.remove('hidden');
+    if (pwaGuideAndroidContent) pwaGuideAndroidContent.classList.add('hidden');
+  } else {
+    if (pwaTabAndroidBtn) pwaTabAndroidBtn.classList.add('active');
+    if (pwaTabIosBtn) pwaTabIosBtn.classList.remove('active');
+    if (pwaGuideAndroidContent) pwaGuideAndroidContent.classList.remove('hidden');
+    if (pwaGuideIosContent) pwaGuideIosContent.classList.add('hidden');
+  }
+}
 
 function initPwaInstallationFlow() {
-  if (!pwaSmartBanner) return;
-
-  // Önceki kapatma kayıtlarını temizle (her sayfa yenilendiğinde garanti çıkması için)
-  try { localStorage.removeItem('sym_pwa_dismissed'); } catch (e) {}
-
+  const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
                        window.navigator.standalone === true;
 
-  // Yalnızca uygulama ana ekrandan tam ekran açılmışsa gizle
+  // Android / Chrome için yerel yükleme olayını yakala
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+  });
+
+  // Eğer uygulama zaten ana ekrandan açılmışsa (Standalone PWA) pop-up açma
   if (isStandalone) {
-    pwaSmartBanner.classList.add('hidden');
     return;
   }
 
-  const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  // Webe girince ana ekrana ekle pop-up'ını otomatik göster
+  setTimeout(() => {
+    if (pwaEntryModal) {
+      openModal(pwaEntryModal);
+    }
+  }, 750);
 
-  // PWA banner devre dışı bırakıldı (kullanıcı isteğiyle temiz arayüz)
-  if (closeIosGuideBtn) closeIosGuideBtn.addEventListener('click', () => closeModal(iosGuideModal));
-  if (dismissIosGuideBtn) dismissIosGuideBtn.addEventListener('click', () => closeModal(iosGuideModal));
-}
+  // Pop-up içindeki "Ana Ekrana Ekle" butonuna basıldığında
+  if (pwaEntryInstallBtn) {
+    pwaEntryInstallBtn.addEventListener('click', async () => {
+      if (pwaEntryModal) closeModal(pwaEntryModal);
 
-function showPwaBanner() {
-  // Devre dışı
-}
+      // Android'de sistem promptu varsa tetikle
+      if (deferredInstallPrompt) {
+        try {
+          deferredInstallPrompt.prompt();
+          deferredInstallPrompt = null;
+        } catch (e) {}
+      }
 
-function hidePwaBanner() {
-  // Devre dışı
+      // Her halükarda nasıl ekleneceğinin adım adım rehberini aç
+      selectPwaGuideTab(isIos ? 'ios' : 'android');
+      if (pwaStepsGuideModal) {
+        openModal(pwaStepsGuideModal);
+      }
+    });
+  }
+
+  // Pop-up içindeki "Daha Sonra" butonuna basıldığında
+  if (pwaEntryDismissBtn) {
+    pwaEntryDismissBtn.addEventListener('click', () => {
+      if (pwaEntryModal) closeModal(pwaEntryModal);
+    });
+  }
+
+  // Sekme geçişleri (iOS / Android)
+  if (pwaTabIosBtn) {
+    pwaTabIosBtn.addEventListener('click', () => selectPwaGuideTab('ios'));
+  }
+  if (pwaTabAndroidBtn) {
+    pwaTabAndroidBtn.addEventListener('click', () => selectPwaGuideTab('android'));
+  }
+
+  // Rehberi kapatma butonları
+  if (closePwaGuideBtn) {
+    closePwaGuideBtn.addEventListener('click', () => {
+      if (pwaStepsGuideModal) closeModal(pwaStepsGuideModal);
+    });
+  }
+  if (pwaGuideDoneBtn) {
+    pwaGuideDoneBtn.addEventListener('click', () => {
+      if (pwaStepsGuideModal) closeModal(pwaStepsGuideModal);
+    });
+  }
+
+  // Yan menüdeki (Sidebar) "Uygulamayı Ekle" butonu
+  if (sidebarInstallBtn) {
+    sidebarInstallBtn.addEventListener('click', () => {
+      const appSidebar = document.getElementById('appSidebar');
+      const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+      if (appSidebar) appSidebar.classList.remove('open');
+      if (sidebarBackdrop) sidebarBackdrop.classList.add('hidden');
+
+      selectPwaGuideTab(isIos ? 'ios' : 'android');
+      if (pwaStepsGuideModal) {
+        openModal(pwaStepsGuideModal);
+      }
+    });
+  }
 }
 
