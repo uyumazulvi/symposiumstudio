@@ -1963,7 +1963,7 @@ function renderTranscriptFeed() {
   if (countBadge) countBadge.classList.remove('hidden');
   transcriptFeed.innerHTML = '';
 
-  const showBoth = (window.innerWidth <= 768) || (currentFilter === 'all');
+  const showBoth = true;
 
   transcriptHistory.forEach(item => {
     const entry = document.createElement('article');
@@ -2216,20 +2216,24 @@ function setupEventListeners() {
     }
   });
 
-  // Tutanak Filtreleri
-  viewAllBtn.addEventListener('click', () => {
-    currentFilter = 'all';
-    viewAllBtn.classList.add('active');
-    viewTrBtn.classList.remove('active');
-    renderTranscriptFeed();
-  });
+  // Tutanak Filtreleri (varsa)
+  if (viewAllBtn) {
+    viewAllBtn.addEventListener('click', () => {
+      currentFilter = 'all';
+      viewAllBtn.classList.add('active');
+      if (viewTrBtn) viewTrBtn.classList.remove('active');
+      renderTranscriptFeed();
+    });
+  }
 
-  viewTrBtn.addEventListener('click', () => {
-    currentFilter = 'tr';
-    viewTrBtn.classList.add('active');
-    viewAllBtn.classList.remove('active');
-    renderTranscriptFeed();
-  });
+  if (viewTrBtn) {
+    viewTrBtn.addEventListener('click', () => {
+      currentFilter = 'tr';
+      viewTrBtn.classList.add('active');
+      if (viewAllBtn) viewAllBtn.classList.remove('active');
+      renderTranscriptFeed();
+    });
+  }
 
   const modalCopyBtn = document.getElementById('modalCopyBtn');
   const modalDownloadBtn = document.getElementById('modalDownloadBtn');
