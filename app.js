@@ -529,7 +529,8 @@ async function ensureMicrophoneAccess() {
     if (!audioContext) {
       audioContext = new (window.AudioContext || window.webkitAudioContext)();
       analyser = audioContext.createAnalyser();
-      analyser.fftSize = 32;
+      analyser.fftSize = 64;
+      analyser.smoothingTimeConstant = 0.3;
       const source = audioContext.createMediaStreamSource(microphoneStream);
       source.connect(analyser);
       startVuMeterLoop();
@@ -548,16 +549,22 @@ function startVuMeterLoop() {
   isVuMeterRunning = true;
 
   const leds = vuLeds ? vuLeds.querySelectorAll('.vu-led') : [];
-  const dataArray = new Uint8Array(analyser.frequencyBinCount);
+  const timeData = new Uint8Array(analyser.fftSize || 64);
 
   function updateLeds() {
     if (analyser && isRecording) {
-      analyser.getByteFrequencyData(dataArray);
-      let sum = 0;
-      for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-      let average = sum / dataArray.length;
+      analyser.getByteTimeDomainData(timeData);
+      let maxDev = 0;
+      for (let i = 0; i < timeData.length; i++) {
+        const dev = Math.abs(timeData[i] - 128);
+        if (dev > maxDev) maxDev = dev;
+      }
 
-      let litCount = Math.min(8, Math.round((average / 110) * 8));
+      // Konuşma seviyesine göre hassas LED sayısı (0 ile 8 arası)
+      let litCount = 0;
+      if (maxDev > 2) {
+        litCount = Math.min(8, Math.max(1, Math.round((maxDev / 32) * 8)));
+      }
 
       leds.forEach((led, idx) => {
         if (idx < litCount) {
@@ -609,6 +616,7 @@ function initRecognitionEngine() {
     isRecognitionActive = true;
     isRecognitionStopping = false;
     setRecordingState(true);
+    updateListeningPrompt();
   };
 
   recognition.onresult = (event) => {
@@ -670,17 +678,29 @@ function initRecognitionEngine() {
   recognition.onerror = (event) => {
     console.warn('Speech recognition error:', event.error);
     if (event.error === 'not-allowed') {
-      showToast('Mikrofon erişim izni verilmedi.');
+      showToast('❌ Mikrofon erişim izni engellendi. Tarayıcı adres çubuğundaki kilit simgesinden mikrofon iznini verin.');
       isRecording = false;
       isRecognitionActive = false;
       isRecognitionStopping = false;
       isPttActive = false;
       isSessionWarm = false;
       setRecordingState(false);
+      if (liveOriginalStream) liveOriginalStream.innerHTML = '<span style="color:#d95d5d;">❌ Mikrofon izni engellendi (Tarayıcıdan izin verin)</span>';
+    } else if (event.error === 'audio-capture') {
+      showToast('❌ Mikrofon donanımından ses alınamıyor. Mikrofon bağlantısını kontrol edin.');
+      isRecording = false;
+      isRecognitionActive = false;
+      isRecognitionStopping = false;
+      setRecordingState(false);
+      if (liveOriginalStream) liveOriginalStream.innerHTML = '<span style="color:#d95d5d;">❌ Mikrofon aygıtı bulunamadı veya meşgul</span>';
+    } else if (event.error === 'network') {
+      showToast('⚠️ Google Konuşma Tanıma sunucusuyla bağlantı kurulamadı (Ağ hatası).');
     } else if (event.error === 'no-speech') {
       // Sessizlik zaman aşımı hatası normaldir, onend güvenli şekilde yeniden bağlayacaktır
     } else if (event.error === 'aborted') {
       // Bilinçli durdurmalarda yoksay
+    } else {
+      showToast(`Konuşma tanıma bildirimi: ${event.error}`);
     }
   };
 
@@ -738,6 +758,25 @@ function initRecognitionEngine() {
       }
     }, 120);
   };
+}
+
+function updateListeningPrompt(speaker) {
+  const spk = speaker || getActiveSpeaker();
+  const acc = ACCENT_REGISTRY[spk.accent] || { name: spk.accent };
+  const tgtName = LANGUAGE_NAMES[targetLanguage] || targetLanguage;
+
+  if (liveOriginalStream && (!turnSpeechBuffer || liveOriginalStream.textContent.startsWith('Dinleniyor'))) {
+    liveOriginalStream.innerHTML = `<span class="listening-pulse">● Dinleniyor</span> &nbsp;—&nbsp; <span class="listening-hint">Mikrofondan <strong>${acc.name}</strong> konuşması bekleniyor...</span>`;
+  }
+  if (liveTranslationStream && (!turnSpeechBuffer || liveTranslationStream.textContent.startsWith('Konuşmacı başladığında') || liveTranslationStream.textContent.includes('konuştuğunuzda') || liveTranslationStream.textContent.includes('dili aynı'))) {
+    const spkShort = (spk.accent || 'en').split('-')[0].toLowerCase();
+    const tgtShort = (targetLanguage || 'tr').toLowerCase();
+    if (spkShort === tgtShort) {
+      liveTranslationStream.innerHTML = `<span class="stream-hint">Konuşmacı ve Dinleyici dili aynı (${acc.name}). Konuşulanlar doğrudan orijinal aktarılır. Farklı bir dile çeviri görmek için üstteki Ana Dili değiştirin.</span>`;
+    } else {
+      liveTranslationStream.innerHTML = `<span class="stream-hint">Mikrofona <strong>${acc.name}</strong> konuştuğunuzda anında <strong>${tgtName}</strong> çevirisi burada akacaktır.</span>`;
+    }
+  }
 }
 
 // ==========================================================================
@@ -1199,7 +1238,7 @@ function renderSoundboardPads() {
       </div>
       <div class="pad-foot">
         <span class="pad-mobile-lang">${routeLabel}</span>
-        <span class="pad-trigger-text">${currentMode === 'ptt' ? 'Basılı Tutun' : 'Aktif Et'}</span>
+        <span class="pad-trigger-text">${isSelected ? '● CANLI' : (currentMode === 'ptt' ? 'Basılı Tutun' : 'Aktif Et')}</span>
       </div>
     `;
 
@@ -1411,8 +1450,16 @@ function setActiveSpeaker(speakerId, autoStart = false) {
     if (pads[i]) {
       const active = s.id === activeSpeakerId;
       pads[i].classList.toggle('active', active);
+      const trig = pads[i].querySelector('.pad-trigger-text');
+      if (trig) {
+        trig.textContent = active ? '● CANLI' : (currentMode === 'ptt' ? 'Basılı Tutun' : 'Aktif Et');
+      }
     }
   });
+
+  if (isRecording) {
+    updateListeningPrompt(cur);
+  }
 
   if (autoStart) {
     startSpeechCapture(speakerId);
@@ -1464,7 +1511,7 @@ function startSpeechCapture(speakerId) {
   recognition.lang = targetLang;
   turnSpeechBuffer = '';
   lastTranslatedSourceText = '';
-  liveOriginalStream.textContent = 'Dinleniyor...';
+  updateListeningPrompt(spk);
   setRecordingState(true);
 
   try {
@@ -1472,6 +1519,9 @@ function startSpeechCapture(speakerId) {
     isRecognitionActive = true;
   } catch (e) {
     console.warn('startSpeechCapture başlatma:', e);
+    if (e.name !== 'InvalidStateError') {
+      showToast(`Mikrofon uyarısı: ${e.message || e.name}`);
+    }
     if (isRecording || isSessionWarm) {
       pendingStartSpeakerId = spk.id;
     }
