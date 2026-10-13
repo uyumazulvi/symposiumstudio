@@ -835,64 +835,13 @@ window.quickSwitchTestMode = quickSwitchTestMode;
 function updateListeningPrompt(speaker) {
   const spk = speaker || getActiveSpeaker();
   const acc = ACCENT_REGISTRY[spk.accent] || { name: spk.accent, short: 'EN' };
-  const srcFamily = (spk.accent || 'en').split('-')[0].toLowerCase();
-  const tgtFamily = (targetLanguage || 'tr').toLowerCase();
-  const tgtName = LANGUAGE_NAMES[tgtFamily] || tgtFamily.toUpperCase();
 
   if (liveOriginalStream && (!turnSpeechBuffer || liveOriginalStream.textContent.startsWith('Dinleniyor') || liveOriginalStream.querySelector('.listening-pulse'))) {
-    liveOriginalStream.innerHTML = `<span class="listening-pulse">● Dinleniyor</span> &nbsp;—&nbsp; <span class="listening-hint">Mikrofondan <strong>${acc.name}</strong> konuşması bekleniyor...</span>`;
+    liveOriginalStream.innerHTML = `<span class="listening-pulse">● Dinleniyor...</span>`;
   }
 
-  if (liveTranslationStream && (!turnSpeechBuffer || liveTranslationStream.textContent.startsWith('Konuşmacı') || liveTranslationStream.querySelector('.prompt-container') || liveTranslationStream.textContent.includes('konuştuğunuzda') || liveTranslationStream.textContent.includes('dili aynı'))) {
-    if (srcFamily === tgtFamily) {
-      liveTranslationStream.innerHTML = `
-        <div class="prompt-container">
-          <div class="prompt-line">
-            🎙️ Mikrofondan <strong>${acc.name}</strong> konuşmanız bekleniyor.
-          </div>
-          <div class="prompt-subline">
-            Konuşmacı ve dinleyici dili aynı (${acc.name}). Konuşulanlar doğrudan orijinal aktarılacaktır.
-          </div>
-          <div class="prompt-action-row">
-            <button type="button" class="prompt-action-pill highlight" onclick="quickSwitchTestMode('tr-en')">
-              🔄 Hızlı Test: Türkçe Konuş ➔ İngilizceye Çevir
-            </button>
-          </div>
-        </div>
-      `;
-    } else if (srcFamily === 'en') {
-      liveTranslationStream.innerHTML = `
-        <div class="prompt-container">
-          <div class="prompt-line">
-            🎙️ Mikrofondan <strong>${acc.name}</strong> konuşmanız bekleniyor (Örn: <em>"Hello, welcome to our conference..."</em>).
-          </div>
-          <div class="prompt-subline">
-            Mikrofona İngilizce konuştuğunuzda anında <strong>${tgtName}</strong> simultane çevirisi burada akacaktır.
-          </div>
-          <div class="prompt-action-row">
-            <button type="button" class="prompt-action-pill highlight" onclick="quickSwitchTestMode('tr-en')">
-              🇹🇷 Türkçe Konuşarak Test Et (TR ➔ EN)
-            </button>
-          </div>
-        </div>
-      `;
-    } else {
-      liveTranslationStream.innerHTML = `
-        <div class="prompt-container">
-          <div class="prompt-line">
-            🎙️ Mikrofondan <strong>${acc.name}</strong> konuşmanız bekleniyor.
-          </div>
-          <div class="prompt-subline">
-            Mikrofona konuştuğunuzda anında <strong>${tgtName}</strong> simultane çevirisi burada akacaktır.
-          </div>
-          <div class="prompt-action-row">
-            <button type="button" class="prompt-action-pill highlight" onclick="quickSwitchTestMode('tr-en')">
-              🇹🇷 Türkçe Konuşarak Test Et (TR ➔ EN)
-            </button>
-          </div>
-        </div>
-      `;
-    }
+  if (liveTranslationStream && (!turnSpeechBuffer || liveTranslationStream.textContent.startsWith('Konuşmacı') || liveTranslationStream.querySelector('.prompt-container') || liveTranslationStream.textContent.includes('konuştuğunuzda') || liveTranslationStream.textContent.includes('akacaktır') || liveTranslationStream.textContent.includes('görünecektir'))) {
+    liveTranslationStream.innerHTML = `<span class="listening-hint">Çevirisi burada akacaktır.</span>`;
   }
 }
 

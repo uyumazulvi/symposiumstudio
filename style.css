@@ -538,38 +538,37 @@ input:focus-visible {
   text-overflow: ellipsis;
 }
 
-.stage-caption-canvas {
-  padding: 0;
+/* Üstteki Orijinal Konuşma Akışı (Beyaz Metin) */
+.stage-source-area {
+  margin: 0;
 }
 
-.caption-stream-text {
-  font-size: clamp(23px, 2.3vw, 29px);
-  font-weight: 500;
+.source-stream-text {
+  font-size: clamp(21px, 2.2vw, 27px);
+  font-weight: 600;
   line-height: 1.35;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
   color: #FFFFFF;
   margin: 0;
   word-break: break-word;
   overflow-wrap: break-word;
 }
 
-.accent-glow {
+/* Alttaki Simultane Çeviri (Çeviri Vurgusu) */
+.stage-caption-canvas {
+  padding: 0;
+  margin-top: 4px;
+}
+
+.caption-stream-text {
+  font-size: clamp(16px, 1.6vw, 20px);
+  font-weight: 500;
+  line-height: 1.45;
   color: var(--accent-mint);
-  font-weight: 600;
-  text-shadow: 0 0 20px var(--accent-mint-glow);
-}
-
-.stage-source-area {
-  margin: 0;
-}
-
-.source-stream-text {
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: var(--text-secondary);
   margin: 0;
   word-break: break-word;
   overflow-wrap: break-word;
+  text-shadow: 0 0 16px var(--accent-mint-glow);
 }
 
 /* ==========================================================================
@@ -1786,24 +1785,26 @@ input:focus-visible {
     color: var(--text-tertiary);
   }
 
-  .caption-stream-text {
-    font-size: 18px !important;
-    line-height: 1.42 !important;
-    letter-spacing: -0.01em !important;
-    font-weight: 500 !important;
-    margin: 0 !important;
-    color: rgba(255, 255, 255, 0.95) !important;
-  }
-
+  /* Üstte: Orijinal konuşma metni (Büyük Beyaz Yazı) */
   .source-stream-text {
-    font-size: 12px !important;
-    line-height: 1.4 !important;
-    color: var(--text-dim) !important;
+    font-size: 19px !important;
+    font-weight: 600 !important;
+    line-height: 1.35 !important;
+    letter-spacing: -0.01em !important;
+    color: #FFFFFF !important;
     margin: 0 !important;
+    display: block !important;
   }
 
-  .source-stream-text:empty {
-    display: none !important;
+  /* Altta: Simultane çevirisi (Vurgulu Mint Yeşili) */
+  .caption-stream-text {
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    line-height: 1.4 !important;
+    color: var(--accent-mint) !important;
+    margin: 0 !important;
+    display: block !important;
+    text-shadow: 0 0 14px rgba(78, 203, 147, 0.35) !important;
   }
 
   /* Mobil Yüzen Dil Kartı (Minimalist 2 Satırlı Izgara) */

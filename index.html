@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>SYMPOSIUM STUDIO — Canlı Konferans & Simultane Çeviri</title>
-  <link rel="stylesheet" href="style.css?v=20261013L">
+  <link rel="stylesheet" href="style.css?v=20261013m">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -185,17 +185,19 @@
             </div>
           </div>
 
-          <!-- BÜYÜK VE AKICI CANLI ÇEVİRİ ALTYAZISI -->
-          <div class="stage-caption-canvas">
-            <span id="targetLangLabelBadge" class="hidden"></span>
-            <p id="liveTranslationStream" class="caption-stream-text">
-              Simultane çeviri bu alanda <span class="accent-glow">görünecektir.</span>
+          <!-- ÜSTTE: ORİJİNAL KONUŞMA (BEYAZ YAZIYLA) -->
+          <div class="stage-source-area">
+            <p id="liveOriginalStream" class="source-stream-text">
+              Konuşmaya başladığınızda söyledikleriniz burada görünecektir.
             </p>
           </div>
 
-          <!-- Orijinal Referans Konuşma Akışı -->
-          <div class="stage-source-area">
-            <p id="liveOriginalStream" class="source-stream-text"></p>
+          <!-- ALTTA: SİMULTANE ÇEVİRİ -->
+          <div class="stage-caption-canvas">
+            <span id="targetLangLabelBadge" class="hidden"></span>
+            <p id="liveTranslationStream" class="caption-stream-text">
+              Çevirisi burada akacaktır.
+            </p>
           </div>
         </section>
 
@@ -760,6 +762,6 @@
       });
     }
   </script>
-  <script src="app.js?v=20261013L"></script>
+  <script src="app.js?v=20261013m"></script>
 </body>
 </html>
