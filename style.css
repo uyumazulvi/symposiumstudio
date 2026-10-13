@@ -1355,16 +1355,30 @@ input:focus-visible {
    9. MODALLAR VE DİYALOGLAR
    ========================================================================== */
 .modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(7, 9, 14, 0.82);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 20000;
+  position: fixed !important;
+  inset: 0 !important;
+  background-color: rgba(7, 9, 14, 0.85) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  z-index: 999999 !important;
+}
+
+.modal-backdrop.hidden {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+.modal-backdrop:not(.hidden) {
+  display: flex !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .modal-card {

@@ -224,12 +224,16 @@ function openModal(modal) {
   closeMobileDrawer();
   modal.classList.remove('hidden');
   modal.style.display = 'flex';
+  modal.style.visibility = 'visible';
+  modal.style.opacity = '1';
 }
 
 function closeModal(modal) {
   if (!modal) return;
   modal.classList.add('hidden');
   modal.style.display = 'none';
+  modal.style.visibility = 'hidden';
+  modal.style.opacity = '0';
 }
 
 // ==========================================================================
@@ -2387,8 +2391,6 @@ function selectPwaGuideTab(platform) {
 
 function initPwaInstallationFlow() {
   const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                       window.navigator.standalone === true;
 
   // Android / Chrome için yerel yükleme olayını yakala
   window.addEventListener('beforeinstallprompt', (e) => {
@@ -2396,17 +2398,13 @@ function initPwaInstallationFlow() {
     deferredInstallPrompt = e;
   });
 
-  // Eğer uygulama zaten ana ekrandan açılmışsa (Standalone PWA) pop-up açma
-  if (isStandalone) {
-    return;
-  }
-
   // Webe girince ana ekrana ekle pop-up'ını otomatik göster
   setTimeout(() => {
-    if (pwaEntryModal) {
-      openModal(pwaEntryModal);
+    const entryModal = document.getElementById('pwaEntryModal');
+    if (entryModal) {
+      openModal(entryModal);
     }
-  }, 750);
+  }, 250);
 
   // Pop-up içindeki "Ana Ekrana Ekle" butonuna basıldığında
   if (pwaEntryInstallBtn) {
@@ -2470,5 +2468,12 @@ function initPwaInstallationFlow() {
       }
     });
   }
+}
+
+// Sayfa yüklendiğinde veya script çalıştığında tetikle
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initPwaInstallationFlow);
+} else {
+  initPwaInstallationFlow();
 }
 
