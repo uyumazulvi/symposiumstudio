@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>SYMPOSIUM STUDIO — Canlı Konferans & Simultane Çeviri</title>
-  <link rel="stylesheet" href="style.css?v=20261013x">
+  <link rel="stylesheet" href="style.css?v=20261013y">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -194,15 +194,35 @@
         <!-- HERO CANLI ALTYAZI ALANI -->
         <section class="teleprompter-stage" aria-label="Canlı Çeviri ve Altyazı">
           <div class="hero-tag-row">
-            <div class="hero-welcome-badge">
-              <span class="badge-text">HOŞ GELDİN</span>
-              <span class="badge-line"></span>
+            <div class="hero-tag-left">
+              <div class="hero-welcome-badge">
+                <span class="badge-text">HOŞ GELDİN</span>
+                <span class="badge-line"></span>
+              </div>
+              <div class="speaker-identity" title="Aktif Konuşmacı">
+                <span id="speakerAvatarDot" class="status-indicator-dot"></span>
+                <span id="activeSpeakerNameDisplay" class="speaker-name-hero">Konuşmacı Seçilmedi</span>
+                <span class="meta-slash">/</span>
+                <span id="activeSpeakerAccentDisplay" class="speaker-accent-hero">Amerikan İngilizcesi ➔ Türkçe</span>
+              </div>
             </div>
-            <div class="speaker-identity" title="Aktif Konuşmacı">
-              <span id="speakerAvatarDot" class="status-indicator-dot"></span>
-              <span id="activeSpeakerNameDisplay" class="speaker-name-hero">Konuşmacı Seçilmedi</span>
-              <span class="meta-slash">/</span>
-              <span id="activeSpeakerAccentDisplay" class="speaker-accent-hero">Amerikan İngilizcesi</span>
+
+            <div class="stage-action-wrap">
+              <!-- PARLAYAN NANE YEŞİLİ HIZLI BAŞLAT / BAS-KONUŞ BUTONU -->
+              <button type="button" id="stagePttBtn" class="pill-action-glow-btn stage-ptt-btn" title="Basılı Tutarak Konuşun (veya Boşluk Tuşu)" aria-label="Bas-Konuş">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="play-icon">
+                  <polygon points="6 4 20 12 6 20 6 4"/>
+                </svg>
+                <span class="stage-ptt-text">Çevir</span>
+              </button>
+
+              <button type="button" id="stopSessionBtn" class="pill-action-glow-btn console-stop-btn start-mode hidden" title="Dinlemeyi Başlat / Durdur">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="play-icon">
+                  <polygon points="6 4 20 12 6 20 6 4"/>
+                </svg>
+                <span class="stop-btn-text-full">Dinlemeyi Başlat</span>
+                <span class="stop-btn-text-short">Başlat</span>
+              </button>
             </div>
           </div>
 
@@ -220,75 +240,6 @@
               Çevirisi burada akacaktır.
             </p>
           </div>
-        </section>
-
-        <!-- YÜZEN DİL VE ÇEVİRİ KARTI (FLOATING TRANSLATE BAR) -->
-        <section class="floating-lang-pill-card">
-          <div class="lang-pill-select-group">
-            <span class="pill-globe-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="2" y1="12" x2="22" y2="12"/>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-              </svg>
-            </span>
-            <select id="meetingSourceLangSelect" class="pill-select" aria-label="Kaynak Dil">
-              <option value="tr-TR" selected>Türkçe (TR)</option>
-              <option value="en-US">İngilizce (EN)</option>
-              <option value="de-DE">Almanca (DE)</option>
-              <option value="fr-FR">Fransızca (FR)</option>
-              <option value="es-ES">İspanyolca (ES)</option>
-              <option value="it-IT">İtalyanca (IT)</option>
-              <option value="ru-RU">Rusça (RU)</option>
-              <option value="ar-SA">Arapça (AR)</option>
-              <option value="zh-CN">Çince (ZH)</option>
-              <option value="ja-JP">Japonca (JA)</option>
-            </select>
-          </div>
-
-          <button type="button" id="swapLanguagesBtn" class="pill-swap-btn" title="Dilleri Değiştir">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"/>
-            </svg>
-          </button>
-
-          <div class="lang-pill-select-group">
-            <span class="pill-globe-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="2" y1="12" x2="22" y2="12"/>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-              </svg>
-            </span>
-            <select id="meetingTargetLangSelect" class="pill-select" aria-label="Hedef Dil">
-              <option value="en">İngilizce (EN)</option>
-              <option value="tr">Türkçe (TR)</option>
-              <option value="de">Almanca (DE)</option>
-              <option value="fr">Fransızca (FR)</option>
-              <option value="es">İspanyolca (ES)</option>
-              <option value="it">İtalyanca (IT)</option>
-              <option value="ru">Rusça (RU)</option>
-              <option value="ar">Arapça (AR)</option>
-              <option value="zh">Çince (ZH)</option>
-              <option value="ja">Japonca (JA)</option>
-            </select>
-          </div>
-
-          <!-- PARLAYAN NANE YEŞİLİ HIZLI BAŞLAT / BAS-KONUŞ BUTONU -->
-          <button type="button" id="stagePttBtn" class="pill-action-glow-btn stage-ptt-btn" title="Basılı Tutarak Konuşun (veya Boşluk Tuşu)" aria-label="Bas-Konuş">
-            <svg viewBox="0 0 24 24" fill="currentColor" class="play-icon">
-              <polygon points="6 4 20 12 6 20 6 4"/>
-            </svg>
-            <span class="stage-ptt-text">Çevir</span>
-          </button>
-
-          <button type="button" id="stopSessionBtn" class="pill-action-glow-btn console-stop-btn start-mode hidden" title="Dinlemeyi Başlat / Durdur">
-            <svg viewBox="0 0 24 24" fill="currentColor" class="play-icon">
-              <polygon points="6 4 20 12 6 20 6 4"/>
-            </svg>
-            <span class="stop-btn-text-full">Dinlemeyi Başlat</span>
-            <span class="stop-btn-text-short">Başlat</span>
-          </button>
         </section>
 
         <!-- MERKEZİ PARLAYAN CAM TUTANAK KARTI (TRANSCRIPT JOURNAL CARD) -->
@@ -619,8 +570,24 @@
             <option value="ja-JP">Japonca (ja-JP)</option>
             <option value="tr-TR">Türkçe (tr-TR)</option>
           </select>
+        </div>
+
+        <div class="field-block">
+          <label for="speakerTargetLangInput">Hedef Çeviri Dili (Altyazı & Dinleme)</label>
+          <select id="speakerTargetLangInput" class="field-input">
+            <option value="tr" selected>Türkçe (TR)</option>
+            <option value="en">İngilizce (EN)</option>
+            <option value="de">Almanca (DE)</option>
+            <option value="fr">Fransızca (FR)</option>
+            <option value="es">İspanyolca (ES)</option>
+            <option value="it">İtalyanca (IT)</option>
+            <option value="ru">Rusça (RU)</option>
+            <option value="ar">Arapça (AR)</option>
+            <option value="zh">Çince (ZH)</option>
+            <option value="ja">Japonca (JA)</option>
+          </select>
           <p class="field-description">
-            Konuşmacının seçilen dilde yaptığı konuşma, dinleyicinin belirlediği Ana Dil'e anlık olarak simultane çevrilir.
+            Konuşmacı konuştuğunda konuşması otomatik olarak bu hedef dile çevrilir.
           </p>
         </div>
 
@@ -678,6 +645,25 @@
             <option value="ja-JP">Japonca (ja-JP)</option>
             <option value="tr-TR">Türkçe (tr-TR)</option>
           </select>
+        </div>
+
+        <div class="field-block">
+          <label for="editSpeakerTargetLangInput">Hedef Çeviri Dili (Altyazı & Dinleme)</label>
+          <select id="editSpeakerTargetLangInput" class="field-input">
+            <option value="tr">Türkçe (TR)</option>
+            <option value="en">İngilizce (EN)</option>
+            <option value="de">Almanca (DE)</option>
+            <option value="fr">Fransızca (FR)</option>
+            <option value="es">İspanyolca (ES)</option>
+            <option value="it">İtalyanca (IT)</option>
+            <option value="ru">Rusça (RU)</option>
+            <option value="ar">Arapça (AR)</option>
+            <option value="zh">Çince (ZH)</option>
+            <option value="ja">Japonca (JA)</option>
+          </select>
+          <p class="field-description">
+            Konuşmacı konuştuğunda konuşması otomatik olarak bu hedef dile çevrilir.
+          </p>
         </div>
 
         <div class="modal-footer split">
@@ -837,6 +823,6 @@
       });
     }
   </script>
-  <script src="app.js?v=20261013x"></script>
+  <script src="app.js?v=20261013y"></script>
 </body>
 </html>

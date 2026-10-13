@@ -559,7 +559,34 @@ input:focus-visible {
 .hero-tag-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
+  width: 100%;
+}
+
+.hero-tag-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.stage-action-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.stage-action-wrap .pill-action-glow-btn {
+  height: 36px;
+  min-height: 36px;
+  max-height: 36px;
+  padding: 0 18px;
+  font-size: 13px;
+  border-radius: 999px;
 }
 
 .hero-welcome-badge {
@@ -2199,6 +2226,22 @@ input:focus-visible {
     gap: 3px !important;
   }
 
+  .hero-tag-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    gap: 8px !important;
+  }
+
+  .hero-tag-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
   .hero-welcome-badge {
     display: none !important;
   }
@@ -2209,6 +2252,24 @@ input:focus-visible {
     color: var(--text-tertiary);
     display: flex !important;
     align-items: center !important;
+    min-width: 0 !important;
+  }
+
+  .stage-action-wrap {
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .stage-action-wrap .pill-action-glow-btn {
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    padding: 0 13px !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    gap: 5px !important;
   }
 
   /* Üstte: Orijinal konuşma metni (Büyük Beyaz Yazı) */
@@ -2240,136 +2301,8 @@ input:focus-visible {
     word-break: break-word !important;
   }
 
-  /* Mobil Yüzen Dil Kartı: Tek Satır, Ultra Şık Cam Kapsül (Linear / Apple Kalitesi) */
   .floating-lang-pill-card {
-    flex-shrink: 0 !important;
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 6px !important;
-    padding: 4px 6px !important;
-    border-radius: 999px !important;
-    background: rgba(13, 17, 26, 0.7) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
-    width: 100% !important;
-    height: 44px !important;
-    min-height: 44px !important;
-    max-height: 44px !important;
-    box-sizing: border-box !important;
-  }
-
-  .floating-lang-pill-card .lang-pill-select-group {
-    flex: 1 1 0 !important;
-    min-width: 0 !important;
-    height: 34px !important;
-    padding: 0 6px !important;
-    border-radius: 999px !important;
-    background: rgba(255, 255, 255, 0.04) !important;
-    border: 1px solid rgba(255, 255, 255, 0.04) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0 !important;
-  }
-
-  .floating-lang-pill-card .pill-globe-icon {
     display: none !important;
-  }
-
-  .floating-lang-pill-card .pill-select {
-    width: 100% !important;
-    font-size: 12px !important;
-    font-weight: 600 !important;
-    color: #FFFFFF !important;
-    background: transparent !important;
-    border: none !important;
-    outline: none !important;
-    padding: 0 !important;
-    text-align: center !important;
-    text-align-last: center !important;
-    cursor: pointer !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-  }
-
-  .floating-lang-pill-card .pill-select option {
-    background: #0E121B !important;
-    color: #FFFFFF !important;
-  }
-
-  .floating-lang-pill-card .pill-swap-btn {
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    border-radius: 50% !important;
-    background: rgba(255, 255, 255, 0.04) !important;
-    border: 1px solid rgba(255, 255, 255, 0.06) !important;
-    color: var(--text-secondary) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    flex-shrink: 0 !important;
-    cursor: pointer !important;
-    transition: transform 0.2s ease, background 0.2s ease !important;
-  }
-
-  .floating-lang-pill-card .pill-swap-btn:active {
-    transform: rotate(180deg) scale(0.92) !important;
-    background: rgba(78, 203, 147, 0.15) !important;
-  }
-
-  .floating-lang-pill-card .pill-swap-btn svg {
-    width: 13px !important;
-    height: 13px !important;
-  }
-
-  /* Canlı Başlat / Bas-Konuş Hap Butonu (Kompakt ve Parlayan Mint) */
-  .floating-lang-pill-card .pill-action-glow-btn {
-    flex-shrink: 0 !important;
-    width: auto !important;
-    height: 34px !important;
-    min-height: 34px !important;
-    max-height: 34px !important;
-    padding: 0 14px !important;
-    border-radius: 999px !important;
-    background: #4ECB93 !important;
-    color: #071013 !important;
-    font-size: 12.5px !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.01em !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 5px !important;
-    border: none !important;
-    box-shadow: 0 0 16px rgba(78, 203, 147, 0.4) !important;
-    cursor: pointer !important;
-    margin: 0 !important;
-    white-space: nowrap !important;
-  }
-
-  .floating-lang-pill-card .pill-action-glow-btn svg {
-    width: 11px !important;
-    height: 11px !important;
-    fill: #071013 !important;
-  }
-
-  /* Aktif Kayıtta Kırmızı / Canlı Durdur Modu */
-  .floating-lang-pill-card .pill-action-glow-btn:not(.start-mode):not(.stage-ptt-btn) {
-    background: #FF5555 !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 0 18px rgba(255, 85, 85, 0.5) !important;
-  }
-
-  .floating-lang-pill-card .pill-action-glow-btn:not(.start-mode):not(.stage-ptt-btn) svg {
-    fill: #FFFFFF !important;
   }
 
   /* Mobil Tutanak Kartı: Kalan TÜM Ekran Yüksekliğini Doldurur */

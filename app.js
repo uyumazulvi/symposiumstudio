@@ -123,9 +123,9 @@ const STUDIO_ACCENTS = [
 
 // Varsayılan Konuşmacı Havuzu (Konuşmacı 1 İngilizce, Konuşmacı 2 Almanca, Konuşmacı 3 Türkçe)
 let speakers = [
-  { id: 'spk_1', name: 'Konuşmacı 1 (İngilizce)', accent: 'en-US', color: '#65C7B0' },
-  { id: 'spk_2', name: 'Konuşmacı 2 (Almanca)', accent: 'de-DE', color: '#D6A66B' },
-  { id: 'spk_3', name: 'Konuşmacı 3 (Türkçe)', accent: 'tr-TR', color: '#8EAA90' }
+  { id: 'spk_1', name: 'Konuşmacı 1 (İngilizce)', accent: 'en-US', targetLang: 'tr', color: '#65C7B0' },
+  { id: 'spk_2', name: 'Konuşmacı 2 (Almanca)', accent: 'de-DE', targetLang: 'tr', color: '#D6A66B' },
+  { id: 'spk_3', name: 'Konuşmacı 3 (Türkçe)', accent: 'tr-TR', targetLang: 'en', color: '#8EAA90' }
 ];
 
 // Oturum Tutanak Arşivi
@@ -203,6 +203,7 @@ const cancelAddSpeakerBtn = document.getElementById('cancelAddSpeakerBtn');
 const addSpeakerForm = document.getElementById('addSpeakerForm');
 const speakerNameInput = document.getElementById('speakerNameInput');
 const speakerAccentInput = document.getElementById('speakerAccentInput');
+const speakerTargetLangInput = document.getElementById('speakerTargetLangInput');
 
 const editSpeakerModal = document.getElementById('editSpeakerModal');
 const closeEditSpeakerBtn = document.getElementById('closeEditSpeakerBtn');
@@ -212,6 +213,7 @@ const editSpeakerForm = document.getElementById('editSpeakerForm');
 const editSpeakerIdInput = document.getElementById('editSpeakerIdInput');
 const editSpeakerNameInput = document.getElementById('editSpeakerNameInput');
 const editSpeakerAccentInput = document.getElementById('editSpeakerAccentInput');
+const editSpeakerTargetLangInput = document.getElementById('editSpeakerTargetLangInput');
 
 const copyScriptBtn = document.getElementById('copyScriptBtn');
 const downloadScriptBtn = document.getElementById('downloadScriptBtn');
@@ -269,6 +271,11 @@ function loadWorkspaceData() {
     if (s) {
       const parsed = JSON.parse(s);
       if (Array.isArray(parsed) && parsed.length > 0) {
+        parsed.forEach(sp => {
+          if (!sp.targetLang) {
+            sp.targetLang = (sp.accent && sp.accent.startsWith('tr')) ? 'en' : 'tr';
+          }
+        });
         speakers = parsed;
       }
     } else {
@@ -278,8 +285,13 @@ function loadWorkspaceData() {
         if (Array.isArray(parsedOld) && parsedOld.length >= 1) {
           const hasTr = parsedOld.some(sp => (sp.accent || '').startsWith('tr'));
           if (!hasTr) {
-            parsedOld.push({ id: 'spk_3', name: 'Konuşmacı 3 (Türkçe)', accent: 'tr-TR', color: '#8EAA90' });
+            parsedOld.push({ id: 'spk_3', name: 'Konuşmacı 3 (Türkçe)', accent: 'tr-TR', targetLang: 'en', color: '#8EAA90' });
           }
+          parsedOld.forEach(sp => {
+            if (!sp.targetLang) {
+              sp.targetLang = (sp.accent && sp.accent.startsWith('tr')) ? 'en' : 'tr';
+            }
+          });
           speakers = parsedOld;
         }
       }
@@ -871,7 +883,7 @@ function quickSwitchTestMode(mode) {
   if (mode === 'tr-en') {
     let trSpk = speakers.find(s => (s.accent || '').startsWith('tr'));
     if (!trSpk) {
-      trSpk = { id: 'spk_tr_' + Date.now(), name: 'Konuşmacı (Türkçe)', accent: 'tr-TR', color: '#8EAA90' };
+      trSpk = { id: 'spk_tr_' + Date.now(), name: 'Konuşmacı (Türkçe)', accent: 'tr-TR', targetLang: 'en', color: '#8EAA90' };
       speakers.push(trSpk);
     }
     targetLanguage = 'en';
@@ -1388,11 +1400,8 @@ function renderSoundboardPads() {
     const monogram = speaker.name.substring(0, 2).toUpperCase();
     const keyNumber = index < 9 ? (index + 1) : null;
 
-    const spkShort = acc.short || (speaker.accent ? speaker.accent.split('-')[0].toUpperCase() : 'EN');
-    const isSameLang = spkShort.toLowerCase() === tgtShort.toLowerCase();
-    const routeLabel = isSameLang ? `${spkShort} (Orijinal)` : `${spkShort} ➔ ${tgtShort}`;
-    const fullRouteHint = isSameLang ? `${acc.name} (Orijinal)` : `${acc.name} ➔ ${LANGUAGE_NAMES[targetLanguage] || targetLanguage}`;
-
+    const spkTgtCode = speaker.targetLang || (speaker.accent && speaker.accent.startsWith('tr') ? 'en' : 'tr');
+    const spkTgtShort = (LANGUAGE_SHORT_CODES[spkTgtCode] || spkTgtCode.toUpperCase());
     const cleanLangName = acc.name.split(' ')[0];
 
     pad.innerHTML = `
@@ -1404,7 +1413,7 @@ function renderSoundboardPads() {
           <span class="pad-name">${escapeHtml(speaker.name)}</span>
           ${keyNumber ? `<span class="pad-key-badge" title="Kısayol: [${keyNumber}]">${keyNumber}</span>` : ''}
         </div>
-        <span class="pad-lang-tag">${acc.flag || '🌐'} ${cleanLangName}</span>
+        <span class="pad-lang-tag">${acc.flag || '🌐'} ${cleanLangName} ➔ ${spkTgtShort}</span>
       </div>
       <button type="button" class="pad-edit-btn" title="Düzenle">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -1582,6 +1591,9 @@ function openEditSpeakerModal(id) {
   editSpeakerIdInput.value = spk.id;
   editSpeakerNameInput.value = spk.name;
   editSpeakerAccentInput.value = spk.accent;
+  if (editSpeakerTargetLangInput) {
+    editSpeakerTargetLangInput.value = spk.targetLang || (spk.accent.startsWith('tr') ? 'en' : 'tr');
+  }
   openModal(editSpeakerModal);
   editSpeakerNameInput.focus();
 }
@@ -1590,12 +1602,33 @@ function setActiveSpeaker(speakerId, autoStart = false) {
   activeSpeakerId = speakerId;
   const cur = getActiveSpeaker();
 
+  // Konuşmacının konuştuğu dili ve hedef çeviri dilini otomatik uyarla
+  if (cur.accent) {
+    sourceLanguage = cur.accent;
+  }
+  if (cur.targetLang) {
+    targetLanguage = cur.targetLang;
+  } else {
+    targetLanguage = (cur.accent && cur.accent.startsWith('tr')) ? 'en' : 'tr';
+  }
+
   activeSpeakerNameDisplay.textContent = cur.name;
   speakerAvatarDot.style.backgroundColor = cur.color;
   speakerAvatarDot.style.boxShadow = 'none';
 
   const acc = ACCENT_REGISTRY[cur.accent] || { name: cur.accent };
-  activeSpeakerAccentDisplay.textContent = acc.name;
+  const tgtName = LANGUAGE_NAMES[targetLanguage] || targetLanguage;
+  activeSpeakerAccentDisplay.textContent = `${acc.name} ➔ ${tgtName}`;
+
+  if (headerNativeLangSelect && headerNativeLangSelect.value !== targetLanguage) {
+    headerNativeLangSelect.value = targetLanguage;
+  }
+  if (meetingSourceLangSelect) {
+    meetingSourceLangSelect.value = cur.accent;
+  }
+  if (meetingTargetLangSelect) {
+    meetingTargetLangSelect.value = targetLanguage;
+  }
 
   // Aktif konuşmacının diliyle sahne çeviri rotası rozetini güncelle
   updateLanguageDisplayBadges();
@@ -2229,11 +2262,38 @@ function setupEventListeners() {
   });
 
   // Yeni Konuşmacı Modalı
-  addNewSpeakerBtn.addEventListener('click', () => {
+  const resetAndOpenAddSpeakerModal = () => {
     speakerNameInput.value = '';
+    if (speakerAccentInput) speakerAccentInput.value = 'en-US';
+    if (speakerTargetLangInput) speakerTargetLangInput.value = 'tr';
     openModal(addSpeakerModal);
     speakerNameInput.focus();
-  });
+  };
+
+  addNewSpeakerBtn.addEventListener('click', resetAndOpenAddSpeakerModal);
+
+  // Dil & Hedef Dil Seçildiğinde Otomatik Eşleşme Önerisi
+  if (speakerAccentInput && speakerTargetLangInput) {
+    speakerAccentInput.addEventListener('change', () => {
+      const val = speakerAccentInput.value;
+      if (val.startsWith('tr')) {
+        speakerTargetLangInput.value = 'en';
+      } else {
+        speakerTargetLangInput.value = 'tr';
+      }
+    });
+  }
+
+  if (editSpeakerAccentInput && editSpeakerTargetLangInput) {
+    editSpeakerAccentInput.addEventListener('change', () => {
+      const val = editSpeakerAccentInput.value;
+      if (val.startsWith('tr')) {
+        editSpeakerTargetLangInput.value = 'en';
+      } else {
+        editSpeakerTargetLangInput.value = 'tr';
+      }
+    });
+  }
 
   if (closeAddSpeakerBtn) closeAddSpeakerBtn.addEventListener('click', () => closeModal(addSpeakerModal));
   if (cancelAddSpeakerBtn) cancelAddSpeakerBtn.addEventListener('click', () => closeModal(addSpeakerModal));
@@ -2248,12 +2308,14 @@ function setupEventListeners() {
     const id = editSpeakerIdInput.value;
     const newName = editSpeakerNameInput.value.trim();
     const newAccent = editSpeakerAccentInput.value;
+    const newTargetLang = (editSpeakerTargetLangInput && editSpeakerTargetLangInput.value) ? editSpeakerTargetLangInput.value : (newAccent.startsWith('tr') ? 'en' : 'tr');
     if (!newName) return;
 
     const spk = speakers.find(s => s.id === id);
     if (spk) {
       spk.name = newName;
       spk.accent = newAccent;
+      spk.targetLang = newTargetLang;
       saveWorkspaceData();
       renderSoundboardPads();
       if (activeSpeakerId === id) {
@@ -2316,11 +2378,7 @@ function setupEventListeners() {
     mobileDrawerBackdrop.addEventListener('click', closeMobileDrawer);
   }
   if (drawerAddSpeakerBtn) {
-    drawerAddSpeakerBtn.addEventListener('click', () => {
-      speakerNameInput.value = '';
-      openModal(addSpeakerModal);
-      speakerNameInput.focus();
-    });
+    drawerAddSpeakerBtn.addEventListener('click', resetAndOpenAddSpeakerModal);
   }
 
   // Mobilde Çekmece Tutamağından Aşağı Kaydırarak Kapatma (Swipe Down)
@@ -2445,12 +2503,14 @@ function setupEventListeners() {
     const name = speakerNameInput.value.trim();
     if (!name) return;
     const accent = speakerAccentInput.value;
+    const targetLang = (speakerTargetLangInput && speakerTargetLangInput.value) ? speakerTargetLangInput.value : (accent.startsWith('tr') ? 'en' : 'tr');
     const color = STUDIO_ACCENTS[speakers.length % STUDIO_ACCENTS.length];
 
     const newSpk = {
       id: 'spk_' + Date.now(),
       name: name,
       accent: accent,
+      targetLang: targetLang,
       color: color
     };
 
