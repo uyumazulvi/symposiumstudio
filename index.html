@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>SYMPOSIUM STUDIO — Canlı Konferans & Simultane Çeviri</title>
-  <link rel="stylesheet" href="style.css?v=20261013a">
+  <link rel="stylesheet" href="style.css?v=20261013b">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -99,11 +99,11 @@
 
       <!-- Mikrofon Modu (Segmented Controller) -->
       <div class="mic-mode-toggle" role="tablist" aria-label="Mikrofon Çalışma Modu">
-        <button id="modeTapBtn" class="mode-pill active" role="tab" aria-selected="true" title="Tek tıkla veya kısayolla konuşmacı geçişi">
+        <button id="modeTapBtn" class="mode-pill" role="tab" aria-selected="false" title="Tek tıkla veya kısayolla konuşmacı geçişi">
           <span class="mode-text-full">Sürekli Akış</span>
           <span class="mode-text-short">Sürekli</span>
         </button>
-        <button id="modePttBtn" class="mode-pill" role="tab" aria-selected="false" title="Telsiz tipi basılı tutarak konuşma">
+        <button id="modePttBtn" class="mode-pill active" role="tab" aria-selected="true" title="Telsiz tipi basılı tutarak konuşma">
           Bas-Konuş
         </button>
       </div>
@@ -259,7 +259,7 @@
         <div class="console-hint">
           <span class="hint-accent-bar"></span>
           <span id="dockInstructionText" class="hint-label">
-            <strong>Bas-Konuş Aktif:</strong> Konuşurken tuşa basılı tutun, bitince bırakın.
+            <strong>Bas-Konuş:</strong> Tuşa basılı tutun (veya Boşluk tuşu).
           </span>
         </div>
 
@@ -286,8 +286,8 @@
         <span id="mobileDrawerExpandCount" class="drawer-expand-badge">0</span>
       </button>
 
-      <!-- Sürekli Akış Modunda Dinlemeyi Başlat / Durdur Butonu -->
-      <button id="stopSessionBtn" class="console-stop-btn start-mode" title="Dinlemeyi Başlat">
+      <!-- Sürekli Akış Modunda Dinlemeyi Başlat / Durdur Butonu (Bas-Konuş'ta gizli) -->
+      <button id="stopSessionBtn" class="console-stop-btn start-mode hidden" title="Dinlemeyi Başlat">
         <svg viewBox="0 0 24 24" fill="currentColor">
           <polygon points="6 4 20 12 6 20 6 4"/>
         </svg>
@@ -715,6 +715,6 @@
       });
     }
   </script>
-  <script src="app.js?v=20261013a"></script>
+  <script src="app.js?v=20261013b"></script>
 </body>
 </html>

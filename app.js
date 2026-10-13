@@ -3,7 +3,7 @@
 // ==========================================================================
 
 // Uygulama Çekirdek Durumu (State)
-let currentMode = 'tap'; // 'tap' (Sürekli Akış) | 'ptt' (Bas-Konuş)
+let currentMode = 'ptt'; // 'ptt' (Bas-Konuş) | 'tap' (Sürekli Akış)
 let isRecording = false;
 let isRecognitionActive = false;
 let isRecognitionStopping = false;
@@ -302,11 +302,11 @@ function loadWorkspaceData() {
       geminiApiKey = k;
       geminiApiKeyInput.value = k;
     }
-    const m = localStorage.getItem('sym_mode_pref');
+    const m = localStorage.getItem('sym_mode_pref_v2');
     if (m === 'tap' || m === 'ptt') {
-      setOperationMode(m);
+      setOperationMode(m, false);
     } else {
-      setOperationMode('tap');
+      setOperationMode('ptt', false);
     }
     const f = localStorage.getItem('sym_font_pref');
     if (f) {
@@ -319,13 +319,14 @@ function loadWorkspaceData() {
       sourceLanguage = src;
       if (meetingSourceLangSelect) meetingSourceLangSelect.value = src;
     }
-    const tgt = localStorage.getItem('sym_target_lang');
+    const tgt = localStorage.getItem('sym_target_lang_v2');
     if (tgt) {
       targetLanguage = tgt;
       if (meetingTargetLangSelect) meetingTargetLangSelect.value = tgt;
       if (headerNativeLangSelect) headerNativeLangSelect.value = tgt;
     } else {
       targetLanguage = 'tr';
+      if (meetingTargetLangSelect) meetingTargetLangSelect.value = 'tr';
       if (headerNativeLangSelect) headerNativeLangSelect.value = 'tr';
     }
     const t = localStorage.getItem('sym_tts_pref');
@@ -350,9 +351,11 @@ function saveWorkspaceData() {
     localStorage.setItem('sym_speakers_v6', JSON.stringify(speakers));
     localStorage.setItem('sym_history_v3', JSON.stringify(transcriptHistory));
     localStorage.setItem('sym_gemini_key', geminiApiKey);
+    localStorage.setItem('sym_mode_pref_v2', currentMode);
     localStorage.setItem('sym_mode_pref', currentMode);
     localStorage.setItem('sym_font_pref', currentFontSize);
     localStorage.setItem('sym_source_lang', sourceLanguage);
+    localStorage.setItem('sym_target_lang_v2', targetLanguage);
     localStorage.setItem('sym_target_lang', targetLanguage);
     localStorage.setItem('sym_tts_pref', isTtsActive ? 'true' : 'false');
     localStorage.setItem('sym_tts_speed', ttsSpeed.toString());
@@ -1391,11 +1394,14 @@ function renderSoundboardPads() {
     // SIFIR GECİKMELİ POINTER EVENTS
     if (currentMode === 'ptt') {
       // BAS-KONUŞ (KESİNTİSİZ & İZİNSİZ AUDIO-GATE)
-      pad.addEventListener('pointerdown', async (e) => {
+      pad.addEventListener('pointerdown', (e) => {
         e.preventDefault();
         clearTimeout(pttReleaseTimer);
         lastTranslatedSourceText = '';
-        await ensureMicrophoneAccess();
+        if (audioContext && audioContext.state === 'suspended') {
+          try { audioContext.resume(); } catch (_) {}
+        }
+        ensureMicrophoneAccess().catch(() => {});
         isSessionWarm = true;
         isPttActive = true;
         setActiveSpeaker(speaker.id, false);
@@ -1413,6 +1419,7 @@ function renderSoundboardPads() {
             isPttActive = false;
             setRecordingState(false);
             commitSpeechTurn();
+            stopSpeechCapture();
           }, 300);
         }
       };
@@ -1729,7 +1736,7 @@ function updateDrawerCounts() {
 // ==========================================================================
 // 9. MOD GEÇİŞİ (BAS-KONUŞ vs SÜREKLİ AKIŞ)
 // ==========================================================================
-function setOperationMode(mode) {
+function setOperationMode(mode, showNotification = true) {
   isPttActive = false;
   clearTimeout(pttReleaseTimer);
   if (isRecording) {
@@ -1743,7 +1750,7 @@ function setOperationMode(mode) {
     modePttBtn.setAttribute('aria-selected', 'true');
     modeTapBtn.classList.remove('active');
     modeTapBtn.setAttribute('aria-selected', 'false');
-    dockInstructionText.innerHTML = '<strong>Bas-Konuş:</strong> Tuşa basılı tutun.';
+    dockInstructionText.innerHTML = '<strong>Bas-Konuş:</strong> Tuşa basılı tutun (veya Boşluk tuşu).';
     stopSessionBtn.classList.add('hidden');
   } else {
     modeTapBtn.classList.add('active');
@@ -1757,7 +1764,9 @@ function setOperationMode(mode) {
 
   renderSoundboardPads();
   saveWorkspaceData();
-  showToast(mode === 'ptt' ? 'Bas-Konuş Modu Aktif' : 'Sürekli Akış Modu Aktif');
+  if (showNotification) {
+    showToast(mode === 'ptt' ? 'Bas-Konuş Modu Aktif' : 'Sürekli Akış Modu Aktif');
+  }
 }
 
 // ==========================================================================
@@ -2151,6 +2160,41 @@ function setupEventListeners() {
       if (speakerIdx >= 0 && speakerIdx < speakers.length) {
         e.preventDefault();
         selectSpeakerByIndex(speakerIdx);
+      }
+    }
+
+    // Bas-Konuş Modunda Boşluk (Space) Tuşu ile Basılı Tutma Desteği
+    if (e.code === 'Space' && currentMode === 'ptt' && !e.repeat) {
+      e.preventDefault();
+      const activePad = soundboardGrid.querySelector('.switcher-pad.active') || soundboardGrid.querySelector('.switcher-pad');
+      if (activePad && !activePad.classList.contains('pressed')) {
+        clearTimeout(pttReleaseTimer);
+        lastTranslatedSourceText = '';
+        if (audioContext && audioContext.state === 'suspended') {
+          try { audioContext.resume(); } catch (_) {}
+        }
+        ensureMicrophoneAccess().catch(() => {});
+        isSessionWarm = true;
+        isPttActive = true;
+        activePad.classList.add('pressed');
+        setRecordingState(true);
+        startSpeechCapture(activeSpeakerId);
+      }
+    }
+  });
+
+  document.addEventListener('keyup', (e) => {
+    if (e.code === 'Space' && currentMode === 'ptt') {
+      const activePad = soundboardGrid.querySelector('.switcher-pad.pressed');
+      if (activePad) {
+        activePad.classList.remove('pressed');
+        clearTimeout(pttReleaseTimer);
+        pttReleaseTimer = setTimeout(() => {
+          isPttActive = false;
+          setRecordingState(false);
+          commitSpeechTurn();
+          stopSpeechCapture();
+        }, 300);
       }
     }
   });
