@@ -1601,6 +1601,9 @@ input:focus-visible {
 
 @media (max-width: 768px) {
   html, body {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
     height: 100% !important;
     height: 100dvh !important;
     min-height: 100% !important;
@@ -1608,7 +1611,11 @@ input:focus-visible {
     overflow: hidden !important;
     margin: 0 !important;
     padding: 0 !important;
+    overscroll-behavior: none !important;
     -webkit-overflow-scrolling: touch;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
   }
 
   .symposi-app-shell {
@@ -1620,6 +1627,7 @@ input:focus-visible {
     display: flex !important;
     flex-direction: column !important;
     overflow: hidden !important;
+    overscroll-behavior: none !important;
   }
 
   /* Mobil Kenar Çubuğu Drawer Olarak Açılır */
@@ -1775,12 +1783,22 @@ input:focus-visible {
     white-space: nowrap;
   }
 
-  /* Mobil Çalışma Alanı: Kalan tüm dikey alanı tam doldurur */
+  /* Mobil Çalışma Alanı: Yalnızca AKTİF sekme görünür, diğerleri kesinlikle gizlenir */
   .workspace-view {
+    display: none !important;
+  }
+
+  .workspace-view.hidden,
+  .workspace-view:not(.active),
+  .hidden {
+    display: none !important;
+  }
+
+  .workspace-view.active {
+    display: flex !important;
     flex: 1 1 0 !important;
     width: 100% !important;
     min-height: 0 !important;
-    display: flex !important;
     flex-direction: column !important;
     padding: 6px 10px calc(6px + env(safe-area-inset-bottom, 0px)) 10px !important;
     gap: 6px !important;
@@ -1790,8 +1808,8 @@ input:focus-visible {
     box-sizing: border-box !important;
   }
 
-  /* Canlı Oturum: Sayfa taşmaz, tam ekrana oturur */
-  #viewLiveSection.workspace-view {
+  /* Canlı Oturum: Sayfa taşmaz, tek ekran mobil uygulama gibi oturur */
+  #viewLiveSection.workspace-view.active {
     flex: 1 1 0 !important;
     height: auto !important;
     max-height: none !important;
@@ -1799,8 +1817,8 @@ input:focus-visible {
     overflow: hidden !important;
   }
 
-  /* Diğer Sekmeler: Gerektiğinde kaydırılır */
-  .workspace-view:not(#viewLiveSection) {
+  /* Ayarlar veya Dil Sekmesi: Sadece aktifken ve gerektiğinde dikey kaydırılır */
+  .workspace-view.active:not(#viewLiveSection) {
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
   }

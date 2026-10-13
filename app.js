@@ -2380,63 +2380,16 @@ function initPwaInstallationFlow() {
   const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-  // MOBİLDE HER SAYFA YENİLENDİĞİNDE ŞERİDİ GÖSTER
-  if (isMobile) {
-    setTimeout(() => {
-      showPwaBanner();
-    }, 350);
-  }
-
-  // Android ve Masaüstü Tarayıcılar İçin Otomatik Yükleme Olayı
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredInstallPrompt = e;
-    if (isMobile) {
-      showPwaBanner();
-    }
-  });
-
-  // Ekle Butonuna Basıldığında
-  if (pwaInstallActionBtn) {
-    pwaInstallActionBtn.addEventListener('click', async () => {
-      if (deferredInstallPrompt) {
-        // Android / Desktop Chrome: Resmi sistem yükleme penceresini aç
-        deferredInstallPrompt.prompt();
-        const choice = await deferredInstallPrompt.userChoice;
-        if (choice && choice.outcome === 'accepted') {
-          hidePwaBanner();
-        }
-        deferredInstallPrompt = null;
-      } else if (isIos) {
-        // iPhone (Safari): 2 adımlı şık mini rehberi aç
-        openModal(iosGuideModal);
-      } else {
-        openModal(iosGuideModal);
-      }
-    });
-  }
-
-  // Kapat Butonuna Basıldığında: Sadece o an kapatır, sayfa yenilendiğinde tekrar gelir
-  if (pwaDismissBannerBtn) {
-    pwaDismissBannerBtn.addEventListener('click', () => {
-      hidePwaBanner();
-    });
-  }
-
-  // iOS Rehberi Kapatma Butonları
+  // PWA banner devre dışı bırakıldı (kullanıcı isteğiyle temiz arayüz)
   if (closeIosGuideBtn) closeIosGuideBtn.addEventListener('click', () => closeModal(iosGuideModal));
   if (dismissIosGuideBtn) dismissIosGuideBtn.addEventListener('click', () => closeModal(iosGuideModal));
 }
 
 function showPwaBanner() {
-  if (pwaSmartBanner) {
-    pwaSmartBanner.classList.remove('hidden');
-  }
+  // Devre dışı
 }
 
 function hidePwaBanner() {
-  if (pwaSmartBanner) {
-    pwaSmartBanner.classList.add('hidden');
-  }
+  // Devre dışı
 }
 
