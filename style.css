@@ -148,11 +148,44 @@ input:focus-visible {
   gap: 32px;
 }
 
+.sidebar-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .sidebar-brand {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 8px;
+  padding: 0 4px;
+}
+
+.sidebar-collapse-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-glass);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.sidebar-collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border-color: var(--border-glass-strong);
+}
+
+.sidebar-collapse-btn svg {
+  width: 15px;
+  height: 15px;
 }
 
 .brand-sym-icon {
@@ -282,6 +315,45 @@ input:focus-visible {
 .mobile-wordmark .brand-sym-icon {
   width: 22px;
   height: 22px;
+}
+
+/* Masaüstü Kenar Çubuğu Aç/Kapat Butonu */
+.desktop-header-left {
+  display: flex;
+  align-items: center;
+}
+
+.desktop-sidebar-toggle-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-glass);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.desktop-sidebar-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border-color: var(--border-glass-strong);
+}
+
+.desktop-sidebar-toggle-btn.collapsed-state {
+  background: rgba(78, 203, 147, 0.12);
+  color: var(--accent-emerald);
+  border-color: rgba(78, 203, 147, 0.35);
+  box-shadow: 0 0 12px rgba(78, 203, 147, 0.2);
+}
+
+.desktop-sidebar-toggle-btn svg {
+  width: 18px;
+  height: 18px;
 }
 
 /* Mod Seçimi (Segmented Controller) */
@@ -1798,6 +1870,41 @@ input:focus-visible {
 }
 
 /* ==========================================================================
+   10.5 MASAÜSTÜ KENAR ÇUBUĞU AÇILIR/KAPANIR (COLLAPSIBLE SIDEBAR)
+   ========================================================================== */
+@media (min-width: 769px) {
+  .app-sidebar {
+    transition: margin-left 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                padding 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.22s ease,
+                border-color 0.2s ease !important;
+    will-change: margin-left, width;
+    overflow-x: hidden;
+  }
+
+  .app-sidebar.desktop-collapsed {
+    margin-left: calc(-1 * var(--sidebar-width)) !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    border-right-color: transparent !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    visibility: hidden;
+  }
+
+  .mic-mode-toggle {
+    margin-right: auto;
+    margin-left: 14px;
+  }
+}
+
+/* ==========================================================================
    11. GELİŞMİŞ MOBİL VE TABLET UYARLAMALARI (RESPONSIVE)
    ========================================================================== */
 @media (max-width: 1024px) {
@@ -1844,6 +1951,13 @@ input:focus-visible {
     flex-direction: column !important;
     overflow: hidden !important;
     overscroll-behavior: none !important;
+  }
+
+  /* Masaüstü Kenar Çubuğu Butonları Mobilde Kesinlikle Gizlenir */
+  .desktop-header-left,
+  .desktop-sidebar-toggle-btn,
+  .sidebar-collapse-btn {
+    display: none !important;
   }
 
   /* Mobil Kenar Çubuğu Drawer Olarak Açılır */

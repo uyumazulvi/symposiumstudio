@@ -1879,6 +1879,57 @@ function setupEventListeners() {
     });
   }
 
+  // Masaüstü Kenar Çubuğu (Açılır / Kapanır - Collapsible) Yönetimi
+  const desktopSidebarToggleBtn = document.getElementById('desktopSidebarToggleBtn');
+  const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+
+  function updateDesktopSidebarUi(isCollapsed) {
+    if (!appSidebar) return;
+    appSidebar.classList.toggle('desktop-collapsed', isCollapsed);
+    if (desktopSidebarToggleBtn) {
+      desktopSidebarToggleBtn.classList.toggle('collapsed-state', isCollapsed);
+      desktopSidebarToggleBtn.setAttribute('title', isCollapsed ? 'Kenar Çubuğunu Aç (Ctrl+B)' : 'Kenar Çubuğunu Daralt (Ctrl+B)');
+    }
+  }
+
+  function toggleDesktopSidebar(forceState) {
+    if (!appSidebar || window.innerWidth <= 768) return;
+    const willCollapse = typeof forceState === 'boolean'
+      ? forceState
+      : !appSidebar.classList.contains('desktop-collapsed');
+
+    updateDesktopSidebarUi(willCollapse);
+    try {
+      localStorage.setItem('sym_desktop_sidebar_collapsed', willCollapse ? '1' : '0');
+    } catch (e) {}
+  }
+
+  // Başlangıçta kayıtlı tercihi yükle (Sadece masaüstü)
+  if (window.innerWidth > 768) {
+    try {
+      if (localStorage.getItem('sym_desktop_sidebar_collapsed') === '1') {
+        updateDesktopSidebarUi(true);
+      }
+    } catch (e) {}
+  }
+
+  if (desktopSidebarToggleBtn) {
+    desktopSidebarToggleBtn.addEventListener('click', () => toggleDesktopSidebar());
+  }
+  if (sidebarCollapseBtn) {
+    sidebarCollapseBtn.addEventListener('click', () => toggleDesktopSidebar(true));
+  }
+
+  // Masaüstü Klavye Kısayolu: Ctrl+B veya Cmd+B
+  window.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B')) {
+      if (window.innerWidth > 768) {
+        e.preventDefault();
+        toggleDesktopSidebar();
+      }
+    }
+  });
+
   // Tema Butonu
   const themeToggleBtn = document.getElementById('themeToggleBtn');
   if (themeToggleBtn) {
