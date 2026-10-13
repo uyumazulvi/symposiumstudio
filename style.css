@@ -976,20 +976,21 @@ input:focus-visible {
 }
 
 .entry-original {
-  font-size: 13.5px;
-  line-height: 1.5;
-  color: var(--text-secondary);
-  font-style: italic;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: #FFFFFF;
+  font-style: normal;
   margin: 0;
   word-break: break-word;
   overflow-wrap: break-word;
 }
 
 .entry-translation {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
-  line-height: 1.5;
-  color: #FFFFFF;
+  line-height: 1.45;
+  color: var(--accent-mint);
   margin: 0;
   word-break: break-word;
   overflow-wrap: break-word;
@@ -1776,22 +1777,26 @@ input:focus-visible {
 
   /* Mobil Çalışma Alanı: Kalan tüm dikey alanı tam doldurur */
   .workspace-view {
-    flex: 1 !important;
+    flex: 1 1 0 !important;
     width: 100% !important;
     min-height: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    padding: 6px 12px calc(8px + env(safe-area-inset-bottom, 0px)) 12px !important;
-    gap: 8px !important;
+    padding: 6px 10px calc(6px + env(safe-area-inset-bottom, 0px)) 10px !important;
+    gap: 6px !important;
     overflow: hidden !important;
     max-width: 100% !important;
     margin: 0 !important;
+    box-sizing: border-box !important;
   }
 
   /* Canlı Oturum: Sayfa taşmaz, tam ekrana oturur */
   #viewLiveSection.workspace-view {
+    flex: 1 1 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
     overflow: hidden !important;
-    height: calc(100% - 48px) !important;
   }
 
   /* Diğer Sekmeler: Gerektiğinde kaydırılır */
@@ -1803,8 +1808,10 @@ input:focus-visible {
   /* Mobil Canlı Sahne Tipografisi (Kompakt ve Sabit) */
   .teleprompter-stage {
     flex-shrink: 0 !important;
-    padding: 2px 2px 0 2px !important;
-    gap: 4px !important;
+    padding: 2px 4px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
   }
 
   .hero-welcome-badge {
@@ -1812,20 +1819,26 @@ input:focus-visible {
   }
 
   .speaker-identity {
-    font-size: 11.5px !important;
-    gap: 6px !important;
+    font-size: 11px !important;
+    gap: 5px !important;
     color: var(--text-tertiary);
+    display: flex !important;
+    align-items: center !important;
   }
 
   /* Üstte: Orijinal konuşma metni (Büyük Beyaz Yazı) */
   .source-stream-text {
-    font-size: 19px !important;
+    font-size: 18px !important;
     font-weight: 600 !important;
     line-height: 1.35 !important;
     letter-spacing: -0.01em !important;
     color: #FFFFFF !important;
     margin: 0 !important;
     display: block !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+    max-height: 52px !important;
+    overflow-y: auto !important;
+    word-break: break-word !important;
   }
 
   /* Altta: Simultane çevirisi (Vurgulu Mint Yeşili) */
@@ -1837,139 +1850,240 @@ input:focus-visible {
     margin: 0 !important;
     display: block !important;
     text-shadow: 0 0 14px rgba(78, 203, 147, 0.35) !important;
+    max-height: 46px !important;
+    overflow-y: auto !important;
+    word-break: break-word !important;
   }
 
-  /* Mobil Yüzen Dil Kartı (Kompakt Sabit 2 Satırlı Izgara) */
+  /* Mobil Yüzen Dil Kartı: Tek Satır, Ultra Şık Cam Kapsül (Linear / Apple Kalitesi) */
   .floating-lang-pill-card {
     flex-shrink: 0 !important;
-    display: grid !important;
-    grid-template-columns: 1fr 30px 1fr !important;
-    grid-template-rows: auto auto !important;
-    gap: 6px !important;
-    padding: 8px 10px !important;
-    border-radius: 16px !important;
-    background: rgba(13, 17, 26, 0.55) !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+    display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+    padding: 4px 6px !important;
+    border-radius: 999px !important;
+    background: rgba(13, 17, 26, 0.7) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+    width: 100% !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    box-sizing: border-box !important;
   }
 
   .floating-lang-pill-card .lang-pill-select-group {
-    padding: 6px 10px !important;
-    border-radius: 12px !important;
-    gap: 4px !important;
+    flex: 1 1 0 !important;
     min-width: 0 !important;
-    background: rgba(255, 255, 255, 0.035) !important;
-    border: none !important;
+    height: 34px !important;
+    padding: 0 6px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0 !important;
   }
 
-  .floating-lang-pill-card .lang-pill-select-group:nth-of-type(1) {
-    grid-column: 1 / 2 !important;
-    grid-row: 1 / 2 !important;
-  }
-
-  /* Mobilde gereksiz dünya ikonunu gizle; dil adı rahatça nefes alsın */
   .floating-lang-pill-card .pill-globe-icon {
     display: none !important;
   }
 
   .floating-lang-pill-card .pill-select {
-    font-size: 12.5px !important;
-    font-weight: 500 !important;
+    width: 100% !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #FFFFFF !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
     padding: 0 !important;
-    text-align: center;
+    text-align: center !important;
+    text-align-last: center !important;
+    cursor: pointer !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+  }
+
+  .floating-lang-pill-card .pill-select option {
+    background: #0E121B !important;
+    color: #FFFFFF !important;
   }
 
   .floating-lang-pill-card .pill-swap-btn {
-    grid-column: 2 / 3 !important;
-    grid-row: 1 / 2 !important;
     width: 28px !important;
     height: 28px !important;
-    justify-self: center !important;
-    align-self: center !important;
+    min-width: 28px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    color: var(--text-secondary) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
     margin: 0 !important;
     flex-shrink: 0 !important;
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: none !important;
+    cursor: pointer !important;
+    transition: transform 0.2s ease, background 0.2s ease !important;
   }
 
-  .floating-lang-pill-card .lang-pill-select-group:nth-of-type(2) {
-    grid-column: 3 / 4 !important;
-    grid-row: 1 / 2 !important;
+  .floating-lang-pill-card .pill-swap-btn:active {
+    transform: rotate(180deg) scale(0.92) !important;
+    background: rgba(78, 203, 147, 0.15) !important;
   }
 
+  .floating-lang-pill-card .pill-swap-btn svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  /* Canlı Başlat / Bas-Konuş Hap Butonu (Kompakt ve Parlayan Mint) */
   .floating-lang-pill-card .pill-action-glow-btn {
-    grid-column: 1 / 4 !important;
-    grid-row: 2 / 3 !important;
-    width: 100% !important;
-    height: 40px !important;
-    min-height: 40px !important;
-    max-height: 40px !important;
-    border-radius: 12px !important;
-    font-size: 13.5px !important;
-    padding: 0 16px !important;
-    margin-top: 2px !important;
+    flex-shrink: 0 !important;
+    width: auto !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+    padding: 0 14px !important;
+    border-radius: 999px !important;
+    background: #4ECB93 !important;
+    color: #071013 !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.01em !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    border: none !important;
+    box-shadow: 0 0 16px rgba(78, 203, 147, 0.4) !important;
+    cursor: pointer !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+  }
+
+  .floating-lang-pill-card .pill-action-glow-btn svg {
+    width: 11px !important;
+    height: 11px !important;
+    fill: #071013 !important;
+  }
+
+  /* Aktif Kayıtta Kırmızı / Canlı Durdur Modu */
+  .floating-lang-pill-card .pill-action-glow-btn:not(.start-mode):not(.stage-ptt-btn) {
+    background: #FF5555 !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 0 18px rgba(255, 85, 85, 0.5) !important;
+  }
+
+  .floating-lang-pill-card .pill-action-glow-btn:not(.start-mode):not(.stage-ptt-btn) svg {
+    fill: #FFFFFF !important;
   }
 
   /* Mobil Tutanak Kartı: Kalan TÜM Ekran Yüksekliğini Doldurur */
   .transcript-journal-card {
-    flex: 1 !important;
+    flex: 1 1 0 !important;
     min-height: 0 !important;
     max-height: none !important;
     display: flex !important;
     flex-direction: column !important;
     overflow: hidden !important;
     border-radius: 16px !important;
-    background: rgba(13, 17, 26, 0.45) !important;
-    border: 1px solid rgba(255, 255, 255, 0.045) !important;
+    background: rgba(13, 17, 26, 0.5) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
   }
 
   .journal-header {
     flex-shrink: 0 !important;
-    padding: 8px 12px !important;
+    padding: 6px 10px !important;
     gap: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
     flex-wrap: nowrap !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.035) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+  }
+
+  .journal-title-wrap {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    min-width: 0 !important;
   }
 
   .journal-title {
     font-size: 10.5px !important;
-    letter-spacing: 0.1em !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.08em !important;
     color: var(--text-tertiary) !important;
+    white-space: nowrap !important;
   }
 
   .journal-count {
-    font-size: 9px !important;
-    padding: 1px 5px !important;
-    background: rgba(255, 255, 255, 0.04) !important;
+    font-size: 9.5px !important;
+    font-weight: 600 !important;
+    padding: 1px 6px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: var(--accent-mint) !important;
     border: none !important;
+    white-space: nowrap !important;
   }
 
   .journal-header-right {
+    display: flex !important;
+    align-items: center !important;
     gap: 6px !important;
+    flex-shrink: 0 !important;
   }
 
   .journal-filter-switch {
-    padding: 1px !important;
-    background: rgba(255, 255, 255, 0.025) !important;
+    padding: 2px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    display: flex !important;
   }
 
   .journal-filter-btn {
     padding: 2px 7px !important;
     font-size: 10px !important;
+    border-radius: 999px !important;
+    white-space: nowrap !important;
+  }
+
+  .journal-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .journal-action-btn {
+    width: 26px !important;
+    height: 26px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 7px !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    color: var(--text-secondary) !important;
+    cursor: pointer !important;
   }
 
   .journal-action-btn span {
     display: none !important;
-  }
-
-  .journal-action-btn {
-    padding: 4px 6px !important;
-    border-radius: 6px !important;
-    background: transparent !important;
-    border: 1px solid rgba(255, 255, 255, 0.04) !important;
   }
 
   .journal-action-btn svg {
@@ -1977,27 +2091,104 @@ input:focus-visible {
     height: 12px !important;
   }
 
+  /* Tutanak Akışı Listesi */
   .journal-feed {
-    flex: 1 !important;
+    flex: 1 1 0 !important;
     min-height: 0 !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
-    padding: 4px 12px !important;
+    padding: 6px 8px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
   }
 
+  .journal-entry {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.035) !important;
+    border-radius: 10px !important;
+    padding: 7px 9px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+  }
+
+  .entry-meta {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    font-size: 11px !important;
+    color: var(--text-tertiary) !important;
+    margin-bottom: 2px !important;
+  }
+
+  .entry-speaker {
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+  }
+
+  .entry-speaker-dot {
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+  }
+
+  .entry-speaker-name {
+    color: var(--text-secondary) !important;
+  }
+
+  .entry-meta-divider {
+    opacity: 0.4 !important;
+  }
+
+  .entry-speaker-accent {
+    font-size: 10px !important;
+    opacity: 0.7 !important;
+  }
+
+  .entry-timestamp {
+    font-size: 10px !important;
+    color: var(--text-tertiary) !important;
+  }
+
+  /* ÜSTTE: Orijinal konuşma metni (BEYAZ YAZI) */
+  .entry-original {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    line-height: 1.4 !important;
+    color: #FFFFFF !important;
+    font-style: normal !important;
+    margin: 0 !important;
+  }
+
+  /* ALTTA: Çeviri metni (MİNT YEŞİLİ) */
+  .entry-translation {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    line-height: 1.4 !important;
+    color: var(--accent-mint) !important;
+    margin: 0 !important;
+    opacity: 0.95 !important;
+  }
+
+  /* Boş Durum (Empty State) */
   .journal-empty-state {
-    padding: 28px 14px !important;
+    padding: 24px 12px !important;
     gap: 8px !important;
+    margin: auto !important;
   }
 
   .empty-wave-graphic svg {
     width: 48px !important;
     height: 18px !important;
-    opacity: 0.65;
+    opacity: 0.7;
   }
 
   .empty-primary {
-    font-size: 12.5px !important;
+    font-size: 13px !important;
     font-weight: 500 !important;
     color: var(--text-dim) !important;
   }
@@ -2012,41 +2203,96 @@ input:focus-visible {
     width: 100% !important;
     margin: 0 !important;
     border-radius: 14px !important;
-    padding: 6px 10px !important;
-    background: rgba(13, 17, 26, 0.55) !important;
+    padding: 4px 8px !important;
+    background: rgba(13, 17, 26, 0.7) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .console-action-bar {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    width: 100% !important;
+    height: 100% !important;
   }
 
   .console-add-speaker-btn {
     width: 30px !important;
     height: 30px !important;
-    border-radius: 10px !important;
+    min-width: 30px !important;
+    border-radius: 50% !important;
     background: rgba(255, 255, 255, 0.04) !important;
-    border: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    color: var(--accent-mint) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .switcher-strip {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .switcher-strip::-webkit-scrollbar {
+    display: none !important;
   }
 
   .switcher-pad {
-    padding: 5px 12px !important;
-    gap: 7px !important;
+    height: 30px !important;
+    padding: 0 10px !important;
+    gap: 6px !important;
     border-radius: 999px !important;
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    background: rgba(255, 255, 255, 0.035) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
   }
 
   .switcher-pad.active {
-    background: rgba(78, 203, 147, 0.12) !important;
-    border-color: rgba(78, 203, 147, 0.35) !important;
+    background: rgba(78, 203, 147, 0.15) !important;
+    border-color: rgba(78, 203, 147, 0.45) !important;
+    box-shadow: 0 0 12px rgba(78, 203, 147, 0.25) !important;
   }
 
   .pad-avatar {
     width: 18px !important;
     height: 18px !important;
-    font-size: 9px !important;
+    min-width: 18px !important;
+    border-radius: 50% !important;
+    font-size: 8.5px !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   .pad-name {
-    font-size: 12px !important;
-    font-weight: 500 !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    color: #FFFFFF !important;
+    white-space: nowrap !important;
   }
 
   /* Mobilde konuşmacı butonundaki gereksiz kısayol numarası, dil etiketi ve kalem ikonunu gizle */
