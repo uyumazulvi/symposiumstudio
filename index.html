@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>SYMPOSIUM STUDIO — Canlı Konferans & Simultane Çeviri</title>
-  <link rel="stylesheet" href="style.css?v=20261013d">
+  <link rel="stylesheet" href="style.css?v=20261013e">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -78,40 +78,21 @@
       </div>
     </nav>
 
-    <!-- Sağ: Kontroller, VU Metre ve Araçlar -->
+    <!-- Sağ: Mod Seçimi, Kulaklık ve Ayarlar -->
     <div class="header-right">
-      <!-- Mikrofon Giriş Seviyesi (VU Meter) -->
-      <div class="meter-block" title="Mikrofon Seviyesi (VU Metre)">
-        <span class="meter-label">MIC</span>
-        <div class="vu-leds" id="vuLeds">
-          <span class="vu-led"></span>
-          <span class="vu-led"></span>
-          <span class="vu-led"></span>
-          <span class="vu-led"></span>
-          <span class="vu-led"></span>
-          <span class="vu-led"></span>
-          <span class="vu-led"></span>
-          <span class="vu-led peak"></span>
-        </div>
-      </div>
-
-      <div class="header-divider"></div>
-
       <!-- Mikrofon Modu (Segmented Controller) -->
       <div class="mic-mode-toggle" role="tablist" aria-label="Mikrofon Çalışma Modu">
-        <button id="modeTapBtn" class="mode-pill" role="tab" aria-selected="false" title="Tek tıkla veya kısayolla konuşmacı geçişi">
+        <button id="modeTapBtn" class="mode-pill" role="tab" aria-selected="false" title="Tek tıkla konuşmacı geçişi">
           <span class="mode-text-full">Sürekli Akış</span>
           <span class="mode-text-short">Sürekli</span>
         </button>
-        <button id="modePttBtn" class="mode-pill active" role="tab" aria-selected="true" title="Telsiz tipi basılı tutarak konuşma">
+        <button id="modePttBtn" class="mode-pill active" role="tab" aria-selected="true" title="Basılı tutarak konuşma">
           Bas-Konuş
         </button>
       </div>
 
-      <div class="header-divider"></div>
-
-      <!-- Kulaklık ile Sesli Tercüme (Simultane TTS Dinleme) -->
-      <button id="headphoneTtsBtn" class="headphone-btn" title="Kulaklıkla Sesli Simultane Tercümanı Aç/Kapat (Çevirileri Seslendir)" aria-label="Sesli Simultane Tercüme" aria-pressed="false">
+      <!-- Kulaklık ile Sesli Tercüme -->
+      <button id="headphoneTtsBtn" class="headphone-btn" title="Kulaklıkla Sesli Simultane Tercüman" aria-label="Sesli Tercüme" aria-pressed="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="headphone-icon">
           <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
           <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
@@ -120,37 +101,13 @@
         <span class="headphone-status-dot"></span>
       </button>
 
-      <div class="header-divider"></div>
-
-      <!-- Araç Butonları (Net ve İşlevsel) -->
-      <div class="utility-actions">
-        <button id="settingsBtn" class="util-btn" title="Yapılandırma & API">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-          </svg>
-        </button>
-        <button id="copyScriptBtn" class="util-btn" title="Tüm Tutanağı Kopyala">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
-          </svg>
-        </button>
-        <button id="downloadScriptBtn" class="util-btn" title="Dökümü TXT İndir">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" y2="3"/>
-          </svg>
-        </button>
-        <button id="clearBtn" class="util-btn danger" title="Tüm Oturum Kaydını Sıfırla">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M3 6h18"/>
-            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-          </svg>
-        </button>
-      </div>
+      <!-- Ayarlar Butonu -->
+      <button id="settingsBtn" class="util-btn" title="Yapılandırma & API">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
     </div>
   </header>
 
@@ -170,29 +127,31 @@
           <span id="activeSpeakerAccentDisplay" class="speaker-accent-hero">Amerikan İngilizcesi</span>
         </div>
 
-        <!-- Sahnede Hızlı Bas-Konuş Butonu -->
-        <button type="button" id="stagePttBtn" class="stage-ptt-btn" title="Basılı Tutarak Konuşun (veya Boşluk Tuşu)" aria-label="Bas-Konuş">
-          <span class="stage-ptt-mic">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 13px; height: 13px; display: block;">
-              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-              <line x1="12" y1="19" x2="12" y2="22"/>
-            </svg>
-          </span>
-          <span class="stage-ptt-text">Bas-Konuş</span>
-          <span class="stage-ptt-hint">Boşluk</span>
-        </button>
+        <div class="stage-controls-right">
+          <!-- Sahnede Hızlı Bas-Konuş Butonu -->
+          <button type="button" id="stagePttBtn" class="stage-ptt-btn" title="Basılı Tutarak Konuşun (veya Boşluk Tuşu)" aria-label="Bas-Konuş">
+            <span class="stage-ptt-mic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 13px; height: 13px; display: block;">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="22"/>
+              </svg>
+            </span>
+            <span class="stage-ptt-text">Bas-Konuş</span>
+            <span class="stage-ptt-hint">Boşluk</span>
+          </button>
 
-        <div class="stage-language-bridge">
-          <div id="stageLangRouteBadge" class="language-route-badge" title="Aktif Konuşmacı Çeviri Rotası">
-            <span id="badgeSourceText">İngilizce</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="bridge-arrow">
-              <path d="M5 12h14m-6-6l6 6-6 6"/>
-            </svg>
-            <span id="badgeTargetText">Türkçe</span>
+          <div class="stage-language-bridge">
+            <div id="stageLangRouteBadge" class="language-route-badge" title="Aktif Konuşmacı Çeviri Rotası">
+              <span id="badgeSourceText">İngilizce</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="bridge-arrow">
+                <path d="M5 12h14m-6-6l6 6-6 6"/>
+              </svg>
+              <span id="badgeTargetText">Türkçe</span>
+            </div>
+            
+            <span id="liveEngineBadge" class="engine-indicator hidden"></span>
           </div>
-          
-          <span id="liveEngineBadge" class="engine-indicator hidden"></span>
         </div>
       </div>
 
@@ -203,11 +162,9 @@
 
       <!-- BÜYÜK VE NET CANLI ÇEVİRİ ALTYAZISI (ODAK NOKTASI) -->
       <div class="stage-caption-canvas">
-        <div class="caption-header">
-          <span id="targetLangLabelBadge" class="caption-badge">TÜRKÇE ALTYAZI</span>
-        </div>
+        <span id="targetLangLabelBadge" class="hidden"></span>
         <p id="liveTranslationStream" class="caption-stream-text">
-          Konuşmacı başladığında simultane çeviri bu alanda büyük ve akıcı bir tipografiyle görüntülenecektir.
+          Konuşmaya başladığınızda simultane çeviri bu alanda görüntülenecektir.
         </p>
       </div>
     </section>
@@ -220,9 +177,37 @@
           <span id="historyCounter" class="journal-count">0 Kayıt</span>
         </div>
 
-        <div class="journal-filter-switch">
-          <button id="viewAllBtn" class="journal-filter-btn active">Çift Dilli</button>
-          <button id="viewTrBtn" class="journal-filter-btn">Yalnızca Çeviri</button>
+        <div class="journal-header-right">
+          <div class="journal-filter-switch">
+            <button id="viewAllBtn" class="journal-filter-btn active">Çift Dilli</button>
+            <button id="viewTrBtn" class="journal-filter-btn">Yalnızca Çeviri</button>
+          </div>
+
+          <div class="journal-actions">
+            <button id="copyScriptBtn" class="journal-action-btn" title="Panoya Kopyala">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+              </svg>
+              <span>Kopyala</span>
+            </button>
+            <button id="downloadScriptBtn" class="journal-action-btn" title="Dökümü TXT İndir">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" y2="3"/>
+              </svg>
+              <span>TXT İndir</span>
+            </button>
+            <button id="clearBtn" class="journal-action-btn danger" title="Tümünü Sıfırla">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M3 6h18"/>
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+              </svg>
+              <span>Sıfırla</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -717,6 +702,6 @@
       });
     }
   </script>
-  <script src="app.js?v=20261013d"></script>
+  <script src="app.js?v=20261013e"></script>
 </body>
 </html>

@@ -8,44 +8,45 @@
    ========================================================================== */
 
 :root {
-  /* Renk Hiyerarşisi */
-  --bg-root: #171816;
-  --bg-surface: #20211E;
-  --bg-surface-elevated: #262722;
-  --bg-surface-active: #2D2E28;
-  --bg-surface-hover: #242520;
+  /* Rafine, Dingin ve Göz Yormayan Modern Renk Hiyerarşisi */
+  --bg-root: #0E1116;
+  --bg-surface: #161A22;
+  --bg-surface-elevated: #1F242E;
+  --bg-surface-active: #272E3B;
+  --bg-surface-hover: #1C212B;
 
-  --border-hairline: #363731;
-  --border-subtle: #2A2B25;
-  --border-focus: #4F5047;
+  --border-hairline: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-focus: rgba(255, 255, 255, 0.22);
 
-  --text-primary: #F0EFE8;
-  --text-secondary: #A09F96;
-  --text-tertiary: #6E6D66;
-  --text-dim: #504F49;
+  --text-primary: #F0F3F8;
+  --text-secondary: #9AA3B2;
+  --text-tertiary: #656E80;
+  --text-dim: #454C5A;
 
-  /* Fonksiyonel ve Akustik Vurgular */
-  --accent-cyan: #65C7B0;
-  --accent-cyan-subtle: rgba(101, 199, 176, 0.10);
-  --accent-cyan-border: rgba(101, 199, 176, 0.35);
+  /* Dingin Zümrüt / Adaçayı ve Yumuşak Sarı Vurgular */
+  --accent-cyan: #4ECB93;
+  --accent-cyan-subtle: rgba(78, 203, 147, 0.12);
+  --accent-cyan-border: rgba(78, 203, 147, 0.35);
 
-  --accent-amber: #D6A66B;
-  --accent-amber-subtle: rgba(214, 166, 107, 0.10);
-  --accent-amber-border: rgba(214, 166, 107, 0.35);
+  --accent-amber: #E2B465;
+  --accent-amber-subtle: rgba(226, 180, 101, 0.12);
+  --accent-amber-border: rgba(226, 180, 101, 0.35);
 
-  --accent-crimson: #D95D5D;
-  --accent-crimson-subtle: rgba(217, 93, 93, 0.12);
+  --accent-crimson: #E06C75;
+  --accent-crimson-subtle: rgba(224, 108, 117, 0.12);
 
   /* Tipografi */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Grid & Ölçüler */
-  --header-height: 56px;
-  --switcher-height: 108px;
-  --radius-xs: 3px;
-  --radius-sm: 5px;
-  --radius-md: 7px;
+  /* Grid & Ölçüler (Yumuşak Modern Eğriler) */
+  --header-height: 54px;
+  --switcher-height: 96px;
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-pill: 999px;
 
   /* Geçişler */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -122,7 +123,7 @@ input:focus-visible {
    ========================================================================== */
 .app-header {
   height: var(--header-height);
-  background-color: rgba(18, 20, 16, 0.98);
+  background-color: rgba(14, 17, 22, 0.97);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-hairline);
@@ -565,11 +566,17 @@ input:focus-visible {
   color: var(--text-secondary);
 }
 
-/* Dil Köprüsü */
+/* Dil Köprüsü ve Sağ Kontroller */
+.stage-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .stage-language-bridge {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .language-route-badge,
@@ -793,7 +800,7 @@ input:focus-visible {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--border-hairline);
-  background-color: rgba(18, 20, 16, 0.95);
+  background-color: rgba(14, 17, 22, 0.96);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   position: sticky;
@@ -826,6 +833,12 @@ input:focus-visible {
   color: var(--text-tertiary);
 }
 
+.journal-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .journal-filter-switch {
   display: flex;
   align-items: center;
@@ -838,7 +851,7 @@ input:focus-visible {
 
 .journal-filter-btn {
   padding: 4px 10px;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 500;
   color: var(--text-secondary);
   border-radius: var(--radius-xs);
@@ -853,6 +866,45 @@ input:focus-visible {
   background-color: var(--bg-surface-elevated);
   color: var(--text-primary);
   font-weight: 600;
+}
+
+.journal-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.journal-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.journal-action-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+.journal-action-btn:hover {
+  background-color: var(--bg-surface-elevated);
+  border-color: var(--border-focus);
+  color: var(--text-primary);
+}
+
+.journal-action-btn.danger:hover {
+  background-color: var(--accent-crimson-subtle);
+  border-color: rgba(224, 108, 117, 0.35);
+  color: var(--accent-crimson);
 }
 
 /* Tutanak Akış Listesi */
@@ -1063,12 +1115,12 @@ input:focus-visible {
    5. RAFİNE KONUŞMACI KONTROL ŞERİDİ (HARDWARE SWITCHER STRIP)
    ========================================================================== */
 .switcher-console {
-  background-color: rgba(22, 24, 20, 0.98);
+  background-color: rgba(14, 17, 22, 0.97);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--border-hairline);
-  box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.65);
-  padding: 10px 36px 12px 36px;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.7);
+  padding: 8px 36px 10px 36px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -1136,198 +1188,153 @@ input:focus-visible {
   border-color: var(--border-focus);
 }
 
-/* Donanım Tipi Switcher Şeridi */
+/* Konuşmacı Seçici Şeridi (Temiz, Ferah ve Modern Kapsüller) */
 .switcher-strip {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
-  gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 2px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.switcher-strip::-webkit-scrollbar {
+  display: none;
 }
 
 .switcher-pad,
 .studio-pad {
-  background-color: var(--bg-root);
+  background-color: rgba(255, 255, 255, 0.035);
   border: 1px solid var(--border-hairline);
-  border-radius: var(--radius-xs);
-  padding: 7px 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 4px;
-  min-height: 52px;
+  border-radius: var(--radius-md);
+  padding: 6px 12px 6px 8px;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
   position: relative;
   cursor: pointer;
+  user-select: none;
   touch-action: manipulation;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform 60ms ease-out;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
 }
 
 .switcher-pad:hover,
 .studio-pad:hover {
-  background-color: var(--bg-surface-hover);
-  border-color: var(--border-focus);
-}
-
-.switcher-pad.pressed,
-.studio-pad.pressed {
-  background-color: var(--bg-surface-active) !important;
-  border-color: var(--accent-cyan) !important;
-  transform: scale(0.99);
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
 }
 
 .switcher-pad.active,
 .studio-pad.active {
-  background-color: var(--bg-surface-elevated);
-  border-color: var(--accent-cyan-border);
+  background-color: rgba(78, 203, 147, 0.09);
+  border-color: var(--speaker-tint, var(--accent-cyan));
+  box-shadow: 0 0 16px rgba(78, 203, 147, 0.12);
 }
 
-.pad-head {
+.switcher-pad.pressed,
+.studio-pad.pressed {
+  background-color: var(--accent-cyan) !important;
+  border-color: var(--accent-cyan) !important;
+  color: #0E1116 !important;
+  transform: scale(0.97);
+}
+
+.switcher-pad.pressed .pad-name,
+.switcher-pad.pressed .pad-lang-tag {
+  color: #0E1116 !important;
+}
+
+/* Konuşmacı Avatar Dairesi */
+.pad-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.pad-monogram {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-size: 11.5px;
   font-weight: 700;
-  letter-spacing: 0.05em;
-  padding: 2px 6px;
-  border-radius: var(--radius-xs);
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-hairline);
-  color: var(--text-primary);
+  color: #0E1116;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-.pad-identity-tag {
+/* Bilgi Alanı */
+.pad-info {
   display: flex;
-  align-items: center;
-  gap: 5px;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
-.pad-key-badge {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  padding: 1px 5px;
-  border-radius: var(--radius-xs);
-  background-color: var(--bg-surface-elevated);
-  border: 1px solid var(--border-hairline);
-  color: var(--accent-cyan);
-  line-height: 1.2;
-}
-
-.switcher-pad.active .pad-key-badge {
-  background-color: var(--accent-cyan);
-  color: #0E1A17;
-  border-color: var(--accent-cyan);
-}
-
-.pad-tools {
+.pad-name-row {
   display: flex;
   align-items: center;
   gap: 6px;
-}
-
-.pad-edit-btn {
-  width: 22px;
-  height: 22px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-tertiary);
-  border-radius: var(--radius-xs);
-  transition: all var(--transition-fast);
-}
-
-.pad-edit-btn svg {
-  width: 12px;
-  height: 12px;
-}
-
-.pad-edit-btn:hover {
-  color: var(--text-primary);
-  background-color: var(--bg-surface);
-}
-
-.pad-status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: var(--border-focus);
-  transition: background-color var(--transition-fast);
-}
-
-.switcher-pad.active .pad-status-dot,
-.studio-pad.active .pad-status-dot {
-  background-color: var(--accent-cyan);
-}
-
-.pad-body {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
 }
 
 .pad-name {
   font-size: 13.5px;
   font-weight: 600;
-  letter-spacing: -0.01em;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.01em;
 }
 
-.pad-accent {
-  font-size: 11.5px;
+.pad-key-badge {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-tertiary);
+  line-height: 1.2;
+}
+
+.pad-lang-tag {
+  font-size: 11px;
+  font-weight: 500;
   color: var(--text-secondary);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.pad-route-tag {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  padding: 1px 5px;
-  border-radius: var(--radius-xs);
-  background-color: rgba(101, 199, 176, 0.12);
-  border: 1px solid rgba(101, 199, 176, 0.25);
-  color: var(--accent-cyan);
-  white-space: nowrap;
-}
-
-.pad-meta-row {
-  display: flex;
+/* Düzenleme Butonu */
+.pad-edit-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-}
-
-.pad-mobile-lang {
-  display: none;
-}
-
-.pad-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.pad-trigger-text {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  justify-content: center;
   color: var(--text-tertiary);
-  text-transform: uppercase;
+  opacity: 0.45;
+  transition: all var(--transition-fast);
+  margin-left: 2px;
+  flex-shrink: 0;
 }
 
-.switcher-pad.active .pad-trigger-text,
-.studio-pad.active .pad-trigger-text {
-  color: var(--accent-cyan);
+.pad-edit-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+.switcher-pad:hover .pad-edit-btn {
+  opacity: 0.85;
+  color: var(--text-secondary);
+}
+
+.pad-edit-btn:hover {
+  opacity: 1 !important;
+  color: var(--text-primary) !important;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .console-stop-btn {
@@ -1805,7 +1812,7 @@ input:focus-visible {
 .btn-ghost {
   padding: 8px 16px;
   border: 1px solid var(--border-hairline);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 500;
   color: var(--text-secondary);
@@ -1821,7 +1828,7 @@ input:focus-visible {
   padding: 8px 18px;
   background-color: var(--accent-cyan);
   color: #0E1A17;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 600;
   transition: opacity var(--transition-fast);
@@ -2331,6 +2338,12 @@ input:focus-visible {
     padding: 1px 4px;
   }
 
+  .journal-header-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
   .journal-filter-switch {
     padding: 1px;
     gap: 2px;
@@ -2339,6 +2352,27 @@ input:focus-visible {
   .journal-filter-btn {
     padding: 3px 6px;
     font-size: 10px;
+  }
+
+  .journal-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+  }
+
+  .journal-action-btn {
+    padding: 3px 6px !important;
+    font-size: 10px !important;
+    border-radius: var(--radius-xs) !important;
+  }
+
+  .journal-action-btn span {
+    display: none !important;
+  }
+
+  .journal-action-btn svg {
+    width: 12px !important;
+    height: 12px !important;
   }
 
   .journal-feed {
@@ -2696,46 +2730,22 @@ input:focus-visible {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.45), inset 0 0 0 1px var(--speaker-tint, var(--accent-cyan)) !important;
   }
 
-  .pad-head {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0 !important;
-    flex-shrink: 0 !important;
+  .pad-avatar {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 10px !important;
   }
 
-  .pad-identity-tag {
-    display: none !important;
-  }
-
-  .pad-monogram,
   .pad-key-badge,
-  .pad-edit-btn,
-  .pad-accent,
-  .pad-trigger-text {
+  .pad-edit-btn {
     display: none !important;
   }
 
-  .pad-tools {
+  .pad-info {
     display: flex !important;
-    align-items: center !important;
-  }
-
-  .pad-status-dot {
-    width: 7px !important;
-    height: 7px !important;
-    border-radius: 50% !important;
-    background-color: var(--speaker-tint, var(--accent-cyan)) !important;
-    flex-shrink: 0 !important;
-    box-shadow: 0 0 5px var(--speaker-tint, var(--accent-cyan)) !important;
-  }
-
-  .switcher-pad.active .pad-status-dot {
-    box-shadow: 0 0 8px var(--speaker-tint, var(--accent-cyan)) !important;
-  }
-
-  .pad-body {
-    display: flex !important;
-    align-items: center !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    min-width: 0 !important;
   }
 
   .pad-name {
@@ -2747,6 +2757,12 @@ input:focus-visible {
     max-width: 85px !important;
     color: var(--text-primary) !important;
     letter-spacing: -0.01em !important;
+  }
+
+  .pad-lang-tag {
+    font-size: 9.5px !important;
+    color: var(--text-secondary) !important;
+    white-space: nowrap !important;
   }
 
   /* Sürekli Akış Modunda Dinlemeyi Başlat / Durdur Butonu (Inline Kompakt Kapsül) */

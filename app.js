@@ -1322,33 +1322,25 @@ function renderSoundboardPads() {
     const routeLabel = isSameLang ? `${spkShort} (Orijinal)` : `${spkShort} ➔ ${tgtShort}`;
     const fullRouteHint = isSameLang ? `${acc.name} (Orijinal)` : `${acc.name} ➔ ${LANGUAGE_NAMES[targetLanguage] || targetLanguage}`;
 
+    const cleanLangName = acc.name.split(' ')[0];
+
     pad.innerHTML = `
-      <div class="pad-head">
-        <div class="pad-identity-tag">
-          <span class="pad-monogram">${monogram}</span>
-          ${keyNumber ? `<span class="pad-key-badge" title="Klavye Kısayolu: [${keyNumber}]">${keyNumber}</span>` : ''}
-        </div>
-        <div class="pad-tools">
-          <span class="pad-route-tag" title="Çeviri Rotası: ${fullRouteHint}">${routeLabel}</span>
-          <button type="button" class="pad-edit-btn" title="Düzenle veya Sil">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-          </button>
-          <span class="pad-status-dot"></span>
-        </div>
+      <div class="pad-avatar" style="background-color: ${speaker.color}">
+        ${monogram}
       </div>
-      <div class="pad-body">
-        <span class="pad-name">${escapeHtml(speaker.name)}</span>
-        <div class="pad-meta-row">
-          <span class="pad-accent">${acc.name}</span>
+      <div class="pad-info">
+        <div class="pad-name-row">
+          <span class="pad-name">${escapeHtml(speaker.name)}</span>
+          ${keyNumber ? `<span class="pad-key-badge" title="Kısayol: [${keyNumber}]">${keyNumber}</span>` : ''}
         </div>
+        <span class="pad-lang-tag">${acc.flag || '🌐'} ${cleanLangName}</span>
       </div>
-      <div class="pad-foot">
-        <span class="pad-mobile-lang">${routeLabel}</span>
-        <span class="pad-trigger-text">${isSelected ? '● CANLI' : (currentMode === 'ptt' ? 'Basılı Tutun' : 'Aktif Et')}</span>
-      </div>
+      <button type="button" class="pad-edit-btn" title="Düzenle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+      </button>
     `;
 
     // Düzenleme Butonu Dinleyicisi (Masaüstü ve Tıklamalar)
