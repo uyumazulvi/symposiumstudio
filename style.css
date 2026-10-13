@@ -533,6 +533,8 @@ input:focus-visible {
   cursor: pointer;
   user-select: none;
   transition: opacity var(--transition-fast);
+  min-width: 0;
+  max-width: 70%;
 }
 
 .speaker-identity:hover {
@@ -549,21 +551,28 @@ input:focus-visible {
 }
 
 .speaker-name-hero {
-  font-size: 16px;
+  font-size: 15.5px;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .meta-slash {
   font-size: 13px;
   color: var(--text-dim);
+  flex-shrink: 0;
 }
 
 .speaker-accent-hero {
   font-size: 13px;
   font-weight: 400;
   color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Dil Köprüsü ve Sağ Kontroller */
@@ -636,7 +645,9 @@ input:focus-visible {
   overflow-y: auto;
   white-space: pre-wrap;
   word-break: break-word;
+  overflow-wrap: break-word;
   scroll-behavior: smooth;
+  margin: 0;
 }
 
 .source-stream-text:empty {
@@ -675,12 +686,14 @@ input:focus-visible {
   letter-spacing: -0.02em;
   color: var(--text-primary);
   word-break: break-word;
+  overflow-wrap: break-word;
   white-space: pre-wrap;
   min-height: 48px;
   max-height: 180px;
   overflow-y: auto;
   scroll-behavior: smooth;
   max-width: 1350px;
+  margin: 0;
 }
 
 .listening-pulse {
@@ -800,12 +813,10 @@ input:focus-visible {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--border-hairline);
-  background-color: rgba(14, 17, 22, 0.96);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  position: sticky;
-  top: var(--header-height);
-  z-index: 35;
+  background-color: var(--bg-root);
+  position: relative;
+  top: auto;
+  z-index: 10;
   flex-shrink: 0;
 }
 
@@ -912,7 +923,7 @@ input:focus-visible {
   flex: 1 1 auto;
   overflow-y: auto;
   min-height: 0;
-  padding: 0 36px 20px 36px;
+  padding: 12px 36px 24px 36px;
   display: flex;
   flex-direction: column;
 }
@@ -976,7 +987,7 @@ input:focus-visible {
 @keyframes journalEntryIn {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(-2px);
   }
   to {
     opacity: 1;
@@ -988,12 +999,12 @@ input:focus-visible {
   background: transparent;
   border: none;
   border-bottom: 1px solid var(--border-hairline);
-  padding: 16px 0;
+  padding: 14px 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   transition: background-color var(--transition-fast);
-  animation: journalEntryIn 220ms ease-out;
+  animation: journalEntryIn 180ms ease-out;
 }
 
 .journal-entry:last-child {
@@ -1005,12 +1016,14 @@ input:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  min-height: 20px;
 }
 
 .entry-speaker {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .entry-speaker-dot {
@@ -1024,22 +1037,30 @@ input:focus-visible {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .entry-meta-divider {
   font-size: 11px;
   color: var(--text-dim);
+  flex-shrink: 0;
 }
 
 .entry-speaker-accent {
   font-size: 12px;
   color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .entry-timestamp {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-tertiary);
+  flex-shrink: 0;
 }
 
 .entry-content {
@@ -1055,15 +1076,19 @@ input:focus-visible {
   font-style: italic;
   white-space: pre-wrap;
   word-break: break-word;
+  overflow-wrap: break-word;
+  margin: 0;
 }
 
 .entry-translation {
-  font-size: 16px;
+  font-size: 15.5px;
   font-weight: 500;
   line-height: 1.5;
   color: var(--text-primary);
   white-space: pre-wrap;
   word-break: break-word;
+  overflow-wrap: break-word;
+  margin: 0;
 }
 
 .stage-ptt-btn {
@@ -1903,7 +1928,7 @@ input:focus-visible {
     padding: 10px 16px;
   }
   .journal-feed {
-    padding: 0 16px;
+    padding: 8px 16px 20px 16px;
   }
   .switcher-console {
     padding: 10px 16px;
@@ -1922,6 +1947,14 @@ input:focus-visible {
    Alt kontrollerin (switcher konsolu) hiçbir ekran çözünürlüğünde kesilmemesini sağlar.
    ========================================================================== */
 @media (min-width: 769px) {
+  html, body {
+    height: 100vh;
+    overflow: hidden;
+  }
+  .workspace-view {
+    height: calc(100vh - var(--header-height));
+    overflow: hidden;
+  }
   .pwa-smart-banner {
     display: none !important; /* Masaüstünde PWA banner'ı alt kontrollerin üzerine binmez */
   }
@@ -1944,7 +1977,7 @@ input:focus-visible {
     padding: 8px 28px;
   }
   .journal-feed {
-    padding: 0 28px;
+    padding: 8px 28px 20px 28px;
   }
   .switcher-console {
     padding: 8px 28px 10px 28px;
