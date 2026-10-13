@@ -1865,7 +1865,7 @@ function renderTranscriptFeed() {
   if (countBadge) countBadge.classList.remove('hidden');
   transcriptFeed.innerHTML = '';
 
-  const showBoth = currentFilter === 'all';
+  const showBoth = (window.innerWidth <= 768) || (currentFilter === 'all');
 
   transcriptHistory.forEach(item => {
     const entry = document.createElement('article');

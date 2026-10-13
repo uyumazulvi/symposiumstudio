@@ -2432,19 +2432,9 @@ input:focus-visible {
     flex-shrink: 0 !important;
   }
 
+  /* Mobilde Çift Dilli / Yalnızca Çeviri Seçimi Kaldırılır (Varsayılan Çift Dilli) */
   .journal-filter-switch {
-    padding: 2px !important;
-    border-radius: 999px !important;
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid rgba(255, 255, 255, 0.04) !important;
-    display: flex !important;
-  }
-
-  .journal-filter-btn {
-    padding: 2px 7px !important;
-    font-size: 10px !important;
-    border-radius: 999px !important;
-    white-space: nowrap !important;
+    display: none !important;
   }
 
   .journal-actions {
