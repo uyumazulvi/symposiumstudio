@@ -2390,32 +2390,34 @@ function setupEventListeners() {
   });
 
   // Konuşmacı Silme Butonu
-  deleteSpeakerBtn.addEventListener('click', () => {
-    const id = editSpeakerIdInput.value;
-    const spk = speakers.find(s => s.id === id);
-    if (!spk) return;
+  if (deleteSpeakerBtn) {
+    deleteSpeakerBtn.addEventListener('click', () => {
+      const id = editSpeakerIdInput.value;
+      const spk = speakers.find(s => s.id === id);
+      if (!spk) return;
 
-    if (speakers.length <= 1) {
-      showToast('En az bir konuşmacı kalmalıdır.');
-      return;
-    }
+      if (speakers.length <= 1) {
+        showToast('En az bir konuşmacı kalmalıdır.');
+        return;
+      }
 
-    if (confirm(`"${spk.name}" konuşmacısını silmek istediğinize emin misiniz?`)) {
-      speakers = speakers.filter(s => s.id !== id);
-      if (activeSpeakerId === id) {
-        activeSpeakerId = speakers[0].id;
-        setActiveSpeaker(activeSpeakerId, false);
+      if (confirm(`"${spk.name}" konuşmacısını silmek istediğinize emin misiniz?`)) {
+        speakers = speakers.filter(s => s.id !== id);
+        if (activeSpeakerId === id) {
+          activeSpeakerId = speakers[0].id;
+          setActiveSpeaker(activeSpeakerId, false);
+        }
+        saveWorkspaceData();
+        renderSoundboardPads();
+        updateDrawerCounts();
+        if (speakers.length < 2) {
+          closeMobileDrawer();
+        }
+        closeModal(editSpeakerModal);
+        showToast(`"${spk.name}" silindi.`);
       }
-      saveWorkspaceData();
-      renderSoundboardPads();
-      updateDrawerCounts();
-      if (speakers.length < 2) {
-        closeMobileDrawer();
-      }
-      closeModal(editSpeakerModal);
-      showToast(`"${spk.name}" silindi.`);
-    }
-  });
+    });
+  }
 
   // Sahne Başlığındaki Konuşmacı Bilgisine Dokunulduğunda Düzenleme Modalı Açma (Özellikle Mobilde Çok Rahat)
   const speakerIdentityEl = document.querySelector('.speaker-identity');
