@@ -296,13 +296,15 @@ input:focus-visible {
 }
 
 .mode-pill {
-  padding: 5px 14px;
+  padding: 6px 16px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
   transition: all var(--transition-fast);
   cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
 }
 
 .mode-pill.active {
@@ -310,6 +312,25 @@ input:focus-visible {
   color: #FFFFFF;
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Mod Buton ve Dinleme Butonu Tam/Kısa Metin Ayrımı */
+.mode-text-full {
+  display: inline;
+  white-space: nowrap;
+}
+
+.mode-text-short {
+  display: none !important;
+}
+
+.stop-btn-text-full {
+  display: inline;
+  white-space: nowrap;
+}
+
+.stop-btn-text-short {
+  display: none !important;
 }
 
 .topbar-right-controls {
@@ -635,38 +656,64 @@ input:focus-visible {
 
 /* Parlayan Nane Yeşili Eylem Butonu */
 .pill-action-glow-btn {
-  background: var(--accent-mint) !important;
-  color: #07090E !important;
-  font-size: 13.5px !important;
-  font-weight: 700 !important;
-  border-radius: 999px !important;
-  padding: 9px 24px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 8px !important;
-  border: none !important;
-  box-shadow: 0 0 24px var(--accent-mint-glow) !important;
-  cursor: pointer !important;
-  user-select: none !important;
-  transition: all var(--transition-fast) !important;
+  background: var(--accent-mint);
+  color: #07090E;
+  font-size: 13.5px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0 22px;
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  box-shadow: 0 0 24px var(--accent-mint-glow);
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.pill-action-glow-btn svg,
+.pill-action-glow-btn .play-icon {
+  width: 14px !important;
+  height: 14px !important;
+  min-width: 14px !important;
+  min-height: 14px !important;
+  max-width: 14px !important;
+  max-height: 14px !important;
+  display: block !important;
   flex-shrink: 0 !important;
 }
 
-.pill-action-glow-btn .play-icon {
-  width: 13px;
-  height: 13px;
+.pill-action-glow-btn.hidden,
+#stagePttBtn.hidden,
+#stopSessionBtn.hidden {
+  display: none !important;
 }
 
 .pill-action-glow-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 0 32px rgba(78, 203, 147, 0.6) !important;
+  box-shadow: 0 0 32px rgba(78, 203, 147, 0.6);
 }
 
 .pill-action-glow-btn:active,
 .pill-action-glow-btn.pressed {
-  transform: scale(0.97) !important;
-  box-shadow: 0 0 36px rgba(78, 203, 147, 0.8) !important;
+  transform: scale(0.97);
+  box-shadow: 0 0 36px rgba(78, 203, 147, 0.85);
+  background: #3ee099;
+}
+
+/* Durdurma modunda kırmızı/alarm rengi */
+.pill-action-glow-btn.console-stop-btn:not(.start-mode) {
+  background: #EF4444 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.45) !important;
 }
 
 /* ==========================================================================
@@ -1591,13 +1638,123 @@ input:focus-visible {
     z-index: 999;
   }
 
-  .mobile-brand-row {
-    display: flex;
+  .app-main-canvas {
+    height: auto !important;
+    min-height: 100vh;
+    overflow: visible !important;
   }
 
   .app-header {
-    padding: 0 16px;
-    height: 56px;
+    height: auto !important;
+    min-height: 54px;
+    padding: 10px 16px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    row-gap: 10px !important;
+  }
+
+  .mobile-brand-row {
+    display: flex !important;
+    order: 1;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mobile-menu-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .mobile-wordmark {
+    font-size: 14px;
+    gap: 6px;
+  }
+
+  .mobile-wordmark .brand-sym-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .topbar-right-controls {
+    display: flex !important;
+    order: 2;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .native-lang-control {
+    padding: 5px 8px;
+    gap: 4px;
+    border-radius: 999px;
+  }
+
+  .native-lang-globe svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .native-lang-select {
+    font-size: 11.5px;
+    max-width: 80px;
+  }
+
+  .headphone-btn {
+    padding: 5px 8px;
+    border-radius: 999px;
+  }
+
+  .headphone-btn .headphone-text-full {
+    display: none !important;
+  }
+
+  .headphone-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .theme-icon-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .mic-mode-toggle {
+    order: 3;
+    width: 100% !important;
+    max-width: 280px;
+    margin: 0 auto;
+    display: flex !important;
+    justify-content: center;
+    padding: 3px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-glass);
+  }
+
+  .mic-mode-toggle .mode-pill {
+    flex: 1;
+    text-align: center;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .mode-text-full {
+    display: none !important;
+  }
+
+  .mode-text-short {
+    display: inline !important;
+    white-space: nowrap;
+  }
+
+  .stop-btn-text-full {
+    display: none !important;
+  }
+
+  .stop-btn-text-short {
+    display: inline !important;
+    white-space: nowrap;
   }
 
   .workspace-view {
@@ -1612,19 +1769,27 @@ input:focus-visible {
     align-items: stretch;
     padding: 12px;
     gap: 10px;
+    border-radius: 18px;
   }
 
   .lang-pill-select-group {
     width: 100%;
+    padding: 10px 14px;
   }
 
   .pill-swap-btn {
     align-self: center;
+    margin: -4px 0;
   }
 
   .pill-action-glow-btn {
-    width: 100%;
-    padding: 11px !important;
+    width: 100% !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    padding: 0 16px !important;
+    font-size: 14px !important;
+    border-radius: 12px !important;
   }
 
   .transcript-journal-card {

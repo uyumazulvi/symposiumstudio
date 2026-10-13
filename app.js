@@ -1736,7 +1736,7 @@ function updateStopButtonState(active) {
   if (active) {
     stopSessionBtn.classList.remove('start-mode');
     stopSessionBtn.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg class="play-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px; display: block; flex-shrink: 0;">
         <rect x="6" y="6" width="12" height="12" rx="2"/>
       </svg>
       <span class="stop-btn-text-full">Dinlemeyi Durdur</span>
@@ -1746,7 +1746,7 @@ function updateStopButtonState(active) {
   } else {
     stopSessionBtn.classList.add('start-mode');
     stopSessionBtn.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="currentColor">
+      <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor" style="width: 14px; height: 14px; display: block; flex-shrink: 0;">
         <polygon points="6 4 20 12 6 20 6 4"/>
       </svg>
       <span class="stop-btn-text-full">Dinlemeyi Başlat</span>
