@@ -1288,25 +1288,33 @@ input:focus-visible {
 }
 
 .pad-edit-btn {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-tertiary);
-  opacity: 0.5;
+  color: var(--text-secondary);
+  opacity: 0.8;
   transition: all var(--transition-fast);
-  margin-left: 2px;
+  margin-left: 4px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
 }
 
 .pad-edit-btn svg {
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
 }
 
+.pad-edit-btn:hover,
 .switcher-pad:hover .pad-edit-btn {
   opacity: 1;
-  color: var(--text-secondary);
+  color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 /* ==========================================================================
@@ -2671,11 +2679,32 @@ input:focus-visible {
     white-space: nowrap !important;
   }
 
-  /* Mobilde konuşmacı butonundaki gereksiz kısayol numarası, dil etiketi ve kalem ikonunu gizle */
+  /* Mobilde konuşmacı butonundaki kısayol numarası ve dil etiketini gizle */
   .pad-key-badge,
-  .pad-lang-tag,
-  .pad-edit-btn {
+  .pad-lang-tag {
     display: none !important;
+  }
+
+  /* Kalem sembolü mobilde de görünür ve rahat dokunulabilir olsun */
+  .pad-edit-btn {
+    display: inline-flex !important;
+    width: 22px !important;
+    height: 22px !important;
+    opacity: 0.9 !important;
+    margin-left: 4px !important;
+    padding: 3px !important;
+    color: var(--text-secondary) !important;
+    border-radius: 6px !important;
+  }
+
+  .pad-edit-btn svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  .pad-edit-btn:active {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: #FFFFFF !important;
   }
 }
 
@@ -3048,6 +3077,12 @@ body.theme-light .pad-key-badge {
 
 body.theme-light .pad-edit-btn {
   color: #64748B !important;
+}
+
+body.theme-light .pad-edit-btn:hover,
+body.theme-light .pad-edit-btn:active {
+  color: #0F172A !important;
+  background-color: rgba(0, 0, 0, 0.08) !important;
 }
 
 body.theme-light .pad-avatar {
