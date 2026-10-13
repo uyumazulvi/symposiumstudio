@@ -1679,13 +1679,15 @@ input:focus-visible {
 
 .modal-footer.split {
   justify-content: space-between;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  gap: 8px;
 }
 
 .footer-actions-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .primary-btn,
@@ -2705,6 +2707,38 @@ input:focus-visible {
   .pad-edit-btn:active {
     background-color: rgba(255, 255, 255, 0.2) !important;
     color: #FFFFFF !important;
+  }
+
+  /* Mobilde konuşmacı düzenleme modalında Sil, Vazgeç, Kaydet butonları yan yana */
+  #editSpeakerModal .modal-footer,
+  .modal-footer.split {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 12px 14px calc(14px + env(safe-area-inset-bottom, 0px)) 14px !important;
+    gap: 6px !important;
+  }
+
+  #editSpeakerModal .footer-actions-right,
+  .modal-footer.split .footer-actions-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+  }
+
+  #editSpeakerModal .modal-footer .btn-danger,
+  #editSpeakerModal .modal-footer .btn-ghost,
+  #editSpeakerModal .modal-footer .btn-solid,
+  .modal-footer.split .btn-danger,
+  .modal-footer.split .btn-ghost,
+  .modal-footer.split .btn-solid {
+    white-space: nowrap !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+    flex-shrink: 0 !important;
   }
 }
 
