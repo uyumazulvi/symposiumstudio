@@ -2496,7 +2496,8 @@ function setupEventListeners() {
       if (!spk) return;
 
       if (speakers.length <= 1) {
-        showToast('En az bir konuşmacı kalmalıdır.');
+        alert('En az bir konuşmacı olmak zorunda!');
+        showToast('En az bir konuşmacı olmak zorunda.');
         return;
       }
 
@@ -2705,6 +2706,7 @@ function applyFontSize(size) {
 let toastTimer = null;
 function showToast(msg) {
   const toast = document.getElementById('systemToast');
+  if (!toast) return;
   toast.textContent = msg;
   toast.classList.add('show');
   clearTimeout(toastTimer);
